@@ -7,7 +7,7 @@ import src.Constants.Locations;
 public abstract class CenterManager implements  Person {
     private Locations locationOfCenterManager;
     private String Id;
-    private static int uniqueFourDigitNumber = 1000;
+    protected static int uniqueFourDigitNumber = 1000;
 
 
 
