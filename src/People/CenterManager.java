@@ -5,6 +5,10 @@ import src.Constants.Locations;
 // Use class "CenterManagerFactory" to make instance of this type
 // for example CenterManagerFactory.createCenterManagerForMontreal() makes a CenterManager with its location in montreal
 public abstract class CenterManager implements  Person {
+    public Locations getLocationOfCenterManager() {
+        return locationOfCenterManager;
+    }
+
     private Locations locationOfCenterManager;
     private String Id;
     protected static int uniqueFourDigitNumber = 1000;

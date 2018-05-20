@@ -54,13 +54,20 @@ public class CenterManagerTest {
 
     @Test
     public void getId() {
+        //simple getter
     }
 
     @Test
     public void setId() {
+        //simple setter
     }
 
     @Test
     public void setLocationOfCenterManager() {
+        ConcreteCenterManager manager = new ConcreteCenterManager();
+        Constants.Locations locationOfManager = Constants.Locations.MTL;
+        manager.setLocationOfCenterManager(locationOfManager);
+
+        Assert.assertEquals(locationOfManager, manager.getLocationOfCenterManager());
     }
 }
