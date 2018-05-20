@@ -37,4 +37,7 @@ public abstract class CenterManager implements  Person {
     public void setLocationOfCenterManager(Locations locationOfCenterManager) {
         this.locationOfCenterManager = locationOfCenterManager;
     }
+    public void resetUniqueFourDidgitNumber(){
+        uniqueFourDigitNumber = 1000;
+    }
 }

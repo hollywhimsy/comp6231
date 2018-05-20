@@ -8,12 +8,15 @@ import src.Constants;
 import src.People.CenterManager;
 
 public class CenterManagerTest {
+    ConcreteCenterManager manager;
     @Before
     public void setUp() throws Exception {
+        manager = new ConcreteCenterManager();
     }
 
     @After
     public void tearDown() throws Exception {
+        manager.resetUniqueFourDidgitNumber();
     }
 
     private class ConcreteCenterManager extends CenterManager{
@@ -32,7 +35,6 @@ public class CenterManagerTest {
 
     @Test
     public void generateId() {
-        ConcreteCenterManager manager = new ConcreteCenterManager();
         Constants.Locations locationOfManager = Constants.Locations.MTL;
         manager.setLocationOfCenterManager(locationOfManager);
 
@@ -63,11 +65,25 @@ public class CenterManagerTest {
     }
 
     @Test
-    public void setLocationOfCenterManager() {
-        ConcreteCenterManager manager = new ConcreteCenterManager();
+    public void setLocationOfCenterManagerTest() {
+
         Constants.Locations locationOfManager = Constants.Locations.MTL;
         manager.setLocationOfCenterManager(locationOfManager);
 
         Assert.assertEquals(locationOfManager, manager.getLocationOfCenterManager());
+    }
+    @Test
+    public void resetUniqueFourDidgitNumberTest(){
+        ConcreteCenterManager manager1 = new ConcreteCenterManager();
+        manager1.setLocationOfCenterManager(Constants.Locations.MTL);
+        manager1.setId(manager1.generateId());
+        ConcreteCenterManager manager2 = new ConcreteCenterManager();
+        manager2.setLocationOfCenterManager(Constants.Locations.MTL);
+        manager2.setId(manager2.generateId());
+
+        Assert.assertNotEquals(manager1.getUniqueFourDigitNumber(), 1000);
+        manager1.resetUniqueFourDidgitNumber();
+        Assert.assertEquals(manager1.getUniqueFourDigitNumber(), 1000);
+
     }
 }
