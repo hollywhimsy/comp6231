@@ -1,4 +1,4 @@
-package common;
+package src.common;
 
 /**
  * Represents a teacher record

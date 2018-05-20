@@ -1,4 +1,4 @@
-package common;
+package src.common;
 /**
  * Represents a record
  * This is an abstract class as it is inherited by TeacherRecord and StudentRecord classes 
