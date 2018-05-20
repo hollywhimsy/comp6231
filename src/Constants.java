@@ -1,3 +1,4 @@
+package src;
 public class Constants{
 
    public enum Locations{
@@ -5,5 +6,8 @@ public class Constants{
    }
    public enum RecordIdPrefix{
        TR, SR;
+   }
+   public enum StudentStatus{
+       ACTIVE, INACTIVE;
    }
 }

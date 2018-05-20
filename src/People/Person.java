@@ -1,7 +1,9 @@
 package src.People;
 
+import com.sun.istack.internal.NotNull;
+
 public interface Person {
-   String getId();
+   @NotNull String getId();
 
     
 }

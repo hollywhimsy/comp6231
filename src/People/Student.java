@@ -1,74 +1,82 @@
 package src.People;
 
 import src.Constants;
+import src.Constants.StudentStatus;
 
-public class Student implements Person {
-    private final String firstName;
-    private final String lastName;
-    private String address;
-    private String phone;
-    private String specialization;
-    private Constants.Locations location;
+import java.util.Date;
+import java.util.List;
 
-    private String Id;
-
-
-
-    public Student(String firstName, String lastName){
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-    public Student(String firstName, String lastName, String address, String phone, String specialization, Constants.Locations location) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.phone = phone;
-        this.specialization = specialization;
-        this.location = location;
-    }
+public class Student {
+    private List<String> courses ;
+    private String firstName;
+    private StudentStatus status;
+    private String lastName;
+    private Date date;
 
 
-    @Override
-    public String getId() {
-        return Id;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public void setLocation(Constants.Locations location) {
-        this.location = location;
-    }
-    public String getFirstName() {
-        return firstName;
+    public StudentStatus getStatus() {
+        return status;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public String getAddress() {
-        return address;
+    public Student() {
     }
 
-    public String getPhone() {
-        return phone;
+    public Student(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
-    public String getSpecialization() {
-        return specialization;
+    public Student(List<String> courses, String firstName, StudentStatus status, String lastName, Date date) {
+        this.courses = courses;
+        this.firstName = firstName;
+        this.status = status;
+        this.lastName = lastName;
+        this.date = date;
     }
 
-    public Constants.Locations getLocation() {
-        return location;
+    public List<String> getCourses() {
+        return courses;
     }
+
+
+
+    public void setCourses(List<String> courses) {
+        this.courses = courses;
+    }
+
+
+
+
+    public Date getDate() {
+        return date;
+    }
+
+
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setStatus(StudentStatus status) {
+        this.status = status;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
 
 }

@@ -4,7 +4,7 @@ import src.Constants;
 
 public class CenterManagerFactory {
 
-    private class CenterManagerForLocation extends CenterManager{
+    private static class CenterManagerForLocation extends CenterManager{
         CenterManagerForLocation(Constants.Locations location){
             this.setLocationOfCenterManager(location);
             this.setId(this.generateId());
@@ -13,13 +13,13 @@ public class CenterManagerFactory {
 
 
 
-    public CenterManager createCenterManagerForMontreal(){
+    public static CenterManager createCenterManagerForMontreal(){
         return new CenterManagerForLocation(Constants.Locations.MTL);
     }
-    public CenterManager createCenterManagerForLaval(){
+    public static CenterManager createCenterManagerForLaval(){
         return new CenterManagerForLocation(Constants.Locations.LVL);
     }
-    public CenterManager createCenterManagerForDollardDesOrmeaux(){
+    public static CenterManager createCenterManagerForDollardDesOrmeaux(){
         return new CenterManagerForLocation(Constants.Locations.DDO);
     }
 }
