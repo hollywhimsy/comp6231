@@ -34,7 +34,6 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
     }
 
 
-
     @Override
     public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
 
@@ -78,7 +77,7 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
 
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         synchronized (this) {
-        TeacherRecord teacher = new TeacherRecord();
+            TeacherRecord teacher = new TeacherRecord();
 //        (firstName, lastName, specialization);
 //            teacher.setAddress(address);
 //            teacher.setLocation(location);
@@ -94,4 +93,3 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
 
     }
 }
-
