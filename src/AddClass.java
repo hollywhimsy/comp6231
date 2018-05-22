@@ -38,11 +38,11 @@ public class AddClass extends UnicastRemoteObject implements AddInterface {
 			
 		} else {
 			id = "SR";
-			String formatted = String.format("%05d", Sfiles.size());
+			String formatted = String.format("%05d", Students.size());
 			id = id + formatted;
 			while(IDs.contains(id)){
 				id = "SR";
-				id = id + String.format("%05d", Sfiles.size()+1);
+				id = id + String.format("%05d", Students.size()+1);
 			}
 			IDs.add(id);
 		}
@@ -65,6 +65,23 @@ public class AddClass extends UnicastRemoteObject implements AddInterface {
 		        records.put(firstLetter, file);
 		}
 		
+	}
+	
+	
+	public void createSRecord(String first, String last, String courseRegistered, String status, String statusDate) {
+		synchronized (this){
+		    SRecord student = new SRecord(first, last);
+		    String lastTemp = last.toUpperCase().trim();
+		    Character firstLetter = lastTemp.charAt(0);
+	            student.addCourse(courseRegistered);
+	            student.setStatus(status);
+	            student.setDate(statusDate);
+		    HashMap<String, Record> file = new HashMap<String, Record>();
+	            String SID = createID(false);
+		    file.put(SID, student);         
+	            Students.put(SID, student);
+	            records.put(firstLetter, file);
+		}        
 	}
 }
 
