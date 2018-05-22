@@ -68,10 +68,10 @@ public class AddClass extends UnicastRemoteObject implements AddInterface {
 	}
 	
 	
-	public void createSRecord(String first, String last, String courseRegistered, String status, String statusDate) {
+	public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) {
 		synchronized (this){
-		    SRecord student = new SRecord(first, last);
-		    String lastTemp = last.toUpperCase().trim();
+		    SRecord student = new SRecord(firstName, lastName);
+		    String lastTemp = lastName.toUpperCase().trim();
 		    Character firstLetter = lastTemp.charAt(0);
 	            student.addCourse(courseRegistered);
 	            student.setStatus(status);
