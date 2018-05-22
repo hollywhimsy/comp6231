@@ -10,14 +10,14 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 
-public class AddClass extends UnicastRemoteObject implements SystemInterface {
+public class CenterServer extends UnicastRemoteObject implements SystemInterface {
 
     private HashMap<Character, HashMap<String, Record>> records = new HashMap<Character, HashMap<String, Record>>();
     private HashMap<String, TeacherRecord> Teachers = new HashMap<String, TeacherRecord>();
     private HashMap<String, StudentRecord> Students = new HashMap<String, StudentRecord>();
     private ArrayList<String> IDs = new ArrayList<String>();
 
-    public AddClass() throws Exception {
+    public CenterServer() throws Exception {
         super();
     }
 
