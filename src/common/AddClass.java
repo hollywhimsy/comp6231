@@ -28,10 +28,7 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
     }
 
 
-    @Override
-    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
 
-    }
 
     @Override
     public Integer getRecordsCount() throws RemoteException {
@@ -71,7 +68,7 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
 
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         synchronized (this) {
-            TeacherRecord teacher = new TeacherRecord();
+            TeacherRecord teacher = new TeacherRecord(firstName, lastName);
 //        (firstName, lastName, specialization);
 //            teacher.setAddress(address);
 //            teacher.setLocation(location);
@@ -85,5 +82,24 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
             records.put(firstLetter, file);
         }
 
+    }
+    
+    
+    @Override
+    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+    	synchronized (this){
+		    StudentRecord student = new StudentRecord(firstName, lastName);
+			String lastTemp = lastName.toUpperCase().trim();
+	        Character firstLetter = lastTemp.charAt(0);
+			
+//            student.addCourse(courseRegistered);
+//            student.setStatus(status);
+//            student.setDate(statusDate);
+	        HashMap<String, Record> file = new HashMap<>();
+            String SID = createID(false);
+	        file.put(SID, student);         
+            Students.put(SID, student);
+            records.put(firstLetter, file);
+	}
     }
 }
