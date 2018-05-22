@@ -1,7 +1,12 @@
 package src;
-
+import java.util.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+
 
 public class AddClass extends UnicastRemoteObject implements AddInterface {
 	private HashMap<Character, HashMap<String, Record>> records = new HashMap<Character, HashMap<String, Record>>();
