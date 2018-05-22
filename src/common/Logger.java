@@ -1,6 +1,12 @@
 package src.common;
 
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Represents the logger class
@@ -26,7 +32,7 @@ public class Logger {
 			pr = new PrintWriter(new FileWriter(file.getAbsoluteFile(), true));
 			
 			DateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			pr.println(dateFormat.format(new Date()) + " : " + message);
+			pr.println(timeFormat.format(new Date()) + " : " + message);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
