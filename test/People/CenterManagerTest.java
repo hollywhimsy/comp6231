@@ -4,8 +4,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import src.Constants;
-import src.People.CenterManager;
+import common.Constants;
+import people.CenterManager;
 
 public class CenterManagerTest {
     ConcreteCenterManager manager;

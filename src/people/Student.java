@@ -1,7 +1,7 @@
-package src.People;
+package people;
 
-import src.Constants;
-import src.Constants.StudentStatus;
+import common.Constants;
+import common.Constants.StudentStatus;
 
 import java.util.Date;
 import java.util.List;

@@ -1,6 +1,6 @@
-package src.common;
+package common;
 
-import src.People.Teacher;
+import people.Teacher;
 
 /**
  * Represents a teacher record

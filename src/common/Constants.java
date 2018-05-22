@@ -1,4 +1,5 @@
-package src;
+package common;
+
 public class Constants{
 
    public enum Locations{

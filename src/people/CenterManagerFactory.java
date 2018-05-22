@@ -1,6 +1,6 @@
-package src.People;
+package people;
 
-import src.Constants;
+import common.Constants;
 
 public class CenterManagerFactory {
 

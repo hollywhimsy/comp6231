@@ -1,13 +1,7 @@
-package src;
+package common;
+
 
 import java.util.*;
-
-
-import src.common.SystemInterface;
-import src.common.Record;
-import src.common.TeacherRecord;
-import src.common.StudentRecord;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.net.DatagramPacket;

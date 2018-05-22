@@ -1,6 +1,4 @@
-package src;
-
-import src.common.SystemInterface;
+package common;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

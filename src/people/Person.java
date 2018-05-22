@@ -1,4 +1,4 @@
-package src.People;
+package people;
 
 import com.sun.istack.internal.NotNull;
 

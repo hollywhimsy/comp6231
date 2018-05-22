@@ -1,9 +1,6 @@
-package src.common;
+package common;
 
-import src.People.Student;
-
-import java.util.Date;
-import java.util.List;
+import people.Student;
 
 /**
  * Represents a student record

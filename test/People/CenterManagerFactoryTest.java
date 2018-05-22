@@ -2,9 +2,9 @@ package test.People;
 
 import org.junit.Assert;
 import org.junit.Test;
-import src.Constants;
-import src.People.CenterManager;
-import src.People.CenterManagerFactory;
+import common.Constants;
+import people.CenterManager;
+import people.CenterManagerFactory;
 
 public class CenterManagerFactoryTest {
 
