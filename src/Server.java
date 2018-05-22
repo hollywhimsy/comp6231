@@ -53,8 +53,7 @@ public class Server extends Thread {
             e.printStackTrace();
         } catch (SocketException e) {
             e.printStackTrace();
-        } catch (AccessException e) {
-            e.printStackTrace();
+
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (IOException e) {
