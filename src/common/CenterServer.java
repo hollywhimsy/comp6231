@@ -29,6 +29,16 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
 
 
 
+    @Override
+    public Integer getRecordsCount() throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
+        return null;
+    }
+
     public String createID(boolean isTeacher) {
         String id = "";
         if (isTeacher) {

@@ -8,7 +8,12 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.HashMap;
+import java.rmi.Remote;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 
 
 public class Server extends Thread {
@@ -28,6 +33,7 @@ public class Server extends Thread {
 
     public Server(String city, int port, int s) {
         try {
+            obj = new CenterServer();
             CenterServer obj = new CenterServer();
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -39,10 +45,8 @@ public class Server extends Thread {
 
     public void run() {
         try {
-            CenterServer obj = new CenterServer();
             Registry registry = LocateRegistry.createRegistry(port);
             registry.bind(city, obj);
-            System.out.println("Server is started");
             DatagramSocket socket = new DatagramSocket(sock);
             byte[] buffer = new byte[1000];
             while (true) {
