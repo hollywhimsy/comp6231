@@ -1,6 +1,5 @@
 package common;
 
-
 import java.util.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -10,34 +9,19 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 
-public class AddClass extends UnicastRemoteObject implements SystemInterface {
+public class CenterServer extends UnicastRemoteObject implements SystemInterface {
 
     private HashMap<Character, HashMap<String, Record>> records = new HashMap<Character, HashMap<String, Record>>();
-    private HashMap<String, TeacherRecord> Teachers = new HashMap<String, TeacherRecord>();
-    private HashMap<String, StudentRecord> Students = new HashMap<String, StudentRecord>();
-    private ArrayList<String> IDs = new ArrayList<String>();
+    private HashMap<String, TeacherRecord> Teachers = new HashMap<>();
+    private HashMap<String, StudentRecord> Students = new HashMap<>();
+    private ArrayList<String> IDs = new ArrayList<>();
 
-    public AddClass() throws Exception {
+    public CenterServer() throws Exception {
         super();
     }
 
     public int add(int x, int y) throws RemoteException {
-
         return x + y;
-
-    }
-
-
-
-
-    @Override
-    public Integer getRecordsCount() throws RemoteException {
-        return null;
-    }
-
-    @Override
-    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
-        return null;
     }
 
     public String createID(boolean isTeacher) {
@@ -65,7 +49,7 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
         return id;
     }
 
-
+    @Override
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         synchronized (this) {
             TeacherRecord teacher = new TeacherRecord(firstName, lastName);
@@ -101,5 +85,22 @@ public class AddClass extends UnicastRemoteObject implements SystemInterface {
             Students.put(SID, student);
             records.put(firstLetter, file);
 	}
+    }
+    
+    
+    @Override
+    public Integer getRecordsCount() throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
+    	    if(IDs.contains(recordID)) {
+    	    	    
+    	    }
+    	    else {
+    	    	    System.err.println("such ID does not exit");
+    	    }
+        return null;
     }
 }

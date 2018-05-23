@@ -17,17 +17,23 @@ import java.rmi.NotBoundException;
 
 
 public class Server extends Thread {
-    AddClass obj = null;
+    CenterServer obj = null;
     DatagramSocket socket = null;
     private String city;
     private int port;
     private Registry registry;
 
     private int sock;
+    /*
+     * here we may create different Server threads and set 
+     * MTL's sock = 2765
+     * LVL's sock = 2865
+     * DDO's sock = 2965
+     */
 
     public Server(String city, int port, int s) {
         try {
-            AddClass obj = new AddClass();
+            obj = new CenterServer();
         } catch (java.lang.Exception e) {
             e.printStackTrace();
         }
@@ -40,7 +46,7 @@ public class Server extends Thread {
         try {
             Registry registry = LocateRegistry.createRegistry(port);
             registry.bind(city, obj);
-            DatagramSocket socket = new DatagramSocket(sock);
+            socket = new DatagramSocket(sock);
             byte[] buffer = new byte[1000];
             while (true) {
                 DatagramPacket request = new DatagramPacket(buffer, buffer.length);
