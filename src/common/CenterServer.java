@@ -18,6 +18,7 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
 
     public CenterServer() throws Exception {
         super();
+
     }
 
     public int add(int x, int y) throws RemoteException {
@@ -54,6 +55,8 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     @Override
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         synchronized (this) {
+
+            System.out.println("creating Trecord");
             TeacherRecord teacher = new TeacherRecord(firstName, lastName);
 //        (firstName, lastName, specialization);
 //            teacher.setAddress(address);

@@ -7,19 +7,42 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.AccessException;
 
-public class Client extends Thread {
+public class Client extends Thread implements SystemInterface  {
     private Registry registry = null;
     private String city;
-    private SystemInterface object = null;
+    private SystemInterface remoteObject = null;
 
     public Client(String city) {
         this.city = city;
+
+        try {
+            if (city == "MTL") {
+                registry = LocateRegistry.getRegistry(2270);
+            }
+            if (city == "LVL") {
+                registry = LocateRegistry.getRegistry(2865);
+            }
+            if (city == "DDO") {
+                registry = LocateRegistry.getRegistry(2965);
+            }
+
+            remoteObject = (SystemInterface) registry.lookup(city);
+
+        } catch (AccessException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     public void run() {
         try {
             if (city == "MTL") {
-                registry = LocateRegistry.getRegistry(2765);
+                registry = LocateRegistry.getRegistry(2270);
             }
             if (city == "LVL") {
                 registry = LocateRegistry.getRegistry(2865);
@@ -32,8 +55,7 @@ public class Client extends Thread {
             obj.createSRecord("Dan", "Soen", "Discrete Math", "Inactive", "2016-12-18");
             obj.createSRecord("Charles", "Lemon", "Math", "Inactive", "2015-12-18");
             obj.createTRecord("Maxim", "Beautin", "Blvd Saint-Andre", "514-333-4493", "Finance", "LVL");
-            object = obj;
-            object.getRecordsCount();
+
         } catch (AccessException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
@@ -56,5 +78,26 @@ public class Client extends Thread {
         String city = "MTL";
         Client instance = new Client(city);
         instance.run();
+    }
+
+    @Override
+    public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) throws RemoteException {
+
+        remoteObject.createTRecord(firstName, lastName, address, phone, specialization,location);
+    }
+
+    @Override
+    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+
+    }
+
+    @Override
+    public Integer getRecordsCount() throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
+        return null;
     }
 }
