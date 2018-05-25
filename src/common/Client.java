@@ -11,10 +11,12 @@ public class Client extends Thread implements SystemInterface  {
     private Registry registry = null;
     private String city;
     private SystemInterface remoteObject = null;
+    private Logger logger;
 
     public Client(String city) {
         this.city = city;
 
+        logger = new Logger("/tmp/logs", city + "_client");
         try {
             if (city == "MTL") {
                 registry = LocateRegistry.getRegistry(2270);
@@ -83,11 +85,14 @@ public class Client extends Thread implements SystemInterface  {
     @Override
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) throws RemoteException {
 
+        logger.write("calling server to createTRecord ");
         remoteObject.createTRecord(firstName, lastName, address, phone, specialization,location);
     }
 
     @Override
     public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+
+        logger.write("calling server to createSRecord ");
 
     }
 

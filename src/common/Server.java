@@ -33,8 +33,8 @@ public class Server extends Thread {
 
     public Server(String city, int port, int s) {
         try {
-            obj = new CenterServer();
-            CenterServer obj = new CenterServer();
+            obj = new CenterServer(city);
+
         } catch (java.lang.Exception e) {
             e.printStackTrace();
         }

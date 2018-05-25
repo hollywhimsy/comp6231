@@ -15,9 +15,13 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     private HashMap<String, TeacherRecord> Teachers = new HashMap<>();
     private HashMap<String, StudentRecord> Students = new HashMap<>();
     private ArrayList<String> IDs = new ArrayList<>();
+    private Logger logger ;
+    private String city ;
 
-    public CenterServer() throws Exception {
+    public CenterServer(String city) throws Exception {
         super();
+        this.city = city;
+        logger = new Logger("/tmp/logs", city + "_server");
 
     }
 
@@ -57,6 +61,8 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
         synchronized (this) {
 
             System.out.println("creating Trecord");
+            logger.write("calling creating Trecord");
+
             TeacherRecord teacher = new TeacherRecord(firstName, lastName);
 //        (firstName, lastName, specialization);
 //            teacher.setAddress(address);
