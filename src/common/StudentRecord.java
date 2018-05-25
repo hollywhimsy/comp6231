@@ -10,40 +10,46 @@ import java.util.*;
  */
 public class StudentRecord extends Record {
 	
-	List<String> courseRegistered = new ArrayList<>();
-	String status;
-	String statusDate;
+	private List<String> courseRegistered = new ArrayList<>();
+	private String status;
+	private String statusDate;
+	private ArrayList<String> full_record = new ArrayList<>();
 	
 	public StudentRecord(String first, String last){
 		super(first, last);
-	}
-	
-	public String getLastName() {
-		return this.lastName;
-	}
-	
-	public String getFirstName() {
-		return this.firstName;
-	}
-	
-	public void addCourse(String course) {
-		courseRegistered.add(course);
-	}
-	
-	public String getStatus() {
-		return this.status;
-	}
-	
-	public void setStatus(String etat) {
-		status = etat;
 	}
 	
 	public String getDate() {
 		return this.statusDate;
 	}
 	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public List<String> getCourseList(){
+		return this.courseRegistered;
+	}
+	
+	public void addCourse(String course) {
+		courseRegistered.add(course);
+	}
+
+	public void setStatus(String etat) {
+		status = etat;
+	}
+	
 	public void setDate(String date) {
 		statusDate = date;
+	}
+	
+	public ArrayList<String> build_record() {
+		full_record.add(this.firstName);
+		full_record.add(this.lastName);
+		full_record.add(this.courseRegistered.toString());
+		full_record.add(this.status);
+		full_record.add(this.statusDate);
+		return full_record;
 	}
 
 }
