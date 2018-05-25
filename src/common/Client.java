@@ -7,7 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.AccessException;
 
-public class Client extends Thread implements SystemInterface  {
+public class Client extends Thread implements SystemInterface {
     private Registry registry = null;
     private String city;
     private SystemInterface remoteObject = null;
@@ -40,7 +40,6 @@ public class Client extends Thread implements SystemInterface  {
     }
 
 
-
     public void run() {
         try {
             if (city == "MTL") {
@@ -68,15 +67,7 @@ public class Client extends Thread implements SystemInterface  {
     }
 
     public static void main(String[] args) throws Exception {
-
-// 	 Registry registry = LocateRegistry.getRegistry(2964); 
-
-// 	 AddInterface obj = (AddInterface) registry.lookup("Addition");
-
-// 	 int n = obj.add(5, 4); 
-// 	 System.out.println("Addition is : " + n);
-
-
+        
         String city = "MTL";
         Client instance = new Client(city);
         instance.run();
@@ -84,25 +75,25 @@ public class Client extends Thread implements SystemInterface  {
 
     @Override
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) throws RemoteException {
-
         logger.write("calling server to createTRecord ");
-        remoteObject.createTRecord(firstName, lastName, address, phone, specialization,location);
+        remoteObject.createTRecord(firstName, lastName, address, phone, specialization, location);
     }
 
     @Override
     public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
-
         logger.write("calling server to createSRecord ");
-
+        remoteObject.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
     }
 
     @Override
     public Integer getRecordsCount() throws RemoteException {
-        return null;
+        logger.write("calling server to getRecordsCount ");
+        return remoteObject.getRecordsCount();
     }
 
     @Override
     public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
-        return null;
+        logger.write("calling server to editRecord ");
+        return remoteObject.editRecord(recordID, fieldName, newValue);
     }
 }
