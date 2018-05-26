@@ -80,7 +80,7 @@ public class Client extends Thread implements SystemInterface {
     }
 
     @Override
-    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+    public void createSRecord(String firstName, String lastName, List<String> courseRegistered, String status, String statusDate) throws RemoteException {
         logger.write("calling server to createSRecord ");
         remoteObject.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
     }
