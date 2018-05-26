@@ -81,7 +81,7 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     
     
     @Override
-    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+    public void createSRecord(String firstName, String lastName, List<String> courseRegistered, String status, String statusDate) throws RemoteException {
     	synchronized (this){
 		    StudentRecord student = new StudentRecord(firstName, lastName);
 			String lastTemp = lastName.toUpperCase().trim();
