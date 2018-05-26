@@ -53,8 +53,8 @@ public class Client extends Thread implements SystemInterface {
             }
 
             SystemInterface obj = (SystemInterface) registry.lookup(city);
-            obj.createSRecord("Dan", "Soen", "Discrete Math", "Inactive", "2016-12-18");
-            obj.createSRecord("Charles", "Lemon", "Math", "Inactive", "2015-12-18");
+            obj.createSRecord("Dan", "Soen", List.asList("Discrete Math"), "Inactive", "2016-12-18");
+            obj.createSRecord("Charles", "Lemon", List.asList("Math"), "Inactive", "2015-12-18");
             obj.createTRecord("Maxim", "Beautin", "Blvd Saint-Andre", "514-333-4493", "Finance", "LVL");
 
         } catch (AccessException e) {
