@@ -67,7 +67,7 @@ public class Client extends Thread implements SystemInterface {
     }
 
     public static void main(String[] args) throws Exception {
-        
+
         String city = "MTL";
         Client instance = new Client(city);
         instance.run();
@@ -92,7 +92,7 @@ public class Client extends Thread implements SystemInterface {
     }
 
     @Override
-    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
+    public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
         logger.write("calling server to editRecord ");
         return remoteObject.editRecord(recordID, fieldName, newValue);
     }

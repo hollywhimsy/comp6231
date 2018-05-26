@@ -18,6 +18,10 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     private Logger logger ;
     private String city ;
 
+    private static List<String> teacherFileds = Arrays.asList("firstName","lastName","address", "phone", "location");
+    private static List<String> studentFields = Arrays.asList("firstName", "lastName","courseregistered", "status", "statusdate");
+
+
     public CenterServer(String city) throws Exception {
         super();
         this.city = city;
@@ -105,13 +109,45 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     }
 
     @Override
-    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
-    	    if(IDs.contains(recordID)) {
-    	    	    
-    	    }
-    	    else {
-    	    	    System.err.println("such ID does not exit");
-    	    }
+    public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
+
+        // validations
+        if( !IDs.contains(recordID)){
+            return new OperationResult(false, "The provided ID does not exist" );
+        }
+
+        // TODO
+
+
+
         return null;
     }
+
+    private Boolean isTeacherID(String recordId)
+    {
+        return recordId.startsWith("TR");
+    }
+
+    private Boolean isStudentID(String recordId)
+    {
+        return recordId.startsWith("ST");
+    }
+
+    private Boolean isValidStudentFieldName(String fieldName)
+    {
+        if ((fieldName == null) || fieldName.isEmpty())
+            return false;
+
+        return studentFields.contains(fieldName);
+    }
+
+    private Boolean isValidTeacherFieldName(String fieldName)
+    {
+        if ((fieldName == null) || fieldName.isEmpty())
+            return false;
+
+        return teacherFileds.contains(fieldName);
+    }
+
+
 }

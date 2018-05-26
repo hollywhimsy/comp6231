@@ -11,7 +11,12 @@ public class TeacherRecord extends Record {
 	private String specialization;
 	private String location;
 	private ArrayList<String> full_record = new ArrayList<>();
-	
+
+	public TeacherRecord(String first, String last) {
+		super(first, last);
+
+	}
+
 	public TeacherRecord(String first, String last, String spec) {
 		super(first, last);
 		this.specialization = spec;

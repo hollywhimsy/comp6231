@@ -12,5 +12,5 @@ public interface SystemInterface extends Remote {
 
     public Integer getRecordsCount() throws RemoteException;
 
-    public Boolean editRecord(String recordID, String fieldName, String newValue) throws RemoteException;
+    public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException;
 }
