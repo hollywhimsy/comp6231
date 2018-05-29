@@ -1,6 +1,7 @@
 package common;
+
 import java.util.*;
-import people.Teacher;
+
 
 /**
  * Represents a teacher record
@@ -50,12 +51,12 @@ public class TeacherRecord extends Record {
 	}
 	
 	public ArrayList<String> build_record(){
-		full_record.add(this.firstName);
-		full_record.add(this.lastName);
-		full_record.add(this.address);
-		full_record.add(this.phone);
-		full_record.add(this.specialization);
-		full_record.add(this.location);
+//		full_record.add(this.firstName);
+//		full_record.add(this.lastName);
+//		full_record.add(this.address);
+//		full_record.add(this.phone);
+//		full_record.add(this.specialization);
+//		full_record.add(this.location);
 		return full_record;
 	}
 	

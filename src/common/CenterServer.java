@@ -15,11 +15,11 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     private HashMap<String, TeacherRecord> Teachers = new HashMap<>();
     private HashMap<String, StudentRecord> Students = new HashMap<>();
     private ArrayList<String> IDs = new ArrayList<>();
-    private Logger logger ;
-    private String city ;
+    private Logger logger;
+    private String city;
 
-    private static List<String> teacherFileds = Arrays.asList("firstName","lastName","address", "phone", "location");
-    private static List<String> studentFields = Arrays.asList("firstName", "lastName","courseregistered", "status", "statusdate");
+    private static List<String> teacherFileds = Arrays.asList("firstName", "lastName", "address", "phone", "location");
+    private static List<String> studentFields = Arrays.asList("firstName", "lastName", "courseregistered", "status", "statusdate");
 
 
     public CenterServer(String city) throws Exception {
@@ -60,7 +60,7 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
         return id;
     }
 
-        @Override
+    @Override
     public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         synchronized (this) {
 
@@ -76,28 +76,28 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
             file.put(TID, teacher);
             Teachers.put(TID, teacher);
             records.put(firstLetter, file);
-            }
+        }
     }
-    
-    
+
+
     @Override
     public void createSRecord(String firstName, String lastName, List<String> courseRegistered, String status, String statusDate) throws RemoteException {
-    	synchronized (this){
-		StudentRecord student = new StudentRecord(firstName, lastName);
-		String lastTemp = lastName.toUpperCase().trim();
-	        Character firstLetter = lastTemp.charAt(0);
-		student.setCourses(courseRegistered);
-                student.setStatus(status);
-                student.setDate(statusDate);
-	        HashMap<String, Record> file = new HashMap<>();
-                String SID = createID(false);
-	        file.put(SID, student);         
-                Students.put(SID, student);
-                records.put(firstLetter, file);
-	}
+        synchronized (this) {
+            StudentRecord student = new StudentRecord(firstName, lastName);
+            String lastTemp = lastName.toUpperCase().trim();
+            Character firstLetter = lastTemp.charAt(0);
+//		student.setCourses(courseRegistered);
+            student.setStatus(status);
+            student.setDate(statusDate);
+            HashMap<String, Record> file = new HashMap<>();
+            String SID = createID(false);
+            file.put(SID, student);
+            Students.put(SID, student);
+            records.put(firstLetter, file);
+        }
     }
-    
-    
+
+
     @Override
     public Integer getRecordsCount() throws RemoteException {
         return null;
@@ -107,37 +107,32 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
 
         // validations
-        if( !IDs.contains(recordID)){
-            return new OperationResult(false, "The provided ID does not exist" );
+        if (!IDs.contains(recordID)) {
+            return new OperationResult(false, "The provided ID does not exist");
         }
 
         // TODO
 
 
-
         return null;
     }
 
-    private Boolean isTeacherID(String recordId)
-    {
+    private Boolean isTeacherID(String recordId) {
         return recordId.startsWith("TR");
     }
 
-    private Boolean isStudentID(String recordId)
-    {
+    private Boolean isStudentID(String recordId) {
         return recordId.startsWith("ST");
     }
 
-    private Boolean isValidStudentFieldName(String fieldName)
-    {
+    private Boolean isValidStudentFieldName(String fieldName) {
         if ((fieldName == null) || fieldName.isEmpty())
             return false;
 
         return studentFields.contains(fieldName);
     }
 
-    private Boolean isValidTeacherFieldName(String fieldName)
-    {
+    private Boolean isValidTeacherFieldName(String fieldName) {
         if ((fieldName == null) || fieldName.isEmpty())
             return false;
 
