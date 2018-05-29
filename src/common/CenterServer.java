@@ -29,11 +29,7 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
 
     }
 
-    public int add(int x, int y) throws RemoteException {
 
-        return x + y;
-
-    }
 
     public String createID(boolean isTeacher) {
         String id = "";
