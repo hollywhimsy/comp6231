@@ -85,10 +85,18 @@ public class Client extends Thread implements SystemInterface {
         logger.write("calling server to getRecordsCount ");
         return remoteObject.getRecordsCount();
     }
+    
+    @Override
+    public Integer getLocalRecordsCount() throws RemoteException {
+        logger.write("calling server to getLocalRecordsCount ");
+        return remoteObject.getLocalRecordsCount();
+    }
 
     @Override
     public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
         logger.write("calling server to editRecord ");
         return remoteObject.editRecord(recordID, fieldName, newValue);
     }
+    
+    
 }

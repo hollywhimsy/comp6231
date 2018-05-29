@@ -98,6 +98,11 @@ public class CenterServer extends UnicastRemoteObject implements SystemInterface
     public Integer getRecordsCount() throws RemoteException {
         return null;
     }
+    
+    @Override
+    public Integer getLocalRecordsCount() throws RemoteException {
+        return null;
+    }
 
     @Override
     public OperationResult editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
