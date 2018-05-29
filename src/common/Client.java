@@ -18,15 +18,10 @@ public class Client extends Thread implements SystemInterface {
 
         logger = new Logger("/tmp/logs", city + "_client");
         try {
-            if (city == "MTL") {
-                registry = LocateRegistry.getRegistry(2270);
-            }
-            if (city == "LVL") {
-                registry = LocateRegistry.getRegistry(2865);
-            }
-            if (city == "DDO") {
-                registry = LocateRegistry.getRegistry(2965);
-            }
+            String serverHost = Infrastucture.getServerHost(city);
+            Integer serverPort = Infrastucture.getServerPort(city);
+
+            registry = LocateRegistry.getRegistry(serverHost, serverPort);
 
             remoteObject = (SystemInterface) registry.lookup(city);
 

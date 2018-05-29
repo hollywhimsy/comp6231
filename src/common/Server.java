@@ -31,7 +31,7 @@ public class Server extends Thread {
      * DDO's sock = 2965
      */
 
-    public Server(String city, int port, int s) {
+    public Server(String city, int port,  int s) {
         try {
             obj = new CenterServer(city);
 
@@ -84,7 +84,7 @@ public class Server extends Thread {
         // TODO
         // read these parameters from args
         String city = "MTL";
-        Integer port = 2270;
+        Integer port = Infrastucture.getServerPort(city);
         int s = 20;
         Server instance = new Server(city, port, 0);
         instance.run();
