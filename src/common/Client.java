@@ -53,8 +53,8 @@ public class Client extends Thread implements SystemInterface {
             }
 
             SystemInterface obj = (SystemInterface) registry.lookup(city);
-            obj.createSRecord("Dan", "Soen", "Discrete Math", "Inactive", "2016-12-18");
-            obj.createSRecord("Charles", "Lemon", "Math", "Inactive", "2015-12-18");
+            obj.createSRecord("Dan", "Soen", Arrays.asList("Discrete Math"), "Inactive", "2016-12-18");
+            obj.createSRecord("Charles", "Lemon", Arrays.asList("Math"), "Inactive", "2015-12-18");
             obj.createTRecord("Maxim", "Beautin", "Blvd Saint-Andre", "514-333-4493", "Finance", "LVL");
 
         } catch (AccessException e) {
@@ -80,7 +80,7 @@ public class Client extends Thread implements SystemInterface {
     }
 
     @Override
-    public void createSRecord(String firstName, String lastName, String courseRegistered, String status, String statusDate) throws RemoteException {
+    public void createSRecord(String firstName, String lastName, List<String> courseRegistered, String status, String statusDate) throws RemoteException {
         logger.write("calling server to createSRecord ");
         remoteObject.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
     }
