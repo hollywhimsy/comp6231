@@ -27,7 +27,6 @@ public class Teacher implements Person {
     }
 
 
-    @Override
     public String getId() {
         return Id;
     }

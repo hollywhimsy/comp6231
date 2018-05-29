@@ -24,7 +24,6 @@ public abstract class CenterManager implements  Person {
         uniqueFourDigitNumber++;
     }
 
-    @Override
     public String getId() {
         return Id;
     }
