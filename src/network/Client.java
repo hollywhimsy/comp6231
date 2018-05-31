@@ -1,6 +1,10 @@
-package common;
+package network;
 
 import java.util.*;
+
+import common.Logger;
+import common.OperationResult;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

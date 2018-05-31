@@ -1,6 +1,13 @@
-package common;
+package network;
 
 import java.util.*;
+
+import common.Logger;
+import common.OperationResult;
+import common.Record;
+import common.StudentRecord;
+import common.TeacherRecord;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.net.DatagramPacket;

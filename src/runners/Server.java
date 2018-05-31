@@ -1,4 +1,4 @@
-package common;
+package runners;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,6 +11,10 @@ import java.rmi.registry.Registry;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.HashMap;
+
+import network.CenterServer;
+import network.Infrastucture;
+
 import java.rmi.Remote;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;

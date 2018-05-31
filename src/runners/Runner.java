@@ -1,4 +1,6 @@
-package common;
+package runners;
+
+import network.Client;
 
 public class Runner {
     public static void main(String[] args) throws Exception {

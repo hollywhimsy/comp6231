@@ -1,4 +1,4 @@
-package common;
+package network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
+
+import common.Record;
 
 // UDP Server needs to be run as a separate thread
 // because it's always running in the background

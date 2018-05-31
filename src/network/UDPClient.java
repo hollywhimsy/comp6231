@@ -1,4 +1,4 @@
-package common;
+package network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
