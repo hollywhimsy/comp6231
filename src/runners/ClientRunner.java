@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import common.Constants;
 import common.StudentRecord;
 import network.ManagerClient;
 
@@ -20,7 +21,7 @@ public class ClientRunner
 		List<String> spec = new ArrayList<String>();
 		spec.add("Math");
 		spec.add("Computer");
-		ManagerClient mng = new ManagerClient("CreateTeacher", "MTL0001", "Bob", "Azadi", "Garland", 123458886, spec);
+		ManagerClient mng = new ManagerClient(Constants.RemoteProcedures.CreateTeacher.name(), "MTL0001", "Bob", "Azadi", "Garland", 123458886, spec);
 		mng.start();		
 				
 		// Call Create Student Record by mng2 as a sample
@@ -29,18 +30,18 @@ public class ClientRunner
 		courses.add("Dist");
 		Date date = new Date();
 		date.getTime();
-		ManagerClient mng2 = new ManagerClient("CreateStudent", "MTL0001", "Alice", "Amani", courses, true, date);
+		ManagerClient mng2 = new ManagerClient(Constants.RemoteProcedures.CreateStudent.name(), "MTL0001", "Alice", "Amani", courses, true, date);
 		mng2.start();
 		
 		// Call Edit Record by mng2 as a sample
 		Date date2 = new Date();
 		date2.getTime();
 		date2.setDate(11);
-		ManagerClient mng3 = new ManagerClient("EditRecords", "MTL0001", "SR00001", "statusDate", date2);
+		ManagerClient mng3 = new ManagerClient(Constants.RemoteProcedures.EditRecords.name(), "MTL0001", "SR00001", "statusDate", date2);
 		mng3.start();
 		
 		// Call Get Records Count by mng3 as a sample
-		ManagerClient mng4 = new ManagerClient("EditRecords", "MTL0001");
+		ManagerClient mng4 = new ManagerClient(Constants.RemoteProcedures.EditRecords.name(), "MTL0001");
 		mng4.start();
 		
 		// Call Return Record by mng1 to retrieve a Teacher record as a sample
