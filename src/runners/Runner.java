@@ -1,15 +1,15 @@
 package runners;
 
-import network.Client;
+import network.ManagerClient;
 
 public class Runner {
     public static void main(String[] args) throws Exception {
 
 
-        Client client = new Client("MTL");
+        ManagerClient client = new ManagerClient("MTL");
 
-       // test create Trecord
-        client.createTRecord("Maxim", "Beautin", "Blvd Saint-Andre", "514-333-4493", "Finance", "MTL");
+//       // test create Trecord
+//        client.createTRecord("Maxim", "Beautin", "Blvd Saint-Andre", "514-333-4493", "Finance", "MTL");
 
     }
 }

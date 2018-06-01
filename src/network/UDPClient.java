@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 
 public class UDPClient 
 {
-	private int serverPort; // Server listen port that client should connect to
+	private int serverPort; // CenterServer listen port that client should connect to
 	
 	// Constructor
 	public UDPClient(int serverPort) 
@@ -30,7 +30,7 @@ public class UDPClient
 			
 			byte[] message = "Count".getBytes(); // client must send "Count" as request
 			
-			InetAddress serverIP = InetAddress.getByName("localhost"); // Server and client have same IP address
+			InetAddress serverIP = InetAddress.getByName("localhost"); // CenterServer and client have same IP address
 			DatagramPacket request = new DatagramPacket(message, message.length, serverIP, serverPort);
 			socket.send(request);
 			
