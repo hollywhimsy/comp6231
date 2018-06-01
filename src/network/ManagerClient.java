@@ -2,6 +2,7 @@ package network;
 
 import java.util.*;
 
+import common.Constants;
 import common.Logger;
 import common.OperationResult;
 import common.Record;
@@ -209,7 +210,7 @@ public class ManagerClient extends Thread implements IManagerClient {
     
     public void run()
 	{
-		if(methodToCall.equals("CreateTeacher"))
+		if(methodToCall.equals(Constants.RemoteProcedures.CreateTeacher.name()))
 		{
 			try 
 			{
@@ -221,7 +222,7 @@ public class ManagerClient extends Thread implements IManagerClient {
 			}
 		}
 		
-		if(methodToCall.equals("CreateStudent"))
+		if(methodToCall.equals(Constants.RemoteProcedures.CreateStudent.name()))
 		{
 			try 
 			{
@@ -233,7 +234,7 @@ public class ManagerClient extends Thread implements IManagerClient {
 			}
 		}
 		
-		if(methodToCall.equals("GetCounts"))
+		if(methodToCall.equals(Constants.RemoteProcedures.GetCounts.name()))
 		{
 			try 
 			{
@@ -245,7 +246,7 @@ public class ManagerClient extends Thread implements IManagerClient {
 			}
 		}
 		
-		if(methodToCall.equals("EditRecords"))
+		if(methodToCall.equals(Constants.RemoteProcedures.EditRecords.name()))
 		{
 			try 
 			{

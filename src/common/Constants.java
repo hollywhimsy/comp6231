@@ -11,4 +11,10 @@ public class Constants{
    public enum StudentStatus{
        ACTIVE, INACTIVE;
    }
+   public enum Specializations {
+
+   }
+   public enum RemoteProcedures{
+       EditRecords, GetCounts, CreateStudent, CreateTeacher
+   }
 }
