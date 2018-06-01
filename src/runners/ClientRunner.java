@@ -16,7 +16,7 @@ public class ClientRunner
 	{
 		System.out.println("Client #1");
 		System.out.println("---------------------------");
-		
+
 		// Call Create Teacher Record by mng1 as a sample
 		List<String> spec = new ArrayList<String>();
 		spec.add("Math");
