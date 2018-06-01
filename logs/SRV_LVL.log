@@ -1,0 +1,7 @@
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[CenterServer Constructor]: Center server is created :)
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[CenterServer.run()]: RMI registration is started
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[CenterServer.run()]: HashMap initialization is done
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[RecordManagerClass Constructor]: An instance of RecordManagerClass is created
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[UDPServer Constructor]: UDPServer is created on port: 3280
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[CenterServer.run()]: RMI registration is successfully done
+Fri Jun 01 18:30:47 EDT 2018 ==> LVL[UDPServer.run()]: Listening on 3280 UDP Port
