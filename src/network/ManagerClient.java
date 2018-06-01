@@ -12,114 +12,132 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.AccessException;
 
-public class ManagerClient implements IManagerClient {
+public class ManagerClient extends Thread implements IManagerClient {
     private String managerId;
     private Registry registry = null;
     private String city;
     private IRecordManager remoteObject = null;
     private Logger logger;
+	private Logger operationResultLogger;
+	
+	private String methodToCall;
+	private String firstName;
+	private String lastName;
+	private String address;
+	private Integer phoneNumber;
+	private List<String> specilization;
+	private List<String> coursesRegistred;
+	private boolean status;
+	private Date statusDate;
+	private String recordId;
+	private String fieldName;
+	private Object newValue;
+	
 
     public ManagerClient(String managerId) {
-
-
-        logger = new Logger("MNG_" + managerId + ".log");
-
-        if (isIdFormatCorrect(managerId))
-        {
-            this.city = managerId.substring(0, 3).toUpperCase();
-            this.managerId = managerId;
-        }
-        else
-        {
-            logger.logToFile("ERROR! [Manager Constructor]: Manager ID is not valid");
-        }
-
-        try
-        {
-            String serverHost = Infrastucture.getServerHost(city);
+    	this.managerId = managerId;
+    	initialize();
+    }
+    private void initialize()
+	{
+		logger = new Logger("MNG_" + managerId + ".log");
+		operationResultLogger = new Logger("Result.log");
+		
+		if (isIdFormatCorrect(managerId))
+		{			
+			city = managerId.substring(0, 3).toUpperCase();
+				
+		}
+		else
+		{
+			logger.logToFile("ERROR! [Manager Constructor]: Manager ID is not valid");
+		}
+		
+		try 
+		{
+			String serverHost = Infrastucture.getServerHost(city);
             Integer serverPort = Infrastucture.getServerPort(city);
 
             registry = LocateRegistry.getRegistry(serverHost, serverPort);
             remoteObject = (IRecordManager) registry.lookup(city);
+         
+			logger.logToFile(managerId + "[Manager Constructor]: Manager connected to RMI registry");
+		} 
+		catch (RemoteException e) 
+		{
+			logger.logToFile(managerId + "[Manager Constructor]: Manager connection to RMI registry failed (RemoteException Error!)");
+			//e.printStackTrace();
+		} 
+		catch (NotBoundException e) 
+		{
+			logger.logToFile(managerId + "[Manager Constructor]: Manager connection to RMI registry failed (NotBoundException Error!)");
+			//e.printStackTrace();
+		}
+	}
 
-//            registry = LocateRegistry.getRegistry(registryPort);
-//            object = (RecordManagerInterface) registry.lookup("GetManager"); // object initialized
+ // Constructor1
+ 	public ManagerClient(String methodToCall, String managerId) 
+ 	{
+ 		this.managerId = managerId;
+ 		this.methodToCall = methodToCall;		
+ 		initialize();		
+ 	}
+ 	// Constructor2
+ 	public ManagerClient(String methodToCall, 
+ 			String managerId, 
+ 			String firstName, 
+ 			String lastName, 
+ 			String address,
+ 			Integer phoneNumber, 
+ 			List<String> specilization) 
+ 	{
+ 		this.managerId = managerId;
+ 		this.methodToCall = methodToCall;
+ 		this.firstName = firstName;
+ 		this.lastName = lastName;
+ 		this.address = address;
+ 		this.phoneNumber = phoneNumber;
+ 		this.specilization = specilization;
+ 		initialize();		
+ 	}
+ 	// Constructor3
+ 	public ManagerClient(String methodToCall, 
+ 			String managerId, 
+ 			String firstName, 
+ 			String lastName, 
+ 			List<String> coursesRegistred,
+ 			boolean status, 
+ 			Date statusDate) 
+ 	{
+ 		this.managerId = managerId;
+ 		this.methodToCall = methodToCall;
+ 		this.firstName = firstName;
+ 		this.lastName = lastName;
+ 		this.coursesRegistred = coursesRegistred;
+ 		this.status = status;
+ 		this.statusDate = statusDate;
+ 		initialize();		
+ 	}
+ 	// Constructor4
+ 	public ManagerClient(String methodToCall, 
+ 			String managerId,
+ 			String recordId,
+ 			String fieldName, 			
+ 			Object newValue) 
+ 	{
+ 		this.managerId = managerId;
+ 		this.methodToCall = methodToCall;
+ 		this.fieldName = fieldName;
+ 		this.newValue = newValue;
+ 		this.recordId = recordId;
+ 		initialize();		
+ 	}
+ 	
 
-            logger.logToFile(managerId + "[Manager Constructor]: Manager connected to RMI registry");
-        }
-        catch (RemoteException e)
-        {
-            logger.logToFile(managerId + "[Manager Constructor]: Manager connection to RMI registry failed (RemoteException Error!)");
-            //e.printStackTrace();
-        }
-        catch (NotBoundException e)
-        {
-            logger.logToFile(managerId + "[Manager Constructor]: Manager connection to RMI registry failed (NotBoundException Error!)");
-            //e.printStackTrace();
-        }
 
+   
 
-    }
-
-
-
-    @Override
-    public boolean createTRecord(String firstName, String lastName, String address, Integer phoneNumber, List<String> specialization) throws RemoteException {
-        if (remoteObject == null)
-        {
-            return false;
-        }
-
-        if (remoteObject.createTRecord(firstName, lastName, address, phoneNumber, specialization, city, managerId))
-        {
-            logger.logToFile(managerId + "[Manager.callCreateTRecord()]: callCreateTRecord called on " +
-                    city + " server and performed successfully");
-            return true;
-        }
-
-        logger.logToFile(managerId + "[Manager.callCreateTRecord()]: callCreateTRecord called on " +
-                city + " server and failed");
-        return false;
-    }
-
-    @Override
-    public boolean createSRecord(String firstName, String lastName, List<String> coursesRegistred, boolean status, Date statusDate) throws RemoteException {
-        if (remoteObject == null)
-        {
-            return false;
-        }
-
-        if (remoteObject.createSRecord(firstName, lastName, coursesRegistred, status, statusDate, managerId))
-        {
-            logger.logToFile(managerId + "[Manager.callCreateSRecord()]: callCreateSRecord called on " +
-                    city + " server and performed successfully");
-            return true;
-        }
-
-        logger.logToFile(managerId + "[Manager.callCreateTRecord()]: callCreateSRecord called on " +
-                city + " server and failed");
-        return false;
-    }
-
-    @Override
-    public String getRecordCounts() throws RemoteException {
-        if (remoteObject == null)
-        {
-            return null;
-        }
-
-        String result = remoteObject.getRecordCounts(managerId);
-        if(result != null)
-        {
-            logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
-                    city + " server and performed successfully");
-            return result;
-        }
-
-        logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
-                city + " server and failed");
-        return null;
-    }
+ 
 
     @Override
     public Integer getLocalRecordsCount() throws RemoteException {
@@ -127,39 +145,7 @@ public class ManagerClient implements IManagerClient {
         return remoteObject.getLocalRecordsCount(managerId);
     }
 
-    @Override
-    public Boolean editRecord(String recordID, String fieldName, Object newValue) throws RemoteException {
-        if (remoteObject.editRecord(recordID, fieldName, newValue, managerId))
-        {
-            logger.logToFile(managerId + "[Manager.callEditRecord()]: callEditRecord called on " +
-                    city + " server and performed successfully");
-            return true;
-        }
 
-        logger.logToFile(managerId + "[Manager.callEditRecord()]: callEditRecord called on " +
-                city + " server and failed");
-        return false;
-    }
-
-    @Override
-    public Record returnRecord(String recordId) throws RemoteException {
-        if (remoteObject == null)
-        {
-            return null;
-        }
-
-        Record result = remoteObject.returnRecord(recordId, managerId);
-        if(result != null)
-        {
-            logger.logToFile(managerId + "[Manager.callReturnRecord()]: callReturnRecord called on " +
-                    city + " server and performed successfully");
-            return result;
-        }
-
-        logger.logToFile(managerId + "[Manager.callReturnRecord()]: callReturnRecord called on " +
-                city + " server and failed");
-        return null;
-    }
 
 
 
@@ -220,4 +206,185 @@ public class ManagerClient implements IManagerClient {
     {
         return managerId;
     }
+    
+    public void run()
+	{
+		if(methodToCall.equals("CreateTeacher"))
+		{
+			try 
+			{
+				callCreateTRecord();
+			} 
+			catch (RemoteException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		if(methodToCall.equals("CreateStudent"))
+		{
+			try 
+			{
+				callCreateSRecord();
+			} 
+			catch (RemoteException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		if(methodToCall.equals("GetCounts"))
+		{
+			try 
+			{
+				callGetRecordCounts();				
+			} 
+			catch (RemoteException e) 
+			{				
+				e.printStackTrace();
+			}
+		}
+		
+		if(methodToCall.equals("EditRecords"))
+		{
+			try 
+			{
+				callEditRecord();		
+			} 
+			catch (RemoteException e) 
+			{				
+				e.printStackTrace();
+			}
+		}	
+	}
+
+    @Override
+    public boolean callCreateTRecord() throws RemoteException
+	{
+		if (remoteObject == null)
+		{
+			logger.logToFile(managerId + "[Manager.callCreateTRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			operationResultLogger.logToFile(managerId + "[Manager.callCreateTRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			return false;
+		}
+		
+		if (remoteObject.createTRecord(firstName, lastName, address, phoneNumber, specilization, city, managerId))
+		{
+			logger.logToFile(managerId + "[Manager.callCreateTRecord()] {Thread ID: "+ this.getId() +
+					"}: Teacher record created");
+			operationResultLogger.logToFile(managerId + "[Manager.callCreateTRecord()] {Thread ID: "+ this.getId() +
+					"}: Teacher record created");
+			return true;
+		}
+		
+		logger.logToFile(managerId + "[Manager.callCreateTRecord()]: callCreateTRecord called on " +
+				city + " server and failed");
+		return false;
+	}
+	
+    @Override
+	public boolean callCreateSRecord() throws RemoteException
+	{
+		if (remoteObject == null)
+		{
+			logger.logToFile(managerId + "[Manager.callCreateSRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			operationResultLogger.logToFile(managerId + "[Manager.callCreateSRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			return false;
+		}
+		
+		if (remoteObject.createSRecord(firstName, lastName, coursesRegistred, status, statusDate, managerId))
+		{
+			logger.logToFile(managerId + "[Manager.callCreateSRecord()]: callCreateSRecord called on " +
+					city + " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[Manager.callCreateSRecord()] {Thread ID: "+ this.getId() +
+					"}: Student record created");
+			return true;
+		}
+		
+		logger.logToFile(managerId + "[Manager.callCreateTRecord()]: callCreateSRecord called on " +
+				city + " server and failed");
+		return false;
+	}
+    
+    @Override
+	public boolean callEditRecord() throws RemoteException
+	{
+		if (remoteObject == null)
+		{
+			logger.logToFile(managerId + "[Manager.callEditRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			operationResultLogger.logToFile(managerId + "[Manager.callEditRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			return false;
+		}
+		
+		if (remoteObject.editRecord(recordId, fieldName, newValue, managerId))
+		{
+			logger.logToFile(managerId + "[Manager.callEditRecord()]: callEditRecord called on " +
+					city + " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[Manager.callEditRecord()] {Thread ID: "+ this.getId() +
+					"}: Edit record performed successfully");
+			return true;
+		}
+		
+		logger.logToFile(managerId + "[Manager.callEditRecord()]: callEditRecord called on " +
+				city + " server and failed");
+		return false;
+	}
+    @Override
+	public String callGetRecordCounts() throws RemoteException
+	{
+		if (remoteObject == null)
+		{
+			logger.logToFile(managerId + "[Manager.callGetRecordCounts()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			operationResultLogger.logToFile(managerId + "[Manager.callGetRecordCounts()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			return null;
+		}
+		
+		String result = remoteObject.getRecordCounts(managerId);
+		if(result != null)
+		{
+			logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
+					city + " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[Manager.getRecordCounts()] {Thread ID: "+ this.getId() +
+					"}: Records Count: " + result);
+			return result;
+		}
+		
+		logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
+				city + " server and failed");
+		return null;
+				
+	}
+	
+	@Override
+	public Record callReturnRecord(String recordId) throws RemoteException
+	{
+		if (remoteObject == null)
+		{
+			logger.logToFile(managerId + "[Manager.callReturnRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			operationResultLogger.logToFile(managerId + "[Manager.callReturnRecord()] {Thread ID: "+ this.getId() + 
+					"}: There is no such a record on " + city);
+			return null;
+		}
+		
+		Record result = remoteObject.returnRecord(recordId, managerId);
+		if(result != null)
+		{
+			logger.logToFile(managerId + "[Manager.callReturnRecord()]: callReturnRecord called on " +
+					city + " server and performed successfully");
+			return result;
+		}
+		
+		logger.logToFile(managerId + "[Manager.callReturnRecord()]: callReturnRecord called on " +
+				city + " server and failed");
+		return null;	
+	}
 }

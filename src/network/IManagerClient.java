@@ -9,25 +9,15 @@ import java.util.List;
 
 public interface IManagerClient extends Remote {
 
-    boolean createTRecord(String firstName,
-                          String lastName,
-                          String address,
-                          Integer phoneNumber,
-                          List<String> specialization) throws RemoteException;
+	boolean callCreateTRecord() throws RemoteException;
 
-    boolean createSRecord(String firstName,
-                          String lastName,
-                          List<String> coursesRegistred,
-                          boolean status,
-                          Date statusDate) throws RemoteException;
+	boolean callCreateSRecord() throws RemoteException;
 
-    String getRecordCounts() throws RemoteException;
+    String callGetRecordCounts() throws RemoteException;
 
     Integer getLocalRecordsCount() throws RemoteException;
 
-    Boolean editRecord(String recordID,
-                       String fieldName,
-                       Object newValue) throws RemoteException;
+    boolean callEditRecord() throws RemoteException;
 
-    Record returnRecord(String recordId) throws RemoteException;
+    Record callReturnRecord(String recordId) throws RemoteException;
 }
