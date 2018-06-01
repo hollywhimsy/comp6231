@@ -17,7 +17,7 @@ public class Logger {
 
     public Logger(String fileName) {
         this.fileName = fileName;
-        this.path = System.getProperty("user.dir") + "\\logs\\"; //Get current working director + "logs"
+        this.path = System.getProperty("user.dir") +  File.separator + "logs" + File.separator ; //Get current working director + "logs"
     }
 
     public Logger(String path, String fileName) {
