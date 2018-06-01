@@ -1,5 +1,8 @@
 package network;
 
+import com.sun.corba.se.impl.orbutil.closure.Constant;
+import common.Constants;
+
 import java.util.*;
 
 /**
@@ -41,9 +44,9 @@ public class Infrastucture {
     private static Map<String, String> initHostsMap() {
         Map<String, String> map = new HashMap<>();
 
-        map.put("MTL", "127.0.0.1");
-        map.put("LVL", "127.0.0.1");
-        map.put("DDO", "127.0.0.1");
+        map.put(Constants.Locations.MTL.name(), "127.0.0.1");
+        map.put(Constants.Locations.LVL.name(), "127.0.0.1");
+        map.put(Constants.Locations.DDO.name(), "127.0.0.1");
 
         return Collections.unmodifiableMap(map);
     }
