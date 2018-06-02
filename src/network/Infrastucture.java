@@ -57,9 +57,9 @@ public class Infrastucture {
     private static Map<String, Integer> initPortsMap() {
 
         Map<String, Integer> map = new HashMap<>();
-        map.put("MTL", 2270);
-        map.put("LVL", 2280);
-        map.put("DDO", 2290);
+        map.put(Constants.Locations.MTL.name(), 2270);
+        map.put(Constants.Locations.LVL.name(), 2280);
+        map.put(Constants.Locations.DDO.name(), 2290);
 
         return Collections.unmodifiableMap(map);
     }
@@ -69,9 +69,9 @@ public class Infrastucture {
     private static Map<String, Integer> initPortsUDPMap() {
 
         Map<String, Integer> map = new HashMap<>();
-        map.put("MTL", 3270);
-        map.put("LVL", 3280);
-        map.put("DDO", 3290);
+        map.put(Constants.Locations.MTL.name(), 3270);
+        map.put(Constants.Locations.LVL.name(), 3280);
+        map.put(Constants.Locations.DDO.name(), 3290);
 
         return Collections.unmodifiableMap(map);
     }
