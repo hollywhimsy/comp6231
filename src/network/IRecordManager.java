@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
-import common.OperationResult;
+//import common.OperationResult;
 import common.Record;
 
 public interface IRecordManager extends Remote {
