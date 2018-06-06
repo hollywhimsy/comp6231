@@ -1,11 +1,8 @@
 package network;
 
 import common.Record;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Date;
-import java.util.List;
 
 public interface IManagerClient extends Remote {
 

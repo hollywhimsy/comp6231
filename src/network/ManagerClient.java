@@ -1,17 +1,13 @@
 package network;
 
 import java.util.*;
-
 import common.Constants;
 import common.Logger;
-
 import common.Record;
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.AccessException;
 
 public class ManagerClient extends Thread implements IManagerClient {
     private String managerId;

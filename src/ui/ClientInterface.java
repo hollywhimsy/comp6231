@@ -3,9 +3,6 @@ package ui;
 import network.ManagerClient;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -22,10 +19,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import javax.swing.SwingConstants;
-
 import common.StudentRecord;
 import common.TeacherRecord;
-
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
 import java.awt.event.KeyAdapter;

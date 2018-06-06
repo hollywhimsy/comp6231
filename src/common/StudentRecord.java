@@ -9,7 +9,8 @@ import java.util.*;
  */
 public class StudentRecord extends Record {
 
-    private List<String> coursesRegistred = new ArrayList<>();
+    private static final long serialVersionUID = 1L;
+	private List<String> coursesRegistred = new ArrayList<>();
     private boolean status;
     private Date statusDate;
     private ArrayList<String> full_record = new ArrayList<>();

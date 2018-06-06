@@ -2,27 +2,15 @@ package network;
 
 import common.Logger;
 import common.Record;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.AccessException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.RemoteException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.HashMap;
-import java.rmi.Remote;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 
 
 public class CenterServer extends Thread {
@@ -31,14 +19,14 @@ public class CenterServer extends Thread {
 
     private String city;
     private int port;
-    private Registry registry;
+//    private Registry registry;
 
     /*
      *  This CenterServer unique logger
      */
     private Logger logger;
 
-    private int sock;
+//    private int sock;
 
     /*
      * here we may create different CenterServer threads and set

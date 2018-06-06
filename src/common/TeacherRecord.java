@@ -7,7 +7,9 @@ import java.util.*;
  * Represents a teacher record
  */
 public class TeacherRecord extends Record {
-    private String address;
+   
+	private static final long serialVersionUID = 1L;
+	private String address;
     private Integer phone;
     private List<String> specialization;
     private String location;
@@ -53,7 +55,15 @@ public class TeacherRecord extends Record {
         this.phone = tel;
     }
 
-    public void setLocation(String loc) {
+    public String getAddress() {
+		return address;
+	}
+
+	public Integer getPhone() {
+		return phone;
+	}
+
+	public void setLocation(String loc) {
         if (!loc.toLowerCase().equals("mtl")
                 && !loc.toLowerCase().equals("lvl")
                 && !loc.toLowerCase().equals("ddo")) {
