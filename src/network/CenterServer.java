@@ -13,20 +13,13 @@ import java.rmi.registry.Registry;
 import java.rmi.AccessException;
 
 
-public class CenterServer extends Thread {
+public class CenterServer extends Thread 
+{
     RecordManager obj = null;
     DatagramSocket socket = null;
-
     private String city;
     private int port;
-//    private Registry registry;
-
-    /*
-     *  This CenterServer unique logger
-     */
-    private Logger logger;
-
-//    private int sock;
+    private Logger logger; // This CenterServer unique logger
 
     /*
      * here we may create different CenterServer threads and set
@@ -35,72 +28,56 @@ public class CenterServer extends Thread {
      * DDO's sock = 2965
      */
 
-    public CenterServer(String city) {
+    // Constructor
+    public CenterServer(String city) 
+    {
         this.city = city;
         this.port = Infrastucture.getServerPort(city);
-
         logger = new Logger("SRV_" + city.trim() + ".log");
         logger.logToFile(city + "[CenterServer Constructor]: Center server is created :)");
-
     }
 
-    public void run() {
-        Registry registry = null;
-        try
+    // Thread Method
+    public void run() 
+    {
+    	try
         {
-            registry = LocateRegistry.createRegistry(port);
+        	Registry registry = LocateRegistry.createRegistry(port); // Connect to RMI registry
             logger.logToFile(city + "[CenterServer.run()]: RMI registration is started");
-        }
-        catch (RemoteException e)
-        {
-            logger.logToFile(city + "[CenterServer.run()]: RMI registration is failed");
-         }
-
-        HashMap<Character, List<Record>> recordsMap = new HashMap<>();
-        for(Character ch = 'A'; ch <= 'Z'; ch ++) // HashMap initialization
-        {
-            ArrayList<Record> recordList = new ArrayList<>();
-            recordsMap.put(ch, recordList);
-        }
-        logger.logToFile(city + "[CenterServer.run()]: HashMap initialization is done");
-
-        RecordManager obj = null;
-        try
-        {
-            obj = new RecordManager(city,
-                    recordsMap,
-                    logger);
-        } catch (RemoteException e)
-        {
-            logger.logToFile(city + "[CenterServer.run()]: RecordManagerClass is failed");
-            //e.printStackTrace();
-        }
-
-        // Start UDP CenterServer as a separate thread
-        Integer udpPort = Infrastucture.getServerPortUDP(city);
-        UDPServer srv = new UDPServer(recordsMap, udpPort, city, logger);
-        srv.start();
-
-        try
-        {
+        
+	        // HashMap initialization
+	        HashMap<Character, List<Record>> recordsMap = new HashMap<>();
+	        for(Character ch = 'A'; ch <= 'Z'; ch ++) 
+	        {
+	            ArrayList<Record> recordList = new ArrayList<>();
+	            recordsMap.put(ch, recordList);
+	        }
+	        logger.logToFile(city + "[CenterServer.run()]: HashMap initialization is done");
+	
+	        RecordManager obj = new RecordManager(city, recordsMap, logger);
+	                 
+	        // Start UDP CenterServer as a separate thread
+	        Integer udpPort = Infrastucture.getServerPortUDP(city);
+	        UDPServer srv = new UDPServer(recordsMap, udpPort, city, logger);
+	        srv.start();
+        
             registry.bind(city, obj);
             logger.logToFile(city + "[CenterServer.run()]: RMI registration is successfully done");
+            
+            System.out.println(city + " server is started!");
+            
         } catch (AccessException e)
         {
             logger.logToFile(city + "[CenterServer.run()]: AccessException occurred");
-            //e.printStackTrace();
-        } catch (RemoteException e)
-        {
-            logger.logToFile(city + "[CenterServer.run()]: RemoteException occurred ");
             //e.printStackTrace();
         } catch (AlreadyBoundException e)
         {
             logger.logToFile(city + "[CenterServer.run()]: AlreadyBoundException occurred (This server is already registered)");
             //e.printStackTrace();
-        }
-
-        System.out.println(city + " server is started!");
+        } catch (RemoteException e)
+        {
+            logger.logToFile(city + "[CenterServer.run()]: RecordManagerClass oject initiation is failed");
+            //e.printStackTrace();
+        }      
     }
-
-
 }

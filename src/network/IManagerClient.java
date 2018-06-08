@@ -1,6 +1,5 @@
 package network;
 
-import common.Record;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -15,6 +14,8 @@ public interface IManagerClient extends Remote {
     Integer getLocalRecordsCount() throws RemoteException;
 
     boolean callEditRecord() throws RemoteException;
-
-    Record callReturnRecord(String recordId) throws RemoteException;
+    
+//    Record callReturnRecord(String recordId) throws RemoteException;
+    
+    boolean callRecordExist(String recordId) throws RemoteException;
 }

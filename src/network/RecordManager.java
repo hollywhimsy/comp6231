@@ -4,8 +4,6 @@ import common.Record;
 import common.TeacherRecord;
 import common.StudentRecord;
 import common.Logger;
-
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;
@@ -13,25 +11,20 @@ import java.util.HashMap;
 import java.util.List;
 
 // Each CenterServer Center has one object instance of this class
-public class RecordManager extends UnicastRemoteObject implements IRecordManager {
+public class RecordManager extends UnicastRemoteObject implements IRecordManager 
+{
     private static final long serialVersionUID = 1L;
     private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
     private HashMap<String, Record> indexPerId = new HashMap<>(); // Needs synchronization, acts as an index to find records by ID
     private Integer lastTeacherId = 0; // Needs synchronization
     private Integer lastStudentId = 0; // Needs synchronization
     private String cityAbbreviation;
-
     private List<Integer> otherServersUDPPorts;
-
-    // Make it List
-//    private int otherServerPort1; // Other CenterServer UDP listening port to connect and gather records number info
-//    private int otherServerPort2; // Other CenterServer UDP listening port to connect and gather records number info
     private Logger logger;
 
     // Constructor
-    protected RecordManager(String abbr,
-                            HashMap<Character, List<Record>> recordsMap,
-                            Logger logger) throws RemoteException {
+    public RecordManager(String abbr, HashMap<Character, List<Record>> recordsMap, Logger logger) throws RemoteException 
+    {
         super();
 
         this.recordsMap = recordsMap;
@@ -49,13 +42,15 @@ public class RecordManager extends UnicastRemoteObject implements IRecordManager
                                  Integer phoneNumber,
                                  List<String> specialization,
                                  String location,
-                                 String callerId) throws RemoteException {
+                                 String callerId) throws RemoteException 
+    {
         if ((firstName == null) ||
                 (lastName == null) ||
                 (address == null) ||
                 (phoneNumber == null) ||
                 (specialization == null) ||
-                (location == null)) {
+                (location == null)) 
+        {
             logger.logToFile(cityAbbreviation + "[RecordManagerClass.createTRecord()]: createTRecord failed (at least one property was NULL)" +
                     " {CallerManagerID: " + callerId + "}");
             return false;
@@ -128,7 +123,6 @@ public class RecordManager extends UnicastRemoteObject implements IRecordManager
 
         return false;
     }
-
 
     @Override
     public String getRecordCounts(String callerId) throws RemoteException {
@@ -250,37 +244,14 @@ public class RecordManager extends UnicastRemoteObject implements IRecordManager
     }
 
     @Override
-    public Record returnRecord(String recordId, String callerId) throws RemoteException {
-        if (recordId == null) {
-            return null;
-        }
-
-        Character ch = recordId.toUpperCase().charAt(0);
-        if (!(ch.equals('T') || ch.equals('S'))) {
-            return null;
-        }
-
-        if (ch.equals('T')) {
-            TeacherRecord teacher = null;
-            synchronized (indexPerId) {
-                teacher = (TeacherRecord) indexPerId.get(recordId);
-            }
-
-            return teacher;
-        }
-
-        if (ch.equals('S')) {
-            StudentRecord student = null;
-            synchronized (indexPerId) {
-                student = (StudentRecord) indexPerId.get(recordId);
-            }
-
-            return student;
-        }
-
-        return null;
-    }
-
+	public boolean recordExist(String recordId) throws RemoteException
+	{
+		if (indexPerId.containsKey(recordId))
+			return true;
+		else
+			return false;
+	}
+    
     private String produceNewId(String prefix, String callerId) {
         if (prefix.toUpperCase().equals("TR")) {
             if (lastTeacherId >= 99999) //ID can have 5 digits only not more
@@ -359,4 +330,5 @@ public class RecordManager extends UnicastRemoteObject implements IRecordManager
 
         return true;
     }
+	
 }

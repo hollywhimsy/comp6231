@@ -4,9 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
-
-import common.Record;
-
 public interface IRecordManager extends Remote {
 
     boolean createTRecord(String firstName,
@@ -32,7 +29,8 @@ public interface IRecordManager extends Remote {
                        String fieldName,
                        Object newValue,
                        String callerId) throws RemoteException;
+    
+    boolean recordExist(String recordId) throws RemoteException;
 
-    Record returnRecord(String recordId,
-                        String callerId) throws RemoteException;
+//    Record returnRecord(String recordId, String callerId) throws RemoteException;
 }

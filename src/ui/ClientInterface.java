@@ -392,17 +392,20 @@ public class ClientInterface
 					{						
 						if(txtT1.getText().toUpperCase().contains("TR"))
 						{
-							TeacherRecord tcr = null;
+							//TeacherRecord tcr = null;
+							ManagerClient mng;
+							boolean check = false;
 							try 
 							{
-								ManagerClient mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
-								tcr = (TeacherRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
+								mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
+								//tcr = (TeacherRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
+								check = mng.callRecordExist(txtT1.getText().toUpperCase());
 							} 
 							catch (RemoteException e) 
 							{
 								//e.printStackTrace();
 							}
-							if (tcr != null)
+							if (check)
 							{
 								txtrOutput.setText("Teacher Record");
 								
@@ -425,17 +428,20 @@ public class ClientInterface
 						
 						if(txtT1.getText().toUpperCase().contains("SR"))
 						{
-							StudentRecord std = null;
+							//StudentRecord std = null;
+							ManagerClient mng;
+							boolean check = false;
 							try 
 							{
-								ManagerClient mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
-								std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
+								mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
+								//std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
+								check = mng.callRecordExist(txtT1.getText().toUpperCase());
 							} 
 							catch (RemoteException e) 
 							{
 								//e.printStackTrace();
 							}
-							if (std != null)
+							if (check)
 							{
 								txtrOutput.setText("Student Record");
 								
@@ -453,15 +459,15 @@ public class ClientInterface
 								
 								if(rdbtnField1.isSelected())
 								{
-									coursesExisting = std.getCoursesRegistred();
-									
-									String out = "Registered Courses: ";
-									for (int i = 0; i < coursesExisting.size(); i ++)
-									{
-										out = out + "[" + coursesExisting.get(i) + "] ";
-									}
-									txtrOutput.setText(out);
-									coursesExisting.clear();
+//									coursesExisting = std.getCoursesRegistred();
+//									
+//									String out = "Registered Courses: ";
+//									for (int i = 0; i < coursesExisting.size(); i ++)
+//									{
+//										out = out + "[" + coursesExisting.get(i) + "] ";
+//									}
+//									txtrOutput.setText(out);
+//									coursesExisting.clear();
 								}
 							}
 							else
@@ -771,24 +777,24 @@ public class ClientInterface
 						chckbxActive.setText("(Check to Rest)");
 						chckbxActive.setVisible(true);
 						
-						StudentRecord std = null;
-						try 
-						{
-							ManagerClient mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
-							std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
-						} 
-						catch (RemoteException e) 
-						{
-							//e.printStackTrace();
-						}
-						coursesExisting = std.getCoursesRegistred();
-											
-						String out = "Registered Courses: ";
-						for (int i = 0; i < coursesExisting.size(); i ++)
-						{
-							out = out + "[" + coursesExisting.get(i) + "] ";
-						}
-						txtrOutput.setText(out);
+//						StudentRecord std = null;
+//						try 
+//						{
+//							ManagerClient mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
+//							std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
+//						} 
+//						catch (RemoteException e) 
+//						{
+//							//e.printStackTrace();
+//						}
+//						coursesExisting = std.getCoursesRegistred();
+//											
+//						String out = "Registered Courses: ";
+//						for (int i = 0; i < coursesExisting.size(); i ++)
+//						{
+//							out = out + "[" + coursesExisting.get(i) + "] ";
+//						}
+//						txtrOutput.setText(out);
 					}					
 				}
 				
