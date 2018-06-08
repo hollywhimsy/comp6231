@@ -11,8 +11,6 @@ public class CenterManagerFactory {
         };
     }
 
-
-
     public static CenterManager createCenterManagerForMontreal(){
         return new CenterManagerForLocation(Constants.Locations.MTL);
     }
