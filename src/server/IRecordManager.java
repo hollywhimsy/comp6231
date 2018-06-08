@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
-public interface IRecordManager extends Remote {
-
+public interface IRecordManager extends Remote 
+{
     boolean createTRecord(String firstName,
                           String lastName,
                           String address,
