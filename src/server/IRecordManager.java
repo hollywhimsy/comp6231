@@ -31,6 +31,4 @@ public interface IRecordManager extends Remote {
                        String callerId) throws RemoteException;
     
     boolean recordExist(String recordId) throws RemoteException;
-
-//    Record returnRecord(String recordId, String callerId) throws RemoteException;
 }
