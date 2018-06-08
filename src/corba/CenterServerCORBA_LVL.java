@@ -1,6 +1,5 @@
 package corba;
 
-import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,17 +17,15 @@ import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 import common.Logger;
 import record.Record;
-import server.RecordManager;
+import server.Infrastucture;
+import server.UDPServer;
 
-public class CenterServerCORBA
+public class CenterServerCORBA_LVL
 {
 	public static void main(String[] args)
 	{
 		String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
-		RecordManager obj = null;
-	    DatagramSocket socket = null;
-	    String city = "MTL";
-	    int port;
+		String city = "LVL";
 	    Logger logger;
 	    HashMap<Character, List<Record>> recordsMap = new HashMap<>();
 	    
@@ -67,13 +64,19 @@ public class CenterServerCORBA
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 			
 			// bind the Object Reference in Naming
-			String name = "RecordManagerCORBA";
+			String name = "RecordManagerCORBA_LVL";
 			NameComponent path[] = ncRef.to_name(name);
 			ncRef.rebind(path, href);
-			System.out.println("RecordManagerCORBA_1 ready and waiting ...");
 			
-			// wait for invocations from clients
-			orb.run();
+
+			// Start UDP CenterServer as a separate thread
+	        Integer udpPort = Infrastucture.getServerPortUDP(city);
+	        UDPServer srv = new UDPServer(recordsMap, udpPort, city, logger);
+	        srv.start();
+	        
+	        System.out.println("RecordManagerCORBA_LVL ready and waiting ...");
+	        // wait for invocations from clients
+			orb.run();			
 			
 		} catch (InvalidName e)
 		{
