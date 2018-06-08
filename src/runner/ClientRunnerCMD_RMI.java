@@ -1,12 +1,13 @@
-package runners;
+package runner;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import common.Constants;
-import network.ManagerClient;
 
-public class ClientRunner 
+import common.Constants;
+import manager.ManagerClient;
+
+public class ClientRunnerCMD_RMI 
 {
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception

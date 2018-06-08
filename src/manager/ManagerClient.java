@@ -1,8 +1,11 @@
-package network;
+package manager;
 
 import java.util.*;
 import common.Constants;
 import common.Logger;
+import server.IRecordManager;
+import server.Infrastucture;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

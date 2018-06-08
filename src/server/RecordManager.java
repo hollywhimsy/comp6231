@@ -1,9 +1,10 @@
-package network;
+package server;
 
-import common.Record;
-import common.TeacherRecord;
-import common.StudentRecord;
 import common.Logger;
+import record.Record;
+import record.StudentRecord;
+import record.TeacherRecord;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Date;

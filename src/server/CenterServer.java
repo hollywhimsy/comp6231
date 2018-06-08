@@ -1,7 +1,8 @@
-package network;
+package server;
 
 import common.Logger;
-import common.Record;
+import record.Record;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

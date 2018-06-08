@@ -1,7 +1,8 @@
-package network;
+package server;
 
-import common.Record;
 import common.Logger;
+import record.Record;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
