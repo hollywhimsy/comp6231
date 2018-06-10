@@ -23,7 +23,7 @@ module corba
 						in string newValue,
 						in string callerId);
     
-    	boolean recordExist(in string recordId);
+    	boolean recordExist(in string recordId, in string callerId);
 
 		boolean transferRecord (in string managerId,
 						in string recordId,
