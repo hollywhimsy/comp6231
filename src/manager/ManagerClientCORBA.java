@@ -37,7 +37,8 @@ public class ManagerClientCORBA extends Thread
 	private Date statusDate;
 	private String recordId;
 	private String fieldName;
-	private Object newValue;		
+	private Object newValue;
+	private String remoteCenterServerName;
 
 	// Constructor (default)
     public ManagerClientCORBA(String managerId) 
@@ -106,11 +107,11 @@ public class ManagerClientCORBA extends Thread
   	public ManagerClientCORBA(String methodToCall, 
   			String managerId,
   			String recordId,
-  			String city) 
+  			String remoteCenterServerName) 
   	{
   		this.managerId = managerId;
   		this.methodToCall = methodToCall;
-  		this.city = city;
+  		this.remoteCenterServerName = remoteCenterServerName;
   		this.recordId = recordId;
   		initialize();		
   	}
@@ -223,33 +224,35 @@ public class ManagerClientCORBA extends Thread
 		}
     	
     	String newVal;
-    	if (fieldName.equals("coursesRegistred"))
-    	{
-    		newVal = "";
+    	switch (fieldName)
+		{
+		case "coursesRegistred":
+			newVal = "";
     		String spliter = "";
     		for (int i = 0; i < ((List<String>) newValue).size(); i++)
     		{
     			// form the acceptable format by remote CORBA server
     			newVal = newVal + spliter + ((List<String>) newValue).get(i);
     			spliter = ",";
-    		}
-    	}else if (fieldName.equals("status"))
-    	{
+    		}			
+			break;
+		case "status":
 			if ((boolean) newValue)
 				newVal = "true";
 			else
 				newVal = "false";
-		}else if (fieldName.equals("statusDate"))
-		{
+			break;
+		case "statusDate":
 			newVal = ((Date) newValue).toString();
-		}else if (fieldName.equals("phoneNumber"))
-		{
+			break;
+		case "phoneNumber":
 			newVal = ((Integer) newValue).toString();
-		}else
-		{
+			break;
+		default:
 			newVal = (String) newValue;
+			break;
 		}
-		
+    			
 		if (recordManager.editRecord(recordId, fieldName, newVal, managerId))
 		{
 			logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()]: callEditRecord called on " +
@@ -287,8 +290,7 @@ public class ManagerClientCORBA extends Thread
 		
 		logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
 				city + " server and failed");
-		return null;
-				
+		return null;				
 	}
 	
  	public boolean callRecordExist(String recordId)
@@ -316,7 +318,8 @@ public class ManagerClientCORBA extends Thread
 			return false;
 		}
  		
- 		if (recordManager.transferRecord(managerId, recordId, city.toUpperCase().trim()))
+ 		System.out.println(managerId + " " + recordId + " " + remoteCenterServerName.toUpperCase().trim());
+ 		if (recordManager.transferRecord(managerId, recordId, remoteCenterServerName.toUpperCase().trim()))
  		{
  			logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
 					"}: Record is trasfered successfully");
@@ -366,17 +369,14 @@ public class ManagerClientCORBA extends Thread
 		} catch (NotFound e)
 		{
 			corbaInitiation = false;
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CannotProceed e)
 		{
 			corbaInitiation = false;
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
 		{
 			corbaInitiation = false;
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}			
 	}

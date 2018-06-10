@@ -360,7 +360,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	            {
 					synchronized (indexPerId)
 					{					
-						logger.logToFile(indexPerId.size() + "");
+						//logger.logToFile(indexPerId.size() + "");
 						teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
 						if (teacher == null)
 						{
@@ -378,7 +378,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Record removed from Index on this server"
 				                    + " {CallerManagerID: " + managerId + "}");
 						}
-						logger.logToFile(indexPerId.size() + "");
+						//logger.logToFile(indexPerId.size() + "");
 					}
 	            }
 								
@@ -477,7 +477,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			//e.printStackTrace();
 		}
 		
-		logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully"
+		logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully to: " + city 
                 + " {CallerManagerID: " + managerId + "}");
 		
 		return true;

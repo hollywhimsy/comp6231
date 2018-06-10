@@ -37,7 +37,7 @@ public class ClientRunnerCMD_CORBA
 		mng3.start();
 		
 		// Call Get Records Count
-		ManagerClientCORBA mng4 = new ManagerClientCORBA("MTL0004");
+		ManagerClientCORBA mng4 = new ManagerClientCORBA("MTL0001");
 		System.out.println(mng4.callGetRecordCounts()); // This can be called by "run" as a thread too
 			
 		// Test if record exists
@@ -48,21 +48,18 @@ public class ClientRunnerCMD_CORBA
 		else
 			System.out.println("There is NO record corresponding to ID: " + id);
 		
-		 //Call transfer Record
-		ManagerClientCORBA mng6 = new ManagerClientCORBA("TransferRecord", "MTL0001", "TR00001", "LVL");
-		if (mng6.callTransferRecord()) // Also this can called by "run" as a thread
-		{
-			System.out.println("Treansfered");
-		}
-			
+		//Call transfer Record
 		try
 		{
-			TimeUnit.SECONDS.sleep(2);
+			// We need to give time the record to be created first, then transfer it
+			// unless, the transfer correctly fails with no such a record error
+			TimeUnit.SECONDS.sleep(1); 
 		} catch (InterruptedException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}		
+		ManagerClientCORBA mng6 = new ManagerClientCORBA("TransferRecord", "MTL0001", "TR00001", "LVL");
+		mng6.run(); // Also this can be called directly
 		
 		// Call Get Records again
 		ManagerClientCORBA mng7 = new ManagerClientCORBA("DDO0001");
