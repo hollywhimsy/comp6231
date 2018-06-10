@@ -1,4 +1,4 @@
-package server;
+package udp;
 
 import common.Logger;
 import record.Record;

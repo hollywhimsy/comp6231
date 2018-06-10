@@ -1,7 +1,4 @@
-package server;
-
-//import com.sun.corba.se.impl.orbutil.closure.Constant;
-import common.Constants;
+package common;
 
 import java.util.*;
 

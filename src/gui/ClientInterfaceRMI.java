@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 
-import manager.ManagerClient;
+import manager.ManagerClientRMI;
 
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.JScrollPane;
 
-public class ClientInterface 
+public class ClientInterfaceRMI 
 {
 
 	private JFrame frameDCMS1;
@@ -96,7 +96,7 @@ public class ClientInterface
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientInterface window = new ClientInterface();
+					ClientInterfaceRMI window = new ClientInterfaceRMI();
 					window.frameDCMS1.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -108,7 +108,7 @@ public class ClientInterface
 	/**
 	 * Create the application.
 	 */
-	public ClientInterface() 
+	public ClientInterfaceRMI() 
 	{
 		initialize();
 		invisibleAll();
@@ -393,11 +393,11 @@ public class ClientInterface
 						if(txtT1.getText().toUpperCase().contains("TR"))
 						{
 							//TeacherRecord tcr = null;
-							ManagerClient mng;
+							ManagerClientRMI mng;
 							boolean check = false;
 							try 
 							{
-								mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
+								mng = new ManagerClientRMI(cmbManagers.getSelectedItem().toString());
 								//tcr = (TeacherRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
 								check = mng.callRecordExist(txtT1.getText().toUpperCase());
 							} 
@@ -429,11 +429,11 @@ public class ClientInterface
 						if(txtT1.getText().toUpperCase().contains("SR"))
 						{
 							//StudentRecord std = null;
-							ManagerClient mng;
+							ManagerClientRMI mng;
 							boolean check = false;
 							try 
 							{
-								mng = new ManagerClient(cmbManagers.getSelectedItem().toString());
+								mng = new ManagerClientRMI(cmbManagers.getSelectedItem().toString());
 								//std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
 								check = mng.callRecordExist(txtT1.getText().toUpperCase());
 							} 
@@ -1307,7 +1307,7 @@ public class ClientInterface
 		{
 			if(!simultaneously)
 			{
-				ManagerClient mng = new ManagerClient("CreateTeacher", 
+				ManagerClientRMI mng = new ManagerClientRMI("CreateTeacher", 
 						cmbManagers.getSelectedItem().toString(), 
 						txtT1.getText().trim(), 
 						txtT2.getText().trim(), 
@@ -1323,7 +1323,7 @@ public class ClientInterface
 				{
 					if(cmbManagers.getItemAt(i).toUpperCase().subSequence(0, 3).equals(txtT5.getText().trim().toUpperCase()))
 					{
-						ManagerClient mng = new ManagerClient("CreateTeacher", 
+						ManagerClientRMI mng = new ManagerClientRMI("CreateTeacher", 
 								cmbManagers.getItemAt(i), 
 								txtT1.getText().trim(), 
 								txtT2.getText().trim(), 
@@ -1377,7 +1377,7 @@ public class ClientInterface
 			date.setMonth(Integer.parseInt(cmbMonth.getSelectedItem().toString()));
 			if(!simultaneously)
 			{
-				ManagerClient mng = new ManagerClient("CreateStudent", 
+				ManagerClientRMI mng = new ManagerClientRMI("CreateStudent", 
 						cmbManagers.getSelectedItem().toString(), 
 						txtT1.getText().trim(), 
 						txtT2.getText().trim(), 
@@ -1390,7 +1390,7 @@ public class ClientInterface
 			{
 				for (int i = 0; i < cmbManagers.getItemCount(); i++)
 				{
-					ManagerClient mng = new ManagerClient("CreateStudent", 
+					ManagerClientRMI mng = new ManagerClientRMI("CreateStudent", 
 							cmbManagers.getItemAt(i), 
 							txtT1.getText().trim(), 
 							txtT2.getText().trim(), 
@@ -1407,14 +1407,14 @@ public class ClientInterface
 	{		
 		if(!simultaneously)
 		{
-			ManagerClient mng = new ManagerClient("GetCounts", cmbManagers.getSelectedItem().toString());
+			ManagerClientRMI mng = new ManagerClientRMI("GetCounts", cmbManagers.getSelectedItem().toString());
 			mng.start();				
 		}
 		else
 		{
 			for (int i = 0; i < cmbManagers.getItemCount(); i++)
 			{
-				ManagerClient mng = new ManagerClient("GetCounts", cmbManagers.getItemAt(i));
+				ManagerClientRMI mng = new ManagerClientRMI("GetCounts", cmbManagers.getItemAt(i));
 				mng.start();
 			}				
 		}					
@@ -1435,7 +1435,7 @@ public class ClientInterface
 				{
 					if(!simultaneously)
 					{
-						ManagerClient mng = new ManagerClient("EditRecords", 
+						ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 								cmbManagers.getSelectedItem().toString(), 
 								txtT1.getText().trim().toUpperCase(), 
 								"coursesRegistred", 
@@ -1446,7 +1446,7 @@ public class ClientInterface
 					{
 						for (int i = 0; i < cmbManagers.getItemCount(); i++)
 						{
-							ManagerClient mng = new ManagerClient("EditRecords", 
+							ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 									cmbManagers.getItemAt(i), 
 									txtT1.getText().trim().toUpperCase(), 
 									"coursesRegistred", 
@@ -1461,7 +1461,7 @@ public class ClientInterface
 			{
 				if(!simultaneously)
 				{
-					ManagerClient mng = new ManagerClient("EditRecords", 
+					ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 							cmbManagers.getSelectedItem().toString(), 
 							txtT1.getText().trim().toUpperCase(), 
 							"status", 
@@ -1472,7 +1472,7 @@ public class ClientInterface
 				{
 					for (int i = 0; i < cmbManagers.getItemCount(); i++)
 					{
-						ManagerClient mng = new ManagerClient("EditRecords", 
+						ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 								cmbManagers.getItemAt(i), 
 								txtT1.getText().trim().toUpperCase(), 
 								"status", 
@@ -1492,7 +1492,7 @@ public class ClientInterface
 				
 				if(!simultaneously)
 				{	
-					ManagerClient mng = new ManagerClient("EditRecords", 
+					ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 							cmbManagers.getSelectedItem().toString(), 
 							txtT1.getText().trim().toUpperCase(), 
 							"statusDate", 
@@ -1503,7 +1503,7 @@ public class ClientInterface
 				{
 					for (int i = 0; i < cmbManagers.getItemCount(); i++)
 					{
-						ManagerClient mng = new ManagerClient("EditRecords", 
+						ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 								cmbManagers.getItemAt(i), 
 								txtT1.getText().trim().toUpperCase(), 
 								"statusDate", 
@@ -1522,7 +1522,7 @@ public class ClientInterface
 				{
 					if(!simultaneously)
 					{
-						ManagerClient mng = new ManagerClient("EditRecords", 
+						ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 								cmbManagers.getSelectedItem().toString(), 
 								txtT1.getText().trim().toUpperCase(), 
 								"address", 
@@ -1533,7 +1533,7 @@ public class ClientInterface
 					{
 						for (int i = 0; i < cmbManagers.getItemCount(); i++)
 						{
-							ManagerClient mng = new ManagerClient("EditRecords", 
+							ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 									cmbManagers.getItemAt(i), 
 									txtT1.getText().trim().toUpperCase(), 
 									"address", 
@@ -1560,7 +1560,7 @@ public class ClientInterface
 					{
 						if(!simultaneously)
 						{
-							ManagerClient mng = new ManagerClient("EditRecords", 
+							ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 									cmbManagers.getSelectedItem().toString(), 
 									txtT1.getText().trim().toUpperCase(), 
 									"phoneNumber", 
@@ -1571,7 +1571,7 @@ public class ClientInterface
 						{
 							for (int i = 0; i < cmbManagers.getItemCount(); i++)
 							{
-								ManagerClient mng = new ManagerClient("EditRecords", 
+								ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 										cmbManagers.getItemAt(i), 
 										txtT1.getText().trim().toUpperCase(), 
 										"phoneNumber", 
@@ -1595,7 +1595,7 @@ public class ClientInterface
 				{
 					if(!simultaneously)
 					{
-						ManagerClient mng = new ManagerClient("EditRecords", 
+						ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 								cmbManagers.getSelectedItem().toString(), 
 								txtT1.getText().trim().toUpperCase(), 
 								"location", 
@@ -1606,7 +1606,7 @@ public class ClientInterface
 					{
 						for (int i = 0; i < cmbManagers.getItemCount(); i++)
 						{
-							ManagerClient mng = new ManagerClient("EditRecords", 
+							ManagerClientRMI mng = new ManagerClientRMI("EditRecords", 
 									cmbManagers.getItemAt(i), 
 									txtT1.getText().trim().toUpperCase(), 
 									"location", 

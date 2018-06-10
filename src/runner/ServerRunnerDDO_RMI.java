@@ -1,11 +1,11 @@
 package runner;
 
-import server.CenterServer;
+import rmi.CenterServerRMI;
 
 public class ServerRunnerDDO_RMI {
 
 	public static void main(String[] args) {
-		CenterServer srv = new CenterServer("DDO");
+		CenterServerRMI srv = new CenterServerRMI("DDO");
 		srv.start();
 	}
 

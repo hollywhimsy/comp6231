@@ -2,21 +2,21 @@ package manager;
 
 import java.util.*;
 import common.Constants;
+import common.Infrastucture;
 import common.Logger;
-import server.IRecordManager;
-import server.Infrastucture;
+import rmi.IRecordManagerRMI;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class ManagerClient extends Thread implements IManagerClient 
+public class ManagerClientRMI extends Thread implements IManagerClientRMI 
 {
     private String managerId;
     private Registry registry = null;
     private String city;
-    private IRecordManager remoteObject = null;
+    private IRecordManagerRMI remoteObject = null;
     private Logger logger;
 	private Logger operationResultLogger;	
 	private String methodToCall;
@@ -33,20 +33,20 @@ public class ManagerClient extends Thread implements IManagerClient
 	private Object newValue;	
 
 	// Constructor (default)
-    public ManagerClient(String managerId) 
+    public ManagerClientRMI(String managerId) 
     {
     	this.managerId = managerId;
     	initialize();
     }    
     // Constructor1
- 	public ManagerClient(String methodToCall, String managerId) 
+ 	public ManagerClientRMI(String methodToCall, String managerId) 
  	{
  		this.managerId = managerId;
  		this.methodToCall = methodToCall;		
  		initialize();		
  	}
  	// Constructor2
- 	public ManagerClient(String methodToCall, 
+ 	public ManagerClientRMI(String methodToCall, 
  			String managerId, 
  			String firstName, 
  			String lastName, 
@@ -64,7 +64,7 @@ public class ManagerClient extends Thread implements IManagerClient
  		initialize();		
  	}
  	// Constructor3
- 	public ManagerClient(String methodToCall, 
+ 	public ManagerClientRMI(String methodToCall, 
  			String managerId, 
  			String firstName, 
  			String lastName, 
@@ -82,7 +82,7 @@ public class ManagerClient extends Thread implements IManagerClient
  		initialize();		
  	}
  	// Constructor4
- 	public ManagerClient(String methodToCall, 
+ 	public ManagerClientRMI(String methodToCall, 
  			String managerId,
  			String recordId,
  			String fieldName, 			
@@ -298,7 +298,7 @@ public class ManagerClient extends Thread implements IManagerClient
             //System.out.println(serverHost + " " + serverPort);
             
             registry = LocateRegistry.getRegistry(serverHost, serverPort);
-            remoteObject = (IRecordManager) registry.lookup(city);
+            remoteObject = (IRecordManagerRMI) registry.lookup(city);
          
 			logger.logToFile(managerId + "[Manager Constructor]: Manager connected to RMI registry");
 		} 
@@ -358,7 +358,7 @@ public class ManagerClient extends Thread implements IManagerClient
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ManagerClient other = (ManagerClient) obj;
+        ManagerClientRMI other = (ManagerClientRMI) obj;
         if (managerId == null) {
             if (other.managerId != null)
                 return false;

@@ -1,18 +1,18 @@
 package runner;
 
 import common.Constants;
-import server.CenterServer;
+import rmi.CenterServerRMI;
 
 public class ServerRunnerAll_RMI {
 
     public static void main(String[] args) {
-        CenterServer srvMTL = new CenterServer(Constants.Locations.MTL.name());
+        CenterServerRMI srvMTL = new CenterServerRMI(Constants.Locations.MTL.name());
         srvMTL.start();
 
-        CenterServer srvLVL = new CenterServer(Constants.Locations.LVL.name());
+        CenterServerRMI srvLVL = new CenterServerRMI(Constants.Locations.LVL.name());
         srvLVL.start();
 
-        CenterServer srvDDO = new CenterServer(Constants.Locations.DDO.name());
+        CenterServerRMI srvDDO = new CenterServerRMI(Constants.Locations.DDO.name());
         srvDDO.start();
     }
 

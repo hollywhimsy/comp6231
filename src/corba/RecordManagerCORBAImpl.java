@@ -11,14 +11,14 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 
+import common.Infrastucture;
 import common.Logger;
 import record.Record;
 import record.StudentRecord;
 import record.TeacherRecord;
-import server.Infrastucture;
-import server.UDPClient;
+import udp.UDPClient;
 
-public class RecordManagerImpl extends RecordManagerCORBAPOA
+public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 {
 	private ORB orb;
 	private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
@@ -35,7 +35,7 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 	}
 	
 	//Constructor
-	public RecordManagerImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbreviation, Logger logger)
+	public RecordManagerCORBAImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbreviation, Logger logger)
 	{
 		super();
 		this.recordsMap = recordsMap;
@@ -174,7 +174,7 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
         }
 
         logger.logToFile(cityAbbreviation + "[RecordManagerImpl.getRecordCounts()]: getRecordCounts is successfully done" +
-                " {CallerManagerID: " + callerId + "}");
+                " {CallerManagerID: " + callerId + "}" + result);
         return result;		
 	}
 
@@ -315,7 +315,6 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
         }
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	public boolean transferRecord(String managerId, String recordId, String remoteCenterServerName)
 	{
@@ -360,16 +359,26 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 				synchronized (recordsMap) 
 	            {
 					synchronized (indexPerId)
-					{						
-							teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-							if (teacher == null)
-							{
-								logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
-					                    + " {CallerManagerID: " + managerId + "}");
-								return false; //The given record dosen't exist in this server
-							}
-							recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
-							indexPerId.remove(recordId.toUpperCase().trim()); // Delete the record from the Index						
+					{					
+						logger.logToFile(indexPerId.size() + "");
+						teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
+						if (teacher == null)
+						{
+							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
+				                    + " {CallerManagerID: " + managerId + "}");
+							return false; //The given record dosen't exist in this server
+						}
+						if (recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher)) // Delete the record from the Map
+						{
+							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Record removed from HashMap on this server"
+				                    + " {CallerManagerID: " + managerId + "}");
+						}
+						if (indexPerId.remove(recordId.toUpperCase().trim(), teacher)) // Delete the record from the Index		
+						{
+							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Record removed from Index on this server"
+				                    + " {CallerManagerID: " + managerId + "}");
+						}
+						logger.logToFile(indexPerId.size() + "");
 					}
 	            }
 								
@@ -383,13 +392,18 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 				}
 				// Call the remote server to add this record on that
 				// By calling createTRecord on the remote server, new record ID will be assigned to the record
-				recMng.createTRecord(teacher.getFirstName(), 
+				if (!(recMng.createTRecord(teacher.getFirstName(), 
 						teacher.getLastName(), 
 						teacher.getAddress(), 
 						teacher.getPhone().toString(), 
 						spec, 
 						city, 
-						city + "0001");
+						city + "0001")))
+				{
+					logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
+		                    + " {CallerManagerID: " + managerId + "}");
+					return false; //The given record dosen't exist in this server
+				}
 				
 				//recMng.shutdown();						
 			} 
@@ -408,8 +422,16 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 				                    + " {CallerManagerID: " + managerId + "}");
 							return false; //The given record dosen't exist in this server
 						}
-						recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
-						indexPerId.remove(recordId.toUpperCase().trim()); // Delete the record from the Index						
+						if (recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student)) // Delete the record from the Map
+						{
+							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Record removed from HashMap on this server"
+				                    + " {CallerManagerID: " + managerId + "}");
+						}
+						if (indexPerId.remove(recordId.toUpperCase().trim(), student)) // Delete the record from the Index		
+						{
+							logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Record removed from Index on this server"
+				                    + " {CallerManagerID: " + managerId + "}");
+						}						
 					}
 	            }
 							
@@ -422,12 +444,17 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 					spliter = ",";
 				}
 				// Call the remote server to add this record on that
-				recMng.createSRecord(student.getFirstName(), 
+				if (!(recMng.createSRecord(student.getFirstName(), 
 						student.getLastName(), 
 						courses, 
 						student.getStatus(), 
 						student.getDate().toString(), 
-						city + "0001");				
+						city + "0001")))
+				{
+					logger.logToFile(cityAbbreviation + "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
+		                    + " {CallerManagerID: " + managerId + "}");
+					return false; //The given record dosen't exist in this server
+				}
 				
 				//recMng.shutdown();	
 			}						

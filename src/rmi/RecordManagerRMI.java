@@ -1,9 +1,11 @@
-package server;
+package rmi;
 
+import common.Infrastucture;
 import common.Logger;
 import record.Record;
 import record.StudentRecord;
 import record.TeacherRecord;
+import udp.UDPClient;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 // Each CenterServer Center has one object instance of this class
-public class RecordManager extends UnicastRemoteObject implements IRecordManager 
+public class RecordManagerRMI extends UnicastRemoteObject implements IRecordManagerRMI 
 {
     private static final long serialVersionUID = 1L;
     private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
@@ -24,7 +26,7 @@ public class RecordManager extends UnicastRemoteObject implements IRecordManager
     private Logger logger;
 
     // Constructor
-    public RecordManager(String abbr, HashMap<Character, List<Record>> recordsMap, Logger logger) throws RemoteException 
+    public RecordManagerRMI(String abbr, HashMap<Character, List<Record>> recordsMap, Logger logger) throws RemoteException 
     {
         super();
 

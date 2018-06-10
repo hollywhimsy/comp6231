@@ -3,7 +3,7 @@ package manager;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IManagerClient extends Remote {
+public interface IManagerClientRMI extends Remote {
 
 	boolean callCreateTRecord() throws RemoteException;
 

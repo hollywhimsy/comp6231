@@ -1,11 +1,11 @@
 package runner;
 
-import server.CenterServer;
+import rmi.CenterServerRMI;
 
 public class ServerRunnerMTL_RMI {
 
 	public static void main(String[] args) {
-        CenterServer srv = new CenterServer("MTL");
+        CenterServerRMI srv = new CenterServerRMI("MTL");
         srv.start();
 	}
 

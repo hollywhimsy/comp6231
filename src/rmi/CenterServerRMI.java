@@ -1,8 +1,9 @@
-package server;
+package rmi;
 
+import common.Infrastucture;
 import common.Logger;
 import record.Record;
-
+import udp.UDPServer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +14,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.AccessException;
 
-
-public class CenterServer extends Thread 
+public class CenterServerRMI extends Thread 
 {
-    RecordManager obj = null;
+    RecordManagerRMI obj = null;
     DatagramSocket socket = null;
     private String city;
     private int port;
@@ -30,11 +30,11 @@ public class CenterServer extends Thread
      */
 
     // Constructor
-    public CenterServer(String city) 
+    public CenterServerRMI(String city) 
     {
         this.city = city;
         this.port = Infrastucture.getServerPort(city);
-        logger = new Logger("SRV_" + city.trim() + ".log");
+        logger = new Logger("SRV_" + city.toUpperCase().trim() + ".log");
         logger.logToFile(city + "[CenterServer Constructor]: Center server is created :)");
     }
 
@@ -55,7 +55,7 @@ public class CenterServer extends Thread
 	        }
 	        logger.logToFile(city + "[CenterServer.run()]: HashMap initialization is done");
 	
-	        RecordManager obj = new RecordManager(city, recordsMap, logger);
+	        RecordManagerRMI obj = new RecordManagerRMI(city, recordsMap, logger);
 	                 
 	        // Start UDP CenterServer as a separate thread
 	        Integer udpPort = Infrastucture.getServerPortUDP(city);

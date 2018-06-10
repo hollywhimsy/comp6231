@@ -1,10 +1,10 @@
-package server;
+package rmi;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
-public interface IRecordManager extends Remote 
+public interface IRecordManagerRMI extends Remote 
 {
     boolean createTRecord(String firstName,
                           String lastName,

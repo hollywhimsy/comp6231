@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import common.Constants;
-import manager.ManagerClient;
+import manager.ManagerClientRMI;
 
 public class ClientRunnerCMD_RMI 
 {
@@ -19,7 +19,7 @@ public class ClientRunnerCMD_RMI
 		List<String> spec = new ArrayList<String>();
 		spec.add("Math");
 		spec.add("Computer");
-		ManagerClient mng = new ManagerClient(Constants.RemoteProcedures.CreateTeacher.name(), "MTL0001", "Bob", "Azadi", "Garland", 123458886, spec);
+		ManagerClientRMI mng = new ManagerClientRMI(Constants.RemoteProcedures.CreateTeacher.name(), "MTL0001", "Bob", "Azadi", "Garland", 123458886, spec);
 		mng.start();		
 				
 		// Call Create Student Record by mng2 as a sample
@@ -28,22 +28,22 @@ public class ClientRunnerCMD_RMI
 		courses.add("Dist");
 		Date date = new Date();
 		date.getTime();
-		ManagerClient mng2 = new ManagerClient(Constants.RemoteProcedures.CreateStudent.name(), "MTL0002", "Alice", "Amani", courses, true, date);
+		ManagerClientRMI mng2 = new ManagerClientRMI(Constants.RemoteProcedures.CreateStudent.name(), "MTL0002", "Alice", "Amani", courses, true, date);
 		mng2.start();
 		
 		// Call Edit Record by mng2 as a sample
 		Date date2 = new Date();
 		date2.getTime();
 		date2.setDate(11);
-		ManagerClient mng3 = new ManagerClient(Constants.RemoteProcedures.EditRecords.name(), "MTL0003", "SR00001", "statusDate", date2);
+		ManagerClientRMI mng3 = new ManagerClientRMI(Constants.RemoteProcedures.EditRecords.name(), "MTL0003", "SR00001", "statusDate", date2);
 		mng3.start();
 		
 		// Call Get Records Count by mng3 as a sample
-		ManagerClient mng4 = new ManagerClient(Constants.RemoteProcedures.EditRecords.name(), "MTL0004");
+		ManagerClientRMI mng4 = new ManagerClientRMI(Constants.RemoteProcedures.EditRecords.name(), "MTL0004");
 		mng4.start();
 			
 		// Test if record exists
-		ManagerClient mng5 = new ManagerClient("MTL0005");
+		ManagerClientRMI mng5 = new ManagerClientRMI("MTL0005");
 		String id = "SR00001";
 		if (mng5.callRecordExist(id))
 			System.out.println("There is a record corresponding to ID: " + id);			
