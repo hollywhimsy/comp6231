@@ -23,7 +23,11 @@ module corba
 						in string newValue,
 						in string callerId);
     
-    	boolean recordExist(in string recordId);		
+    	boolean recordExist(in string recordId);
+
+		boolean transferRecord (in string managerId,
+						in string recordId,
+						in string remoteCenterServerName);
 
 		oneway void shutdown();
 	};	

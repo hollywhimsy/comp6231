@@ -287,6 +287,13 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 		else
 			return false;
 	}
+	
+	@Override
+	public boolean transferRecord(String managerId, String recordId, String remoteCenterServerName)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	@Override
 	public void shutdown()
@@ -372,4 +379,5 @@ public class RecordManagerImpl extends RecordManagerCORBAPOA
 
         return true;
     }
+	
 }
