@@ -30,10 +30,8 @@ import javax.swing.JScrollPane;
 
 public class ClientInterfaceCORBA
 {
-
 	private JFrame frameDCMS1;
 	private final ButtonGroup rdbtnGroupMainFunctions = new ButtonGroup();
-
 	private JRadioButton rdbtnAddManager;
 	private JRadioButton rdbtnCreateTeacher;
 	private JRadioButton rdbtnCreateStudent;
@@ -121,7 +119,7 @@ public class ClientInterfaceCORBA
 	{
 		frameDCMS1 = new JFrame();
 		frameDCMS1.setTitle("Distributed Class Management System - CORBA");
-		frameDCMS1.setBounds(100, 100, 1028, 621);
+		frameDCMS1.setBounds(100, 100, 1008, 621);
 		frameDCMS1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -321,7 +319,7 @@ public class ClientInterfaceCORBA
 		rdbtnGetRecordsCount.setBounds(30, 240, 306, 37);
 		pnlMain.add(rdbtnGetRecordsCount);
 
-		rdbtnEditARecord = new JRadioButton("Edit a Record");
+		rdbtnEditARecord = new JRadioButton("Edit Record");
 		rdbtnEditARecord.addActionListener(new ActionListener()
 		{
 			@SuppressWarnings("deprecation")
@@ -547,14 +545,7 @@ public class ClientInterfaceCORBA
 		pnlMain.add(txtT6);
 		txtT6.setColumns(10);
 
-		chckbxActive = new JCheckBox(" (Check if Active)");
-		chckbxActive.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-			}
-		});
+		chckbxActive = new JCheckBox(" (Check if Active)");	
 		chckbxActive.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		chckbxActive.setBounds(576, 274, 234, 37);
 		pnlMain.add(chckbxActive);
@@ -583,7 +574,6 @@ public class ClientInterfaceCORBA
 				{
 					if (txtT6.getText().toString().trim().length() == 0)
 					{
-						// if (specializations.size() == 0)
 						txtrOutput.setText("Error! Please enter the specialization");
 					} else
 					{
@@ -759,26 +749,6 @@ public class ClientInterfaceCORBA
 						lblLabel7.setVisible(true);
 						chckbxActive.setText("(Check to Rest)");
 						chckbxActive.setVisible(true);
-
-						// StudentRecord std = null;
-						// try
-						// {
-						// ManagerClient mng = new
-						// ManagerClient(cmbManagers.getSelectedItem().toString());
-						// std = (StudentRecord) mng.callReturnRecord(txtT1.getText().toUpperCase());
-						// }
-						// catch (RemoteException e)
-						// {
-						// //e.printStackTrace();
-						// }
-						// coursesExisting = std.getCoursesRegistred();
-						//
-						// String out = "Registered Courses: ";
-						// for (int i = 0; i < coursesExisting.size(); i ++)
-						// {
-						// out = out + "[" + coursesExisting.get(i) + "] ";
-						// }
-						// txtrOutput.setText(out);
 					}
 				}
 
@@ -1023,7 +993,7 @@ public class ClientInterfaceCORBA
 		btnAddManager.setBounds(89, 124, 155, 37);
 		pnlMain.add(btnAddManager);
 
-		btnRunByAll = new JButton("Run By All Managers");
+		btnRunByAll = new JButton("Cuncurrent Execute");
 		btnRunByAll.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
@@ -1228,11 +1198,9 @@ public class ClientInterfaceCORBA
 
 		if (!simultaneously)
 		{
-			if (!cmbxManagers.getSelectedItem().toString().subSequence(0, 3)
-					.equals(txtT5.getText().trim().toUpperCase()))
+			if (!cmbxManagers.getSelectedItem().toString().subSequence(0, 3).equals(txtT5.getText().trim().toUpperCase()))
 			{
-				txtrOutput.setText(
-						"Error! Manager " + cmbxManagers.getSelectedItem() + " can only add record to Location "
+				txtrOutput.setText("Error! Manager " + cmbxManagers.getSelectedItem() + " can only add record to Location "
 								+ cmbxManagers.getSelectedItem().toString().substring(0, 3));
 				pass = false;
 			}
@@ -1283,8 +1251,7 @@ public class ClientInterfaceCORBA
 			{
 				for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 				{
-					if (cmbxManagers.getItemAt(i).toUpperCase().subSequence(0, 3)
-							.equals(txtT5.getText().trim().toUpperCase()))
+					if (cmbxManagers.getItemAt(i).toUpperCase().subSequence(0, 3).equals(txtT5.getText().trim().toUpperCase()))
 					{
 						ManagerClientCORBA mng = new ManagerClientCORBA("CreateTeacher", cmbxManagers.getItemAt(i),
 								txtT1.getText().trim(), txtT2.getText().trim(), txtT3.getText().trim(),
@@ -1416,8 +1383,7 @@ public class ClientInterfaceCORBA
 					{
 						for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 						{
-							if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-									.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+							if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 							{
 								ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords",
 										cmbxManagers.getItemAt(i), txtT1.getText().trim().toUpperCase(),
@@ -1451,8 +1417,7 @@ public class ClientInterfaceCORBA
 				{
 					for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 					{
-						if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-								.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+						if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 						{
 							ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords", cmbxManagers.getItemAt(i),
 									txtT1.getText().trim().toUpperCase(), "status", chckbxActive.isSelected());
@@ -1489,8 +1454,7 @@ public class ClientInterfaceCORBA
 				{
 					for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 					{
-						if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-								.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+						if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 						{
 							ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords", cmbxManagers.getItemAt(i),
 									txtT1.getText().trim().toUpperCase(), "statusDate", date2);
@@ -1526,8 +1490,7 @@ public class ClientInterfaceCORBA
 					{
 						for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 						{
-							if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-									.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+							if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 							{
 								ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords",
 										cmbxManagers.getItemAt(i), txtT1.getText().trim().toUpperCase(), "address",
@@ -1570,8 +1533,7 @@ public class ClientInterfaceCORBA
 						{
 							for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 							{
-								if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-										.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+								if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 								{
 									ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords",
 											cmbxManagers.getItemAt(i), txtT1.getText().trim().toUpperCase(),
@@ -1612,8 +1574,7 @@ public class ClientInterfaceCORBA
 					{
 						for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 						{
-							if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-									.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+							if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 							{
 								ManagerClientCORBA mng = new ManagerClientCORBA("EditRecords",
 										cmbxManagers.getItemAt(i), txtT1.getText().trim().toUpperCase(), "location",
@@ -1663,8 +1624,7 @@ public class ClientInterfaceCORBA
 		{
 			for (int i = 0; i < cmbxManagers.getItemCount(); i++)
 			{
-				if (cmbxManagers.getItemAt(i).subSequence(0, 3)
-						.equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
+				if (cmbxManagers.getItemAt(i).subSequence(0, 3).equals(cmbxManagers.getSelectedItem().toString().subSequence(0, 3)))
 				{
 					ManagerClientCORBA mng = new ManagerClientCORBA("TransferRecord", cmbxManagers.getItemAt(i),
 							txtT1.getText().trim().toUpperCase(), txtT2.getText().trim().toUpperCase());
