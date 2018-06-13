@@ -26,53 +26,53 @@ public class CenterServerCORBA extends Thread
 	private String city;
 	private Logger logger;
 	private HashMap<Character, List<Record>> recordsMap = new HashMap<>();
-	
+
 	// Constructor
 	public CenterServerCORBA(String city)
 	{
 		super();
 
 		this.city = city;
-				
+
 		configuration[0] = "-ORBInitialPort";
 		configuration[1] = "1050";
 		configuration[2] = "-ORBInitialHost";
 		configuration[3] = "localhost";
-		
+
 		logger = new Logger("SRV_" + city.toUpperCase().trim() + ".log");
-		
-		// HashMap initialization        
-        for(Character ch = 'A'; ch <= 'Z'; ch ++) 
-        {
-            ArrayList<Record> recordList = new ArrayList<>();
-            recordsMap.put(ch, recordList);
-        }
-        logger.logToFile(city + "[CenterServerCORBA Constructor]: HashMap initialization is done");
-        
-        logger.logToFile(city + "[CenterServerCORBA Constructor]: CORBA Center server is created :)");
+
+		// HashMap initialization
+		for (Character ch = 'A'; ch <= 'Z'; ch++)
+		{
+			ArrayList<Record> recordList = new ArrayList<>();
+			recordsMap.put(ch, recordList);
+		}
+		logger.logToFile(city + "[CenterServerCORBA Constructor]: HashMap initialization is done");
+
+		logger.logToFile(city + "[CenterServerCORBA Constructor]: CORBA Center server is created :)");
 	}
-    
+
 	// Thread Method
-    public void run() 
-    {
-    	try
+	public void run()
+	{
+		try
 		{
 			ORB orb = ORB.init(configuration, null);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: ORB is initialized");
-			
+
 			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 			rootPOA.the_POAManager().activate();
 			logger.logToFile(city + "[CenterServerCORBA.run()]: POA Manager is activated");
-			
-			RecordManagerCORBAImpl recMngImp= new RecordManagerCORBAImpl(recordsMap, city, logger);
+
+			RecordManagerCORBAImpl recMngImp = new RecordManagerCORBAImpl(recordsMap, city, logger);
 			recMngImp.setOrb(orb);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Servant with ORB is registered");
-			
+
 			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);
-			RecordManagerCORBA href= RecordManagerCORBAHelper.narrow(ref);
+			RecordManagerCORBA href = RecordManagerCORBAHelper.narrow(ref);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Object reference from Servant recieved");
-			
-			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");			
+
+			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: The Name Service in invoked");
 
@@ -82,15 +82,14 @@ public class CenterServerCORBA extends Thread
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Object reference is binded with Name Service");
 
 			// Start UDP CenterServer as a separate thread
-	        Integer udpPort = Infrastucture.getServerPortUDP(city);
-	        UDPServer srv = new UDPServer(recordsMap, udpPort, city, logger);
-	        srv.start();
-	        	        
-	        logger.logToFile(city + "[CenterServerCORBA.run()]: CORBA Server is started successfully");
-	        // wait for invocations from clients
+			Integer udpPort = Infrastucture.getServerPortUDP(city);
+			UDPServer srv = new UDPServer(recordsMap, udpPort, city, logger);
+			srv.start();
+
+			logger.logToFile(city + "[CenterServerCORBA.run()]: CORBA Server is started successfully");
+			// wait for invocations from clients
 			orb.run();
-			
-			
+
 		} catch (InvalidName e)
 		{
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Error! InvalidName");
@@ -105,7 +104,8 @@ public class CenterServerCORBA extends Thread
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Error! WrongPolicy");
 		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
 		{
-			logger.logToFile(city + "[CenterServerCORBA.run()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
+			logger.logToFile(
+					city + "[CenterServerCORBA.run()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
 		} catch (NotFound e)
 		{
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Error! NotFound");
@@ -113,5 +113,5 @@ public class CenterServerCORBA extends Thread
 		{
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Error! CannotProceed");
 		}
-    }
+	}
 }

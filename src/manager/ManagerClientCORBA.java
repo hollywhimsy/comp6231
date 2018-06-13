@@ -16,16 +16,17 @@ import corba.RecordManagerCORBAHelper;
 
 public class ManagerClientCORBA extends Thread
 {
-	private String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
+	private String[] configuration =
+	{ "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
 	private ORB orb;
 	private org.omg.CORBA.Object objRef;
 	private NamingContextExt ncRef;
 	private RecordManagerCORBA recordManager;
 	private boolean corbaInitiation = true;
 	private String managerId;
-    private String city;
-    private Logger logger;
-	private Logger operationResultLogger;	
+	private String city;
+	private Logger logger;
+	private Logger operationResultLogger;
 	private String methodToCall;
 	private String firstName;
 	private String lastName;
@@ -41,121 +42,109 @@ public class ManagerClientCORBA extends Thread
 	private String remoteCenterServerName;
 
 	// Constructor (default)
-    public ManagerClientCORBA(String managerId) 
-    {
-    	this.managerId = managerId;
-    	initialize();
-    }    
-    // Constructor1
- 	public ManagerClientCORBA(String methodToCall, String managerId) 
- 	{
- 		this.managerId = managerId;
- 		this.methodToCall = methodToCall;		
- 		initialize();		
- 	}
- 	// Constructor2
- 	public ManagerClientCORBA(String methodToCall, 
- 			String managerId, 
- 			String firstName, 
- 			String lastName, 
- 			String address,
- 			Integer phoneNumber, 
- 			List<String> specilization) 
- 	{
- 		this.managerId = managerId;
- 		this.methodToCall = methodToCall;
- 		this.firstName = firstName;
- 		this.lastName = lastName;
- 		this.address = address;
- 		this.phoneNumber = phoneNumber;
- 		this.specilization = specilization;
- 		initialize();		
- 	}
- 	// Constructor3
- 	public ManagerClientCORBA(String methodToCall, 
- 			String managerId, 
- 			String firstName, 
- 			String lastName, 
- 			List<String> coursesRegistred,
- 			boolean status, 
- 			Date statusDate) 
- 	{
- 		this.managerId = managerId;
- 		this.methodToCall = methodToCall;
- 		this.firstName = firstName;
- 		this.lastName = lastName;
- 		this.coursesRegistred = coursesRegistred;
- 		this.status = status;
- 		this.statusDate = statusDate;
- 		initialize();		
- 	}
- 	// Constructor4
- 	public ManagerClientCORBA(String methodToCall, 
- 			String managerId,
- 			String recordId,
- 			String fieldName, 			
- 			Object newValue) 
- 	{
- 		this.managerId = managerId;
- 		this.methodToCall = methodToCall;
- 		this.fieldName = fieldName;
- 		this.newValue = newValue;
- 		this.recordId = recordId;
- 		initialize();		
- 	}
- 	// Constructor5
-  	public ManagerClientCORBA(String methodToCall, 
-  			String managerId,
-  			String recordId,
-  			String remoteCenterServerName) 
-  	{
-  		this.managerId = managerId;
-  		this.methodToCall = methodToCall;
-  		this.remoteCenterServerName = remoteCenterServerName;
-  		this.recordId = recordId;
-  		initialize();		
-  	}
- 	
- 	// Thread Method
- 	public void run()
+	public ManagerClientCORBA(String managerId)
 	{
- 		if(methodToCall.equals(Constants.RemoteProcedures.CreateTeacher.name()))
+		this.managerId = managerId;
+		initialize();
+	}
+
+	// Constructor1
+	public ManagerClientCORBA(String methodToCall, String managerId)
+	{
+		this.managerId = managerId;
+		this.methodToCall = methodToCall;
+		initialize();
+	}
+
+	// Constructor2
+	public ManagerClientCORBA(String methodToCall, String managerId, String firstName, String lastName, String address,
+			Integer phoneNumber, List<String> specilization)
+	{
+		this.managerId = managerId;
+		this.methodToCall = methodToCall;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.phoneNumber = phoneNumber;
+		this.specilization = specilization;
+		initialize();
+	}
+
+	// Constructor3
+	public ManagerClientCORBA(String methodToCall, String managerId, String firstName, String lastName,
+			List<String> coursesRegistred, boolean status, Date statusDate)
+	{
+		this.managerId = managerId;
+		this.methodToCall = methodToCall;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.coursesRegistred = coursesRegistred;
+		this.status = status;
+		this.statusDate = statusDate;
+		initialize();
+	}
+
+	// Constructor4
+	public ManagerClientCORBA(String methodToCall, String managerId, String recordId, String fieldName, Object newValue)
+	{
+		this.managerId = managerId;
+		this.methodToCall = methodToCall;
+		this.fieldName = fieldName;
+		this.newValue = newValue;
+		this.recordId = recordId;
+		initialize();
+	}
+
+	// Constructor5
+	public ManagerClientCORBA(String methodToCall, String managerId, String recordId, String remoteCenterServerName)
+	{
+		this.managerId = managerId;
+		this.methodToCall = methodToCall;
+		this.remoteCenterServerName = remoteCenterServerName;
+		this.recordId = recordId;
+		initialize();
+	}
+
+	// Thread Method
+	public void run()
+	{
+		if (methodToCall.equals(Constants.RemoteProcedures.CreateTeacher.name()))
 		{
-			callCreateTRecord();			
+			callCreateTRecord();
 		}
-		
-		if(methodToCall.equals(Constants.RemoteProcedures.CreateStudent.name()))
+
+		if (methodToCall.equals(Constants.RemoteProcedures.CreateStudent.name()))
 		{
-			callCreateSRecord();			
+			callCreateSRecord();
 		}
-		
-		if(methodToCall.equals(Constants.RemoteProcedures.GetCounts.name()))
+
+		if (methodToCall.equals(Constants.RemoteProcedures.GetCounts.name()))
 		{
-			callGetRecordCounts();				
+			callGetRecordCounts();
 		}
-		
-		if(methodToCall.equals(Constants.RemoteProcedures.EditRecords.name()))
-		{			
-			callEditRecord();				
+
+		if (methodToCall.equals(Constants.RemoteProcedures.EditRecords.name()))
+		{
+			callEditRecord();
 		}
-		
-		if(methodToCall.equals("TransferRecord"))
+
+		if (methodToCall.equals("TransferRecord"))
 		{
 			callTransferRecord();
 		}
 	}
- 	
- 	public boolean callCreateTRecord()
+
+	public boolean callCreateTRecord()
 	{
 		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return false;
 		}
-		
+
 		String spec = "";
 		String spliter = "";
 		for (int i = 0; i < specilization.size(); i++)
@@ -163,32 +152,32 @@ public class ManagerClientCORBA extends Thread
 			// form the acceptable format by remote CORBA server
 			spec = spec + spliter + specilization.get(i);
 			spliter = ",";
-		}		
+		}
 		if (recordManager.createTRecord(firstName, lastName, address, phoneNumber.toString(), spec, city, managerId))
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "+ this.getId() +
-					"}: Teacher record created");
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "+ this.getId() +
-					"}: Teacher record created");
+			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: " + this.getId()
+					+ "}: Teacher record created");
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()] {Thread ID: "
+					+ this.getId() + "}: Teacher record created");
 			return true;
 		}
-		
-		logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()]: callCreateTRecord called on " +
-				city + " server and failed");
+
+		logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()]: callCreateTRecord called on " + city
+				+ " server and failed");
 		return false;
 	}
-	
- 	public boolean callCreateSRecord()
+
+	public boolean callCreateSRecord()
 	{
 		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return false;
 		}
-		
+
 		String courses = "";
 		String spliter = "";
 		for (int i = 0; i < coursesRegistred.size(); i++)
@@ -199,42 +188,42 @@ public class ManagerClientCORBA extends Thread
 		}
 		if (recordManager.createSRecord(firstName, lastName, courses, status, statusDate.toString(), managerId))
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()]: callCreateSRecord called on " +
-					city + " server and performed successfully");
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: "+ this.getId() +
-					"}: Student record created");
+			logger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()]: callCreateSRecord called on " + city
+					+ " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callCreateSRecord()] {Thread ID: "
+					+ this.getId() + "}: Student record created");
 			return true;
 		}
-		
-		logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()]: callCreateSRecord called on " +
-				city + " server and failed");
+
+		logger.logToFile(managerId + "[ManagerClientCORBA.callCreateTRecord()]: callCreateSRecord called on " + city
+				+ " server and failed");
 		return false;
 	}
-    
- 	@SuppressWarnings("unchecked")
+
+	@SuppressWarnings("unchecked")
 	public boolean callEditRecord()
 	{
-    	if (!corbaInitiation)
+		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return false;
 		}
-    	
-    	String newVal;
-    	switch (fieldName)
+
+		String newVal;
+		switch (fieldName)
 		{
 		case "coursesRegistred":
 			newVal = "";
-    		String spliter = "";
-    		for (int i = 0; i < ((List<String>) newValue).size(); i++)
-    		{
-    			// form the acceptable format by remote CORBA server
-    			newVal = newVal + spliter + ((List<String>) newValue).get(i);
-    			spliter = ",";
-    		}			
+			String spliter = "";
+			for (int i = 0; i < ((List<String>) newValue).size(); i++)
+			{
+				// form the acceptable format by remote CORBA server
+				newVal = newVal + spliter + ((List<String>) newValue).get(i);
+				spliter = ",";
+			}
 			break;
 		case "status":
 			if ((boolean) newValue)
@@ -252,116 +241,115 @@ public class ManagerClientCORBA extends Thread
 			newVal = (String) newValue;
 			break;
 		}
-    			
+
 		if (recordManager.editRecord(recordId, fieldName, newVal, managerId))
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()]: callEditRecord called on " +
-					city + " server and performed successfully");
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: "+ this.getId() +
-					"}: Edit record performed successfully");
+			logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()]: callEditRecord called on " + city
+					+ " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()] {Thread ID: "
+					+ this.getId() + "}: Edit record performed successfully");
 			return true;
 		}
-		
-		logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()]: callEditRecord called on " +
-				city + " server and failed");
+
+		logger.logToFile(managerId + "[ManagerClientCORBA.callEditRecord()]: callEditRecord called on " + city
+				+ " server and failed");
 		return false;
 	}
-    
- 	public String callGetRecordCounts()
+
+	public String callGetRecordCounts()
 	{
 		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return null;
 		}
-		
+
 		String result = recordManager.getRecordCounts(managerId);
-		if(result != null)
+		if (result != null)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()]: callGetRecordCounts called on " +
-					city + " server and performed successfully");
-			operationResultLogger.logToFile(managerId + "[Manager.getRecordCounts()] {Thread ID: "+ this.getId() +
-					"}: Records Count: " + result);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callGetRecordCounts()]: callGetRecordCounts called on "
+					+ city + " server and performed successfully");
+			operationResultLogger.logToFile(managerId + "[Manager.getRecordCounts()] {Thread ID: " + this.getId()
+					+ "}: Records Count: " + result);
 			return result;
 		}
-		
-		logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " +
-				city + " server and failed");
-		return null;				
+
+		logger.logToFile(managerId + "[Manager.callGetRecordCounts()]: callGetRecordCounts called on " + city
+				+ " server and failed");
+		return null;
 	}
-	
- 	public boolean callRecordExist(String recordId)
+
+	public boolean callRecordExist(String recordId)
 	{
 		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callRecordExist()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callRecordExist()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callRecordExist()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callRecordExist()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return false;
 		}
-		
+
 		return recordManager.recordExist(recordId, managerId);
 	}
-	
-  	public boolean callTransferRecord()
- 	{
- 		if (!corbaInitiation)
+
+	public boolean callTransferRecord()
+	{
+		if (!corbaInitiation)
 		{
-			logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-					"}: Error! CORBA Initialization failed for the city: " + city);
+			logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: " + this.getId()
+					+ "}: Error! CORBA Initialization failed for the city: " + city);
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "
+					+ this.getId() + "}: Error! CORBA Initialization failed for the city: " + city);
 			return false;
 		}
- 		
- 		System.out.println(managerId + " " + recordId + " " + remoteCenterServerName.toUpperCase().trim());
- 		if (recordManager.transferRecord(managerId, recordId, remoteCenterServerName.toUpperCase().trim()))
- 		{
- 			logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-					"}: Record is trasfered successfully");
-			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-					"}: Record is trasfered successfully");
+
+		//System.out.println(managerId + " " + recordId + " " + remoteCenterServerName.toUpperCase().trim());
+		if (recordManager.transferRecord(managerId, recordId, remoteCenterServerName.toUpperCase().trim()))
+		{
+			logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: " + this.getId()
+					+ "}: Record is trasfered successfully");
+			operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "
+					+ this.getId() + "}: Record is trasfered successfully");
 			return true;
- 		}
- 		
- 		logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-				"}: Record transferring failed");
-		operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "+ this.getId() + 
-				"}: Record transferring failed");
-		
- 		return false;
- 	}
- 	
- 	private void initialize()
+		}
+
+		logger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: " + this.getId()
+				+ "}: Record transferring failed");
+		operationResultLogger.logToFile(managerId + "[ManagerClientCORBA.callTransferRecord()] {Thread ID: "
+				+ this.getId() + "}: Record transferring failed");
+
+		return false;
+	}
+
+	private void initialize()
 	{
 		logger = new Logger("MNG_" + managerId.toUpperCase().trim() + ".log");
 		operationResultLogger = new Logger("Result.log");
-		
+
 		if (isIdFormatCorrect(managerId))
-		{			
-			city = managerId.substring(0, 3).toUpperCase();				
-		}
-		else
+		{
+			city = managerId.substring(0, 3).toUpperCase();
+		} else
 		{
 			logger.logToFile("[ManagerClientCORBA Constructor]: ERROR! Manager ID is not valid");
 			corbaInitiation = false;
 		}
-		
+
 		// get the root naming context
 		try
-		{	
+		{
 			// create and initialize the ORB
-			orb= ORB.init(configuration, null);
-			
+			orb = ORB.init(configuration, null);
+
 			objRef = orb.resolve_initial_references("NameService");
-			ncRef= NamingContextExtHelper.narrow(objRef);
+			ncRef = NamingContextExtHelper.narrow(objRef);
 			String name1 = "RecordManagerCORBA_" + city.toUpperCase().trim(); // resolve the Object Reference in Naming
-			recordManager = RecordManagerCORBAHelper.narrow(ncRef.resolve_str(name1));			
-			
+			recordManager = RecordManagerCORBAHelper.narrow(ncRef.resolve_str(name1));
+
 		} catch (InvalidName e1)
 		{
 			corbaInitiation = false;
@@ -378,40 +366,40 @@ public class ManagerClientCORBA extends Thread
 		{
 			corbaInitiation = false;
 			e.printStackTrace();
-		}			
+		}
 	}
- 	
-    private boolean isIdFormatCorrect(String id)
-    {
-        if (id == null)
-        {
-            return false;
-        }
 
-        if (id.length() != 7)
-        {
-            return false;
-        }
+	private boolean isIdFormatCorrect(String id)
+	{
+		if (id == null)
+		{
+			return false;
+		}
 
-        String srvName = id.substring(0, 3).toUpperCase();
-        if(!Infrastucture.isSystemServerName(srvName))
-        {
-            return false;
-        }
+		if (id.length() != 7)
+		{
+			return false;
+		}
 
-        if(!(id.substring(3, 4).chars().allMatch(Character::isDigit)))
-        {
-            return false;
-        }
+		String srvName = id.substring(0, 3).toUpperCase();
+		if (!Infrastucture.isSystemServerName(srvName))
+		{
+			return false;
+		}
 
-        return true;
-    }
+		if (!(id.substring(3, 4).chars().allMatch(Character::isDigit)))
+		{
+			return false;
+		}
 
- 	public String getManagerId()
-    {
-        return managerId;
-    }
- 	 	
+		return true;
+	}
+
+	public String getManagerId()
+	{
+		return managerId;
+	}
+
 	@Override
 	public int hashCode()
 	{
@@ -420,7 +408,7 @@ public class ManagerClientCORBA extends Thread
 		result = prime * result + ((managerId == null) ? 0 : managerId.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -438,5 +426,5 @@ public class ManagerClientCORBA extends Thread
 		} else if (!managerId.equals(other.managerId))
 			return false;
 		return true;
-	} 	
+	}
 }
