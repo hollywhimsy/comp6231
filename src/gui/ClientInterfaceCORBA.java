@@ -1242,7 +1242,7 @@ public class ClientInterfaceCORBA
 
 				if (mng.callCreateTRecord())
 				{
-					txtrOutput.setText("Teacher record created by calling remote server");
+					txtrOutput.setText("Teacher record created successfullty by calling remote server");
 				} else
 				{
 					txtrOutput.setText("Error! For more information see the log files");
@@ -1311,7 +1311,7 @@ public class ClientInterfaceCORBA
 
 				if (mng.callCreateSRecord())
 				{
-					txtrOutput.setText("Student record created by calling remote server");
+					txtrOutput.setText("Student record created successfullty by calling remote server");
 				} else
 				{
 					txtrOutput.setText("Error! For more information see the log files");
@@ -1374,7 +1374,7 @@ public class ClientInterfaceCORBA
 								"coursesRegistred", coursesNewList);
 						if (mng.callEditRecord())
 						{
-							txtrOutput.setText("The record is edited by calling remote server");
+							txtrOutput.setText("The record is edited successfullty by calling remote server");
 						} else
 						{
 							txtrOutput.setText("Error! For more information see the log files");
@@ -1408,7 +1408,7 @@ public class ClientInterfaceCORBA
 							chckbxActive.isSelected());
 					if (mng.callEditRecord())
 					{
-						txtrOutput.setText("The record is edited by calling remote server");
+						txtrOutput.setText("The record is edited successfullty by calling remote server");
 					} else
 					{
 						txtrOutput.setText("Error! For more information see the log files");
@@ -1445,7 +1445,7 @@ public class ClientInterfaceCORBA
 							"statusDate", date2);
 					if (mng.callEditRecord())
 					{
-						txtrOutput.setText("The record is edited by calling remote server");
+						txtrOutput.setText("The record is edited successfullty by calling remote server");
 					} else
 					{
 						txtrOutput.setText("Error! For more information see the log files");
@@ -1481,7 +1481,7 @@ public class ClientInterfaceCORBA
 								"address", txtT6.getText().trim());
 						if (mng.callEditRecord())
 						{
-							txtrOutput.setText("The record is edited by calling remote server");
+							txtrOutput.setText("The record is edited successfullty by calling remote server");
 						} else
 						{
 							txtrOutput.setText("Error! For more information see the log files");
@@ -1524,7 +1524,7 @@ public class ClientInterfaceCORBA
 									"phoneNumber", Integer.valueOf(txtT6.getText().trim()));
 							if (mng.callEditRecord())
 							{
-								txtrOutput.setText("The record is edited by calling remote server");
+								txtrOutput.setText("The record is edited successfullty by calling remote server");
 							} else
 							{
 								txtrOutput.setText("Error! For more information see the log files");
@@ -1565,7 +1565,7 @@ public class ClientInterfaceCORBA
 								"location", txtT6.getText().trim().toUpperCase());
 						if (mng.callEditRecord())
 						{
-							txtrOutput.setText("The record is edited by calling remote server");
+							txtrOutput.setText("The record is edited successfullty by calling remote server");
 						} else
 						{
 							txtrOutput.setText("Error! For more information see the log files");
@@ -1588,7 +1588,7 @@ public class ClientInterfaceCORBA
 					}
 				} else
 				{
-					txtrOutput.setText("Error! Only MTL, LVL, or DDO are valid for location.");
+					txtrOutput.setText("Error! Only MTL, LVL, or DDO are valid as location.");
 				}
 			}
 		}
@@ -1615,7 +1615,7 @@ public class ClientInterfaceCORBA
 					txtT1.getText().trim().toUpperCase(), txtT2.getText().trim().toUpperCase());
 			if (mng.callTransferRecord())
 			{
-				txtrOutput.setText("The record is transfered by calling remote server");
+				txtrOutput.setText("The record is transfered successfullty by calling remote server");
 			} else
 			{
 				txtrOutput.setText("Error! For more information see the log files");
