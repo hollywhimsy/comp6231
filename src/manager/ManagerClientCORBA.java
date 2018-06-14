@@ -41,7 +41,7 @@ public class ManagerClientCORBA extends Thread
 	private Object newValue;
 	private String remoteCenterServerName;
 
-	// Constructor (default)
+	// Constructor (default: no new thread)
 	public ManagerClientCORBA(String managerId)
 	{
 		this.managerId = managerId;
@@ -352,20 +352,20 @@ public class ManagerClientCORBA extends Thread
 
 		} catch (InvalidName e1)
 		{
-			corbaInitiation = false;
-			e1.printStackTrace();
+			logger.logToFile("[ManagerClientCORBA Constructor]: Error! Invalid Context Name");
+			corbaInitiation = false;			
 		} catch (NotFound e)
 		{
-			corbaInitiation = false;
-			e.printStackTrace();
+			logger.logToFile("[ManagerClientCORBA Constructor]: Error! Context NotFound");
+			corbaInitiation = false;			
 		} catch (CannotProceed e)
 		{
-			corbaInitiation = false;
-			e.printStackTrace();
+			logger.logToFile("[ManagerClientCORBA Constructor]: Error! CannotProceed");
+			corbaInitiation = false;			
 		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
 		{
-			corbaInitiation = false;
-			e.printStackTrace();
+			logger.logToFile("[ManagerClientCORBA Constructor]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
+			corbaInitiation = false;			
 		}
 	}
 
