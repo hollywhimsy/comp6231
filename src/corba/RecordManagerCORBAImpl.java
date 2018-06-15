@@ -421,7 +421,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				// By calling createTRecord on the remote server, new record ID will be assigned
 				// to the record
 				if (!(recMng.createTRecord(teacher.getFirstName(), teacher.getLastName(), teacher.getAddress(),
-						teacher.getPhone().toString(), spec, city, city + "0001")))
+						teacher.getPhone().toString(), spec, city, city + "0001")))//default remoteCenterServerManager
 				{
 					logger.logToFile(cityAbbr
 							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"

@@ -53,6 +53,8 @@ public class CenterServerCORBA extends Thread
 	}
 
 	// Thread Method
+	//since we are running 3 servers on 1 machine, thus we have threads.
+	//in real world example, we have 3 servers in 3 separate machines, without threads
 	public void run()
 	{
 		try
@@ -64,6 +66,9 @@ public class CenterServerCORBA extends Thread
 			rootPOA.the_POAManager().activate();
 			logger.logToFile(city + "[CenterServerCORBA.run()]: POA Manager is activated");
 
+			/*
+			 * each city has one separate hashmap for records
+			 */
 			RecordManagerCORBAImpl recMngImp = new RecordManagerCORBAImpl(recordsMap, city, logger);
 			recMngImp.setOrb(orb);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Servant with ORB is registered");
