@@ -31,6 +31,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	
 	/*
 	 * id after deleting from Records and reusing issue
+	 * id overflow while there are enough spaces in the hashmap
 	 */
 	
 	public void setOrb(ORB orb)
