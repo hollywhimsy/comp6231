@@ -185,6 +185,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			return false;
 		}
 
+		String oldValue = null;
 		Character ch = recordID.toUpperCase().charAt(0);
 		// If the record is Teacher type
 		if (ch.equals('T'))
@@ -205,21 +206,27 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 					switch (fieldName)
 					{
 					case "address":
+						oldValue = teacher.getAddress();
 						teacher.setAddress(newValue);
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: address"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					case "phoneNumber":
+						oldValue = teacher.getPhone().toString();
 						teacher.setPhoneNumber(Integer.parseInt(newValue));
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					case "location":
+						oldValue = teacher.getLocation();
 						teacher.setLocation(newValue);
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
@@ -258,6 +265,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						student.setCoursesRegistred(courses);
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					case "status":
@@ -266,17 +274,21 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 							status = true;
 						else
 							status = false;
+						oldValue = String.valueOf(student.getStatus());
 						student.setStatus(status);
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: status"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					case "statusDate":
 						Date date = new Date();
 						date.parse(newValue);
+						oldValue = student.getStatusDate().toString();
 						student.setStatusDate(date);
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: statusDate"
+								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
