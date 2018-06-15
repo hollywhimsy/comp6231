@@ -1,5 +1,7 @@
 package corba;
-
+/*
+ * adapter for the server side
+ */
 
 /**
 * corba/RecordManagerCORBAPOA.java .

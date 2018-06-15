@@ -28,7 +28,11 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	private String cityAbbr;
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
-
+	
+	/*
+	 * id after deleting from Records and reusing issue
+	 */
+	
 	public void setOrb(ORB orb)
 	{
 		this.orb = orb;
@@ -75,6 +79,9 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				synchronized (indexPerId)
 				{
 					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).add(teacher);
+					/*
+					 * support new key for hashmap if it is not in the map yet
+					 */
 					indexPerId.put(id, teacher);
 				}
 			}
@@ -114,7 +121,13 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				synchronized (indexPerId)
 				{
 					indexPerId.put(id, student);
+					/*
+					 * same for the TR hashmap
+					 */
 					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).add(student);
+//					List<Record> rec = recordsMap.get(student.getLastName().toUpperCase().charAt(0));
+//					rec.add(student);
+					
 				}
 			}
 
@@ -133,6 +146,9 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		{
 			synchronized (indexPerId)
 			{
+				/*
+				 * needs to be changed into: (Character ch: recordsMap.keySet()){}
+				 */
 				for (Character ch = 'A'; ch <= 'Z'; ch++)
 				{
 					count += recordsMap.get(ch).size();
@@ -144,7 +160,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 
 		for (Integer udpPort : otherServersUDPPorts)
 		{
-			UDPClient client = new UDPClient(udpPort);
+			UDPClient client = new UDPClient(udpPort);//create a UDPClient by itself, connect to the UDPServer by udpPort
 			String tempStr = client.requestCount().trim();
 
 			if (tempStr == null)
@@ -177,7 +193,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			return false;
 		}
 
-		if (!(isIdFormatCorrect(recordID)))
+		if (!(isIdFormatCorrect(recordID)))//efficiency
 		{
 			logger.logToFile(cityAbbr
 					+ "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)"
@@ -255,7 +271,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						String[] parts = newValue.split(",");
 						for (int i = 0; i < parts.length; i++)
 							courses.add(parts[i]);
-						student.setCoursesRegistred(courses);
+						student.setCoursesRegistred(courses);//set the course status as well
 						logger.logToFile(cityAbbr
 								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred"
 								+ " {CallerManagerID: " + managerId + "}");
@@ -505,6 +521,12 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		orb.shutdown(false);
 	}
 
+	
+	/*
+	 * Create new id for the new record, for both TeacherRecord and StudentRecord
+	 * The id cannot be greater than 99999 since there are only 5 digits for id format
+	 * make id from integer to string by adding zeros at front of the id
+	 */
 	private String produceNewId(String prefix, String managerId)
 	{
 		if (prefix.toUpperCase().equals("TR"))

@@ -32,3 +32,12 @@ module corba
 		oneway void shutdown();
 	};	
 };
+
+/*
+supported data type:
+string
+boolean
+(int)
+
+
+*/
