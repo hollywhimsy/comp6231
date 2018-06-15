@@ -225,7 +225,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						oldValue = teacher.getLocation();
 						teacher.setLocation(newValue);
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber"
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: location"
 								+ " oldValue: " + oldValue + " newValue: " + newValue
 								+ " {CallerManagerID: " + managerId + "}");
 						break;
