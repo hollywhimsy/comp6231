@@ -10,7 +10,6 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
-
 import common.Infrastucture;
 import common.Logger;
 import record.Record;
@@ -28,12 +27,12 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	private String cityAbbr;
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
-	
+
 	/*
-	 * id after deleting from Records and reusing issue
-	 * id overflow while there are enough spaces in the hashmap
+	 * id after deleting from Records and reusing issue id overflow while there are
+	 * enough spaces in the hashmap
 	 */
-	
+
 	public void setOrb(ORB orb)
 	{
 		this.orb = orb;
@@ -87,8 +86,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				}
 			}
 
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord is successfully done (ID: "
-							+ id + ")" + " {CallerManagerID: " + managerId + "}");
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord is successfully done (ID: " + id + ")"
+					+ " {CallerManagerID: " + managerId + "}");
 			return true;
 		}
 		return false;
@@ -126,14 +125,11 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 					 * same for the TR hashmap
 					 */
 					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).add(student);
-//					List<Record> rec = recordsMap.get(student.getLastName().toUpperCase().charAt(0));
-//					rec.add(student);
-					
 				}
 			}
 
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createSRecord is successfully done (ID: "
-							+ id + ")" + " {CallerManagerID: " + managerId + "}");
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createSRecord is successfully done (ID: " + id + ")"
+					+ " {CallerManagerID: " + managerId + "}");
 			return true;
 		}
 		return false;
@@ -161,14 +157,14 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 
 		for (Integer udpPort : otherServersUDPPorts)
 		{
-			UDPClient client = new UDPClient(udpPort);//create a UDPClient by itself, connect to the UDPServer by udpPort
+			UDPClient client = new UDPClient(udpPort);// create a UDPClient by itself, connect to the UDPServer by udpPort
 			String tempStr = client.requestCount().trim();
 
 			if (tempStr == null)
 			{
 				logger.logToFile(
-						cityAbbr + "[RecordManagerImpl.getRecordCounts()]: UDP server did not respond on port:"
-								+ udpPort + " {CallerManagerID: " + managerId + "}");
+						cityAbbr + "[RecordManagerImpl.getRecordCounts()]: UDP server did not respond on port:" + udpPort + " {CallerManagerID: "
+								+ managerId + "}");
 			} else
 			{
 				result = result + ", " + tempStr;
@@ -176,13 +172,11 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		}
 
 		logger.logToFile(
-				cityAbbr + "[RecordManagerImpl.getRecordCounts()]: getRecordCounts is successfully done"
-						+ " {CallerManagerID: " + managerId + "}");
+				cityAbbr + "[RecordManagerImpl.getRecordCounts()]: getRecordCounts is successfully done" + " {CallerManagerID: " + managerId + "}");
 		return result;
 	}
 
-	@SuppressWarnings(
-	{ "deprecation", "static-access" })
+	@SuppressWarnings({ "deprecation", "static-access" })
 	@Override
 	public boolean editRecord(String recordID, String fieldName, String newValue, String managerId)
 	{
@@ -194,11 +188,10 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			return false;
 		}
 
-		if (!(isIdFormatCorrect(recordID)))//efficiency
+		if (!(isIdFormatCorrect(recordID)))// efficiency
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)"
-					+ " {CallerManagerID: " + managerId + "}");
+					+ "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
@@ -215,8 +208,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 					if (teacher == null)
 					{
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)"
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)" + " {CallerManagerID: " + managerId
+								+ "}");
 						return false;
 					}
 
@@ -226,30 +219,27 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						oldValue = teacher.getAddress();
 						teacher.setAddress(newValue);
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: address"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: address" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "phoneNumber":
 						oldValue = teacher.getPhone().toString();
 						teacher.setPhoneNumber(Integer.parseInt(newValue));
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "location":
 						oldValue = teacher.getLocation();
 						teacher.setLocation(newValue);
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: location"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: location" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)"
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)" + " {CallerManagerID: " + managerId
+								+ "}");
 						return false;
 					}
 				}
@@ -267,8 +257,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 					if (student == null)
 					{
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)"
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)" + " {CallerManagerID: " + managerId
+								+ "}");
 						return false;
 					}
 
@@ -279,11 +269,10 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						String[] parts = newValue.split(",");
 						for (int i = 0; i < parts.length; i++)
 							courses.add(parts[i]);
-						student.setCoursesRegistred(courses);//set the course status as well
+						student.setCoursesRegistred(courses);// set the course status as well
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "status":
 						boolean status;
@@ -294,9 +283,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						oldValue = String.valueOf(student.getStatus());
 						student.setStatus(status);
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: status"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: status" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "statusDate":
 						Date date = new Date();
@@ -304,14 +292,13 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 						oldValue = student.getStatusDate().toString();
 						student.setStatusDate(date);
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: statusDate"
-								+ " oldValue: " + oldValue + " newValue: " + newValue
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: statusDate" + " oldValue: " + oldValue
+								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
 						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)"
-								+ " {CallerManagerID: " + managerId + "}");
+								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)" + " {CallerManagerID: " + managerId
+								+ "}");
 						return false;
 					}
 				}
@@ -327,8 +314,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		if (!(isIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.recordExist()]: editRecord failed (recordId format is incorrect)"
-					+ " {CallerManagerID: " + managerId + "}");
+					+ "[RecordManagerImpl.recordExist()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
@@ -350,8 +336,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		if (!(isIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(
-					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect"
-							+ " {CallerManagerID: " + managerId + "}");
+					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
@@ -359,15 +344,14 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				|| remoteCenterServerName.toUpperCase().equals("DDO"))))
 		{
 			logger.logToFile(
-					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid"
-							+ " {CallerManagerID: " + managerId + "}");
+					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: " + managerId
+							+ "}");
 			return false; // Given city name is incorrect
 		}
 
 		RecordManagerCORBA recMng;
 		String city = remoteCenterServerName.toUpperCase().trim();
-		String[] configuration =
-		{ "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
+		String[] configuration = { "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
 
 		try
 		{
@@ -392,7 +376,6 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				{
 					synchronized (indexPerId)
 					{
-						// logger.logToFile(indexPerId.size() + "");
 						teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
 						if (teacher == null)
 						{
@@ -401,23 +384,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 									+ " {CallerManagerID: " + managerId + "}");
 							return false; // The given record dosen't exist in this server
 						}
-						if (recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher)) // Delete the
-																											// record
-																											// from the
-																											// Map
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Record removed from HashMap on this server"
-									+ " {CallerManagerID: " + managerId + "}");
-						}
-						if (indexPerId.remove(recordId.toUpperCase().trim(), teacher)) // Delete the record from the
-																						// Index
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Record removed from Index on this server"
-									+ " {CallerManagerID: " + managerId + "}");
-						}
-						// logger.logToFile(indexPerId.size() + "");
+						recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
+						indexPerId.remove(recordId.toUpperCase().trim(), teacher); // Delete the record from the Index
 					}
 				}
 
@@ -433,11 +401,11 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 				// By calling createTRecord on the remote server, new record ID will be assigned
 				// to the record
 				if (!(recMng.createTRecord(teacher.getFirstName(), teacher.getLastName(), teacher.getAddress(),
-						teacher.getPhone().toString(), spec, city, city + "0001")))//default remoteCenterServerManager
+						teacher.getPhone().toString(), spec, city, city + "0001")))// default remoteCenterServerManager
 				{
 					logger.logToFile(cityAbbr
-							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
-							+ " {CallerManagerID: " + managerId + "}");
+							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server" + " {CallerManagerID: "
+							+ managerId + "}");
 					return false; // The given record dosen't exist in this server
 				}
 
@@ -459,22 +427,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 									+ " {CallerManagerID: " + managerId + "}");
 							return false; // The given record dosen't exist in this server
 						}
-						if (recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student)) // Delete the
-																											// record
-																											// from the
-																											// Map
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Record removed from HashMap on this server"
-									+ " {CallerManagerID: " + managerId + "}");
-						}
-						if (indexPerId.remove(recordId.toUpperCase().trim(), student)) // Delete the record from the
-																						// Index
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Record removed from Index on this server"
-									+ " {CallerManagerID: " + managerId + "}");
-						}
+						recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
+						indexPerId.remove(recordId.toUpperCase().trim(), student); // Delete the record from the Index
 					}
 				}
 
@@ -487,12 +441,12 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 					spliter = ",";
 				}
 				// Call the remote server to add this record on that
-				if (!(recMng.createSRecord(student.getFirstName(), student.getLastName(), courses, student.getStatus(),
-						student.getDate().toString(), city + "0001")))
+				if (!(recMng.createSRecord(student.getFirstName(), student.getLastName(), courses, student.getStatus(), student.getDate().toString(),
+						city + "0001")))
 				{
 					logger.logToFile(cityAbbr
-							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
-							+ " {CallerManagerID: " + managerId + "}");
+							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server" + " {CallerManagerID: "
+							+ managerId + "}");
 					return false; // The given record dosen't exist in this server
 				}
 
@@ -502,28 +456,25 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		} catch (InvalidName e)
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! Invalid Context Name"
-					+ " {CallerManagerID: " + managerId + "}");			
+					+ "[RecordManagerImpl.transferRecord()]: Error! Invalid Context Name" + " {CallerManagerID: " + managerId + "}");
 		} catch (NotFound e)
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! Context NotFound"
-					+ " {CallerManagerID: " + managerId + "}");				
+					+ "[RecordManagerImpl.transferRecord()]: Error! Context NotFound" + " {CallerManagerID: " + managerId + "}");
 		} catch (CannotProceed e)
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! CannotProceed"
-					+ " {CallerManagerID: " + managerId + "}");				
+					+ "[RecordManagerImpl.transferRecord()]: Error! CannotProceed" + " {CallerManagerID: " + managerId + "}");
 		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName"
-					+ " {CallerManagerID: " + managerId + "}");				
+					+ "[RecordManagerImpl.transferRecord()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName" + " {CallerManagerID: "
+					+ managerId + "}");
 		}
 
 		logger.logToFile(cityAbbr
-				+ "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully to: " + city
-				+ " {CallerManagerID: " + managerId + "}");
+				+ "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully to: " + city + " {CallerManagerID: " + managerId
+				+ "}");
 
 		return true;
 	}
@@ -534,11 +485,10 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 		orb.shutdown(false);
 	}
 
-	
 	/*
 	 * Create new id for the new record, for both TeacherRecord and StudentRecord
-	 * The id cannot be greater than 99999 since there are only 5 digits for id format
-	 * make id from integer to string by adding zeros at front of the id
+	 * The id cannot be greater than 99999 since there are only 5 digits for id
+	 * format make id from integer to string by adding zeros at front of the id
 	 */
 	private String produceNewId(String prefix, String managerId)
 	{
@@ -547,8 +497,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			if (lastTeacherId >= 99999) // ID can have 5 digits only not more
 			{
 				logger.logToFile(cityAbbr
-						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Teachers record number reached 99999)"
-						+ " {CallerManagerID: " + managerId + "}");
+						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Teachers record number reached 99999)" + " {CallerManagerID: "
+						+ managerId + "}");
 				return null;
 			}
 
@@ -575,8 +525,8 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			if (lastStudentId >= 99999) // ID can have 5 digits only not more
 			{
 				logger.logToFile(cityAbbr
-						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Students record number reached 99999)"
-						+ " {CallerManagerID: " + managerId + "}");
+						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Students record number reached 99999)" + " {CallerManagerID: "
+						+ managerId + "}");
 				return null;
 			}
 
@@ -633,5 +583,4 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 
 		return true;
 	}
-
 }
