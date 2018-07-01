@@ -1,0 +1,187 @@
+<ns1:deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java" xmlns:ns1="http://xml.apache.org/axis/wsdd/">
+ <ns1:globalConfiguration>
+  <ns1:parameter name="sendMultiRefs" value="true"/>
+  <ns1:parameter name="disablePrettyXML" value="true"/>
+  <ns1:parameter name="adminPassword" value="admin"/>
+  <ns1:parameter name="attachments.Directory" value="D:\Progs\Java-Progs\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\DCMS3Server\WEB-INF\attachments"/>
+  <ns1:parameter name="dotNetSoapEncFix" value="true"/>
+  <ns1:parameter name="enableNamespacePrefixOptimization" value="false"/>
+  <ns1:parameter name="sendXMLDeclaration" value="true"/>
+  <ns1:parameter name="sendXsiTypes" value="true"/>
+  <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <ns1:requestFlow>
+   <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
+    <ns1:parameter name="scope" value="session"/>
+   </ns1:handler>
+   <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
+    <ns1:parameter name="scope" value="request"/>
+    <ns1:parameter name="extension" value=".jwr"/>
+   </ns1:handler>
+  </ns1:requestFlow>
+ </ns1:globalConfiguration>
+ <ns1:handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+ <ns1:handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+ <ns1:handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
+ <ns1:service name="RecordManagerDDOImpl" provider="java:RPC" style="wrapped" use="literal">
+  <ns2:operation name="createTRecord" qname="ns1:createTRecord" returnQName="ns1:createTRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns1="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://xml.apache.org/axis/wsdd/">
+   <ns2:parameter qname="ns1:firstName" type="xsd:string"/>
+   <ns2:parameter qname="ns1:lastName" type="xsd:string"/>
+   <ns2:parameter qname="ns1:address" type="xsd:string"/>
+   <ns2:parameter qname="ns1:phoneNumber" type="xsd:int"/>
+   <ns2:parameter qname="ns1:specialization" type="xsd:string"/>
+   <ns2:parameter qname="ns1:location" type="xsd:string"/>
+   <ns2:parameter qname="ns1:managerId" type="xsd:string"/>
+  </ns2:operation>
+  <ns1:operation name="createSRecord" qname="ns2:createSRecord" returnQName="ns2:createSRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns2="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns2:firstName" type="xsd:string"/>
+   <ns1:parameter qname="ns2:lastName" type="xsd:string"/>
+   <ns1:parameter qname="ns2:coursesRegistred" type="xsd:string"/>
+   <ns1:parameter qname="ns2:status" type="xsd:boolean"/>
+   <ns1:parameter qname="ns2:statusDate" type="xsd:string"/>
+   <ns1:parameter qname="ns2:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="editRecord" qname="ns3:editRecord" returnQName="ns3:editRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns3="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns3:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns3:fieldName" type="xsd:string"/>
+   <ns1:parameter qname="ns3:newValue" type="xsd:string"/>
+   <ns1:parameter qname="ns3:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="transferRecord" qname="ns4:transferRecord" returnQName="ns4:transferRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns4="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns4:managerId" type="xsd:string"/>
+   <ns1:parameter qname="ns4:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns4:remoteCenterServerName" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="getRecordsCount" qname="ns5:getRecordsCount" returnQName="ns5:getRecordsCountReturn" returnType="xsd:string" soapAction="" xmlns:ns5="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns5:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="recordExist" qname="ns6:recordExist" returnQName="ns6:recordExistReturn" returnType="xsd:boolean" soapAction="" xmlns:ns6="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns6:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns6:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:parameter name="allowedMethods" value="getRecordsCount editRecord createSRecord transferRecord createTRecord recordExist"/>
+  <ns1:parameter name="typeMappingVersion" value="1.2"/>
+  <ns1:parameter name="wsdlPortType" value="RecordManagerDDOImpl"/>
+  <ns1:parameter name="className" value="servers.RecordManagerDDOImpl"/>
+  <ns1:parameter name="wsdlServicePort" value="RecordManagerDDOImpl"/>
+  <ns1:parameter name="schemaQualified" value="http://servers"/>
+  <ns1:parameter name="wsdlTargetNamespace" value="http://servers"/>
+  <ns1:parameter name="wsdlServiceElement" value="RecordManagerDDOImplService"/>
+ </ns1:service>
+ <ns1:service name="AdminService" provider="java:MSG">
+  <ns1:parameter name="allowedMethods" value="AdminService"/>
+  <ns1:parameter name="enableRemoteAdmin" value="false"/>
+  <ns1:parameter name="className" value="org.apache.axis.utils.Admin"/>
+  <ns1:namespace>http://xml.apache.org/axis/wsdd/</ns1:namespace>
+ </ns1:service>
+ <ns1:service name="Version" provider="java:RPC">
+  <ns1:parameter name="allowedMethods" value="getVersion"/>
+  <ns1:parameter name="className" value="org.apache.axis.Version"/>
+ </ns1:service>
+ <ns1:service name="RecordManagerMTLImpl" provider="java:RPC" style="wrapped" use="literal">
+  <ns1:operation name="createTRecord" qname="ns7:createTRecord" returnQName="ns7:createTRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns7="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns7:firstName" type="xsd:string"/>
+   <ns1:parameter qname="ns7:lastName" type="xsd:string"/>
+   <ns1:parameter qname="ns7:address" type="xsd:string"/>
+   <ns1:parameter qname="ns7:phoneNumber" type="xsd:int"/>
+   <ns1:parameter qname="ns7:specialization" type="xsd:string"/>
+   <ns1:parameter qname="ns7:location" type="xsd:string"/>
+   <ns1:parameter qname="ns7:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="createSRecord" qname="ns8:createSRecord" returnQName="ns8:createSRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns8="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns8:firstName" type="xsd:string"/>
+   <ns1:parameter qname="ns8:lastName" type="xsd:string"/>
+   <ns1:parameter qname="ns8:coursesRegistred" type="xsd:string"/>
+   <ns1:parameter qname="ns8:status" type="xsd:boolean"/>
+   <ns1:parameter qname="ns8:statusDate" type="xsd:string"/>
+   <ns1:parameter qname="ns8:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="editRecord" qname="ns9:editRecord" returnQName="ns9:editRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns9="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns9:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns9:fieldName" type="xsd:string"/>
+   <ns1:parameter qname="ns9:newValue" type="xsd:string"/>
+   <ns1:parameter qname="ns9:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="transferRecord" qname="ns10:transferRecord" returnQName="ns10:transferRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns10="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns10:managerId" type="xsd:string"/>
+   <ns1:parameter qname="ns10:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns10:remoteCenterServerName" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="getRecordsCount" qname="ns11:getRecordsCount" returnQName="ns11:getRecordsCountReturn" returnType="xsd:string" soapAction="" xmlns:ns11="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns11:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="recordExist" qname="ns12:recordExist" returnQName="ns12:recordExistReturn" returnType="xsd:boolean" soapAction="" xmlns:ns12="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns12:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns12:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:parameter name="allowedMethods" value="getRecordsCount editRecord createSRecord transferRecord createTRecord recordExist"/>
+  <ns1:parameter name="typeMappingVersion" value="1.2"/>
+  <ns1:parameter name="wsdlPortType" value="RecordManagerMTLImpl"/>
+  <ns1:parameter name="className" value="servers.RecordManagerMTLImpl"/>
+  <ns1:parameter name="wsdlServicePort" value="RecordManagerMTLImpl"/>
+  <ns1:parameter name="schemaQualified" value="http://servers"/>
+  <ns1:parameter name="wsdlTargetNamespace" value="http://servers"/>
+  <ns1:parameter name="wsdlServiceElement" value="RecordManagerMTLImplService"/>
+ </ns1:service>
+ <ns1:service name="RecordManagerLVLImpl" provider="java:RPC" style="wrapped" use="literal">
+  <ns1:operation name="createTRecord" qname="ns13:createTRecord" returnQName="ns13:createTRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns13="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns13:firstName" type="xsd:string"/>
+   <ns1:parameter qname="ns13:lastName" type="xsd:string"/>
+   <ns1:parameter qname="ns13:address" type="xsd:string"/>
+   <ns1:parameter qname="ns13:phoneNumber" type="xsd:int"/>
+   <ns1:parameter qname="ns13:specialization" type="xsd:string"/>
+   <ns1:parameter qname="ns13:location" type="xsd:string"/>
+   <ns1:parameter qname="ns13:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="createSRecord" qname="ns14:createSRecord" returnQName="ns14:createSRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns14="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns14:firstName" type="xsd:string"/>
+   <ns1:parameter qname="ns14:lastName" type="xsd:string"/>
+   <ns1:parameter qname="ns14:coursesRegistred" type="xsd:string"/>
+   <ns1:parameter qname="ns14:status" type="xsd:boolean"/>
+   <ns1:parameter qname="ns14:statusDate" type="xsd:string"/>
+   <ns1:parameter qname="ns14:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="editRecord" qname="ns15:editRecord" returnQName="ns15:editRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns15="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns15:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns15:fieldName" type="xsd:string"/>
+   <ns1:parameter qname="ns15:newValue" type="xsd:string"/>
+   <ns1:parameter qname="ns15:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="transferRecord" qname="ns16:transferRecord" returnQName="ns16:transferRecordReturn" returnType="xsd:string" soapAction="" xmlns:ns16="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns16:managerId" type="xsd:string"/>
+   <ns1:parameter qname="ns16:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns16:remoteCenterServerName" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="getRecordsCount" qname="ns17:getRecordsCount" returnQName="ns17:getRecordsCountReturn" returnType="xsd:string" soapAction="" xmlns:ns17="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns17:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:operation name="recordExist" qname="ns18:recordExist" returnQName="ns18:recordExistReturn" returnType="xsd:boolean" soapAction="" xmlns:ns18="http://servers" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <ns1:parameter qname="ns18:recordId" type="xsd:string"/>
+   <ns1:parameter qname="ns18:managerId" type="xsd:string"/>
+  </ns1:operation>
+  <ns1:parameter name="allowedMethods" value="getRecordsCount editRecord createSRecord transferRecord createTRecord recordExist"/>
+  <ns1:parameter name="wsdlPortType" value="RecordManagerLVLImpl"/>
+  <ns1:parameter name="typeMappingVersion" value="1.2"/>
+  <ns1:parameter name="schemaQualified" value="http://servers"/>
+  <ns1:parameter name="wsdlServicePort" value="RecordManagerLVLImpl"/>
+  <ns1:parameter name="className" value="servers.RecordManagerLVLImpl"/>
+  <ns1:parameter name="wsdlTargetNamespace" value="http://servers"/>
+  <ns1:parameter name="wsdlServiceElement" value="RecordManagerLVLImplService"/>
+ </ns1:service>
+ <ns1:transport name="http">
+  <ns1:requestFlow>
+   <ns1:handler type="URLMapper"/>
+   <ns1:handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+  </ns1:requestFlow>
+  <ns1:parameter name="qs:list" value="org.apache.axis.transport.http.QSListHandler"/>
+  <ns1:parameter name="qs:wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
+  <ns1:parameter name="qs.list" value="org.apache.axis.transport.http.QSListHandler"/>
+  <ns1:parameter name="qs.method" value="org.apache.axis.transport.http.QSMethodHandler"/>
+  <ns1:parameter name="qs:method" value="org.apache.axis.transport.http.QSMethodHandler"/>
+  <ns1:parameter name="qs.wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
+ </ns1:transport>
+ <ns1:transport name="local">
+  <ns1:responseFlow>
+   <ns1:handler type="LocalResponder"/>
+  </ns1:responseFlow>
+ </ns1:transport>
+</ns1:deployment>

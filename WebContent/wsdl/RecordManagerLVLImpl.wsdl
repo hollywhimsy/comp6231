@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://servers" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://servers" xmlns:intf="http://servers" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://servers" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="createTRecord">
+    <complexType>
+     <sequence>
+      <element name="firstName" type="xsd:string"/>
+      <element name="lastName" type="xsd:string"/>
+      <element name="address" type="xsd:string"/>
+      <element name="phoneNumber" type="xsd:int"/>
+      <element name="specialization" type="xsd:string"/>
+      <element name="location" type="xsd:string"/>
+      <element name="managerId" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createTRecordResponse">
+    <complexType>
+     <sequence>
+      <element name="createTRecordReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createSRecord">
+    <complexType>
+     <sequence>
+      <element name="firstName" type="xsd:string"/>
+      <element name="lastName" type="xsd:string"/>
+      <element name="coursesRegistred" type="xsd:string"/>
+      <element name="status" type="xsd:boolean"/>
+      <element name="statusDate" type="xsd:string"/>
+      <element name="managerId" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="createSRecordResponse">
+    <complexType>
+     <sequence>
+      <element name="createSRecordReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="editRecord">
+    <complexType>
+     <sequence>
+      <element name="recordId" type="xsd:string"/>
+      <element name="fieldName" type="xsd:string"/>
+      <element name="newValue" type="xsd:string"/>
+      <element name="managerId" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="editRecordResponse">
+    <complexType>
+     <sequence>
+      <element name="editRecordReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="transferRecord">
+    <complexType>
+     <sequence>
+      <element name="managerId" type="xsd:string"/>
+      <element name="recordId" type="xsd:string"/>
+      <element name="remoteCenterServerName" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="transferRecordResponse">
+    <complexType>
+     <sequence>
+      <element name="transferRecordReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRecordsCount">
+    <complexType>
+     <sequence>
+      <element name="managerId" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getRecordsCountResponse">
+    <complexType>
+     <sequence>
+      <element name="getRecordsCountReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="recordExist">
+    <complexType>
+     <sequence>
+      <element name="recordId" type="xsd:string"/>
+      <element name="managerId" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="recordExistResponse">
+    <complexType>
+     <sequence>
+      <element name="recordExistReturn" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="createTRecordRequest">
+
+      <wsdl:part element="impl:createTRecord" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRecordsCountResponse">
+
+      <wsdl:part element="impl:getRecordsCountResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="editRecordResponse">
+
+      <wsdl:part element="impl:editRecordResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createTRecordResponse">
+
+      <wsdl:part element="impl:createTRecordResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="editRecordRequest">
+
+      <wsdl:part element="impl:editRecord" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="recordExistResponse">
+
+      <wsdl:part element="impl:recordExistResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="transferRecordRequest">
+
+      <wsdl:part element="impl:transferRecord" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="transferRecordResponse">
+
+      <wsdl:part element="impl:transferRecordResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRecordsCountRequest">
+
+      <wsdl:part element="impl:getRecordsCount" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="recordExistRequest">
+
+      <wsdl:part element="impl:recordExist" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createSRecordResponse">
+
+      <wsdl:part element="impl:createSRecordResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="createSRecordRequest">
+
+      <wsdl:part element="impl:createSRecord" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="RecordManagerLVLImpl">
+
+      <wsdl:operation name="createTRecord">
+
+         <wsdl:input message="impl:createTRecordRequest" name="createTRecordRequest"/>
+
+         <wsdl:output message="impl:createTRecordResponse" name="createTRecordResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createSRecord">
+
+         <wsdl:input message="impl:createSRecordRequest" name="createSRecordRequest"/>
+
+         <wsdl:output message="impl:createSRecordResponse" name="createSRecordResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="editRecord">
+
+         <wsdl:input message="impl:editRecordRequest" name="editRecordRequest"/>
+
+         <wsdl:output message="impl:editRecordResponse" name="editRecordResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="transferRecord">
+
+         <wsdl:input message="impl:transferRecordRequest" name="transferRecordRequest"/>
+
+         <wsdl:output message="impl:transferRecordResponse" name="transferRecordResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRecordsCount">
+
+         <wsdl:input message="impl:getRecordsCountRequest" name="getRecordsCountRequest"/>
+
+         <wsdl:output message="impl:getRecordsCountResponse" name="getRecordsCountResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="recordExist">
+
+         <wsdl:input message="impl:recordExistRequest" name="recordExistRequest"/>
+
+         <wsdl:output message="impl:recordExistResponse" name="recordExistResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="RecordManagerLVLImplSoapBinding" type="impl:RecordManagerLVLImpl">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="createTRecord">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createTRecordRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createTRecordResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="createSRecord">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="createSRecordRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="createSRecordResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="editRecord">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="editRecordRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="editRecordResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="transferRecord">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="transferRecordRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="transferRecordResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRecordsCount">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRecordsCountRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRecordsCountResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="recordExist">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="recordExistRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="recordExistResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="RecordManagerLVLImplService">
+
+      <wsdl:port binding="impl:RecordManagerLVLImplSoapBinding" name="RecordManagerLVLImpl">
+
+         <wsdlsoap:address location="http://localhost:8080/DCMS3/services/RecordManagerLVLImpl"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
