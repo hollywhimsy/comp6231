@@ -28,11 +28,6 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
 
-	/*
-	 * id after deleting from Records and reusing issue id overflow while there are
-	 * enough spaces in the hashmap
-	 */
-
 	public void setOrb(ORB orb)
 	{
 		this.orb = orb;

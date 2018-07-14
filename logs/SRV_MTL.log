@@ -1,0 +1,18 @@
+Sat Jul 14 04:28:05 EDT 2018 ==> MTL[UDPServer Constructor]: UDPServer is created on port: 1353
+Sat Jul 14 04:28:05 EDT 2018 ==> MTL[UDPServer.run()]: Listening on 1353 UDP Port
+Sat Jul 14 04:28:22 EDT 2018 ==> MTL[UDPServer Constructor]: UDPServer is created on port: 1353
+Sat Jul 14 04:28:22 EDT 2018 ==> MTL[UDPServer.run()]: UDP Socket Exception Error!
+Sat Jul 14 04:28:22 EDT 2018 ==> MTL[UDPServer.run()]: UDP Socket is Closed!
+Sat Jul 14 04:28:25 EDT 2018 ==> MTL[RUDPClient]: Request is sent!
+Sat Jul 14 04:28:25 EDT 2018 ==> MTL[UDPServer.run()]: UDP CenterServer Recieved a Request!
+Sat Jul 14 04:28:25 EDT 2018 ==> MTL[RUDPClient]: Reply received!
+Sat Jul 14 04:28:25 EDT 2018 ==> MTL[UDPServer.run()]: UDP CenterServer Replyed To /127.0.0.1:63273 @@ I'm alive! @@
+Sat Jul 14 04:28:25 EDT 2018 ==> MTL[RUDPClient]: Socket is closed!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[UDPServer Constructor]: UDPServer is created on port: 1353
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[UDPServer.run()]: UDP Socket Exception Error!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[UDPServer.run()]: UDP Socket is Closed!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[UDPServer.run()]: UDP CenterServer Recieved a Request!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[UDPServer.run()]: UDP CenterServer Replyed To /127.0.0.1:63275 @@ I'm alive! @@
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[RUDPClient]: Request is sent!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[RUDPClient]: Reply received!
+Sat Jul 14 04:28:39 EDT 2018 ==> MTL[RUDPClient]: Socket is closed!
