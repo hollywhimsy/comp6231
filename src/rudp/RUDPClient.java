@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import common.Logger;
 
 public class RUDPClient 
@@ -27,12 +29,12 @@ public class RUDPClient
 	/*
 	 * request can be:
 	 * 		HeartBit: server returns ACK to show it's alive
-	 * 		createTRecord,[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean
-	 * 		createSRecord,[String]: the [String] gives the parameters and server creates a student record and returns a boolean
-	 * 		getRecordsCount,[String]: the [String] gives the parameters and server returns the records count
-	 * 		editRecord,[String]: the [String] gives the parameters and server edits the record and returns a boolean
-	 * 		recordExist,[String]: the [String] gives the parameters and server returns true/false
-	 * 		transferRecord,[String]: the [String] gives the parameters and server transfers the record and returns a boolean
+	 * 		createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean
+	 * 		createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean
+	 * 		getRecordsCount~[String]: the [String] gives the parameters and server returns the records count
+	 * 		editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
+	 * 		recordExist~[String]: the [String] gives the parameters and server returns true/false
+	 * 		transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
 	public String requestRemote(String city, String request) 
 	{
@@ -42,7 +44,9 @@ public class RUDPClient
 		{
 			socket = new DatagramSocket();
 			
-			byte[] message = request.getBytes(); // client must send "Count" as request
+			String str = request.trim() + "^" + generateChecksum(request.trim());
+			
+			byte[] message = str.getBytes(); // client must send "Count" as request
 			
 			InetAddress serverIP = InetAddress.getByName("localhost"); // CenterServer and client have same IP address
 			DatagramPacket udpRequest = new DatagramPacket(message, message.length, serverIP, serverPort);
@@ -79,4 +83,26 @@ public class RUDPClient
 		}
 		return null;		
 	}
+	
+	private String generateChecksum(String str)
+    {
+		MessageDigest md;
+		StringBuffer sb = null;
+		try
+		{
+			md = MessageDigest.getInstance("MD5");
+			md.update(str.getBytes());
+			byte[] digest = md.digest();
+			sb = new StringBuffer();
+			for (byte b : digest) 
+			{
+				sb.append(String.format("%02x", b & 0xff));
+			}
+		} catch (NoSuchAlgorithmException e)
+		{
+			e.printStackTrace();
+		}	
+		
+        return sb.toString();
+    }	
 }

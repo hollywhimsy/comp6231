@@ -12,6 +12,7 @@ public class MtlCenterManager extends Thread
 	private String city;
 	private Logger logger;
 	private HashMap<Character, List<Record>> recordsMap = new HashMap<>();
+	private HashMap<String, Record> indexPerId = new HashMap<>();
 	
 	public MtlCenterManager(String city)
 	{

@@ -11,20 +11,21 @@ import record.StudentRecord;
 import record.TeacherRecord;
 import udp.UDPClient;
 
-public class MtlCenterImpl
+public class CenterImpl
 {
 	private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
-	private HashMap<String, Record> indexPerId = new HashMap<>(); // Needs synchronization
+	private HashMap<String, Record> indexPerId; // Needs synchronization
 	private Integer lastTeacherId = 0; // Needs synchronization
 	private Integer lastStudentId = 0; // Needs synchronization
 	private String cityAbbr;
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
 	
-	public MtlCenterImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbr, Logger logger)
+	public CenterImpl(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, String cityAbbr, Logger logger)
 	{
 		super();
 		this.recordsMap = recordsMap;
+		this.indexPerId = indexPerId;
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
 		this.otherServersUDPPorts = Infrastucture.getOtherServersUDPPorts(cityAbbr);
