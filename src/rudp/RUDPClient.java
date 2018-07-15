@@ -44,7 +44,9 @@ public class RUDPClient
 		{
 			socket = new DatagramSocket();
 			
-			String str = request.trim() + "^" + generateChecksum(request.trim());
+			String str = request + "#" + generateChecksum(request);
+			
+			System.out.println(str);
 			
 			byte[] message = str.getBytes(); // client must send "Count" as request
 			
@@ -58,11 +60,11 @@ public class RUDPClient
 			socket.setSoTimeout(timeout); // makes the "receive" non-blocking
 			socket.receive(reply);
 			String rep = new String(reply.getData());
-			String[] parts = rep.split("^");
+			String[] parts = rep.split("#");
 			String respons = null;			
 			if (parts.length == 2)
 			{
-				if (parts[1].equals(generateChecksum(parts[0])))
+				if (parts[1].trim().equals(generateChecksum(parts[0])))
 				{
 					respons = parts[0];
 					logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
@@ -112,5 +114,5 @@ public class RUDPClient
 		}	
 		
         return sb.toString();
-    }	
+    }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import common.Infrastucture;
 import common.Logger;
 import record.Record;
 import record.StudentRecord;
@@ -21,14 +20,15 @@ public class CenterImpl
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
 		
-	public CenterImpl(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, String cityAbbr, Logger logger)
+	public CenterImpl(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, String cityAbbr, Logger logger, 
+			List<Integer> othersPort)
 	{
 		super();
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;		
-		this.otherServersUDPPorts = Infrastucture.getOtherServersUDPPorts(cityAbbr);
+		this.otherServersUDPPorts = othersPort;
 	}
 	
 	/*
@@ -282,20 +282,20 @@ public class CenterImpl
 
 		String result = cityAbbr + " " + count;
 
-		for (Integer udpPort : otherServersUDPPorts)
-		{
-			UDPClient client = new UDPClient(udpPort);// create a UDPClient by itself, connect to the UDPServer by udpPort
-			String tempStr = client.requestCount().trim();
-
-			if (tempStr == null)
-			{
-				logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordCounts()]: UDP server did not respond on port:" + udpPort 
-						+ " {CallerManagerID: " + managerId + "}");
-			} else
-			{
-				result = result + ", " + tempStr;
-			}
-		}
+//		for (Integer udpPort : otherServersUDPPorts)
+//		{
+//			UDPClient client = new UDPClient(udpPort);// create a UDPClient by itself, connect to the UDPServer by udpPort
+//			String tempStr = client.requestCount().trim();
+//
+//			if (tempStr == null)
+//			{
+//				logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordCounts()]: UDP server did not respond on port:" + udpPort 
+//						+ " {CallerManagerID: " + managerId + "}");
+//			} else
+//			{
+//				result = result + ", " + tempStr;
+//			}
+//		}
 
 		logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordCounts()]: getRecordCounts is successfully done" + " {CallerManagerID: " 
 				+ managerId + "}");
