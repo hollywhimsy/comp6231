@@ -1,4 +1,4 @@
-package rudp;
+package centerServer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -36,7 +36,7 @@ public class RUDPClient
 	 * 		recordExist~[String]: the [String] gives the parameters and server returns true/false
 	 * 		transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
-	public String requestRemote(String city, String request) 
+	public String requestRemote(String request) 
 	{
 		DatagramSocket socket = null;
 		
@@ -46,7 +46,7 @@ public class RUDPClient
 			
 			String str = request + "#" + generateChecksum(request);
 			
-			System.out.println(str);
+//			System.out.println(str);
 			
 			byte[] message = str.getBytes(); // client must send "Count" as request
 			
