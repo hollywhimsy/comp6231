@@ -1,18 +1,14 @@
 package record;
 
-import java.io.Serializable;
-
 /**
  * Represents a record This is an abstract class as it is inherited by
  * TeacherRecord and StudentRecord classes
  */
-public abstract class Record implements Serializable
+public abstract class Record
 {
-
-	private static final long serialVersionUID = 1L;
 	private String recordId;
-	String firstName;
-	String lastName;
+	private String firstName;
+	private String lastName;
 
 	public Record(String first, String last)
 	{
@@ -37,6 +33,21 @@ public abstract class Record implements Serializable
 		return this.lastName;
 	}
 
+	public String getRecordId()
+	{
+		return recordId;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+	
 	@Override
 	public int hashCode()
 	{
@@ -64,20 +75,5 @@ public abstract class Record implements Serializable
 			return false;
 
 		return true;
-	}
-
-	public String getRecordId()
-	{
-		return recordId;
-	}
-
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
-	}
-
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
 	}
 }

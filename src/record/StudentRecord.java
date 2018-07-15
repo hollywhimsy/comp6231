@@ -6,14 +6,11 @@ import java.util.*;
  * Represents a student record
  */
 public class StudentRecord extends Record
-{
-
-	private static final long serialVersionUID = 1L;
+{	
 	private List<String> coursesRegistred = new ArrayList<>();
 	private boolean status;
 	private Date statusDate;
-	private ArrayList<String> full_record = new ArrayList<>();
-
+	
 	public StudentRecord(String first, String last)
 	{
 		super(first, last);
@@ -45,16 +42,6 @@ public class StudentRecord extends Record
 	public void setDate(Date date)
 	{
 		statusDate = date;
-	}
-
-	public ArrayList<String> build_record()
-	{
-		full_record.add(this.firstName);
-		full_record.add(this.lastName);
-		full_record.add(this.coursesRegistred.toString());
-
-		full_record.add(this.statusDate.toString());
-		return full_record;
 	}
 
 	public List<String> getCoursesRegistred()
