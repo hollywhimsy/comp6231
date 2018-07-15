@@ -271,7 +271,7 @@ public class CenterServerCore extends Thread
 			{
 				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 				{
-					RUDPClient client = new RUDPClient(ports.get(srv), cityAbbr, logger);// create a UDPClient by itself, connect to the UDPServer by
+					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);// create a UDPClient by itself, connect to the UDPServer by
 																							// udpPort
 					String tempStr = client.requestRemote("getMyRecordsCount~" + parts[1]).trim();
 
@@ -603,7 +603,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RUDPClient rudpClient = new RUDPClient(ports.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(ports.get(city), cityAbbr, logger);
 			// [String]:
 			// firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String reply = rudpClient.requestRemote("createTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~"
@@ -647,7 +647,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RUDPClient rudpClient = new RUDPClient(ports.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(ports.get(city), cityAbbr, logger);
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 			String reply = rudpClient.requestRemote("createSRecord~" + student.getFirstName() + "~" + student.getLastName() + "~" + courses
 					+ "~" + student.getStatus() + "~" + student.getDate().toString() + "~" + city + "0001");

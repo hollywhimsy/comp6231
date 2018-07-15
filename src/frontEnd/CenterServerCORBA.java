@@ -1,4 +1,4 @@
-package corba;
+package frontEnd;
 
 import java.util.ArrayList;
 import java.util.HashMap;

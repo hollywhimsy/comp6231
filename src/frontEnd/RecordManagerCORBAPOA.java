@@ -1,4 +1,4 @@
-package corba;
+package frontEnd;
 /*
  * adapter for the server side
  */
@@ -12,7 +12,7 @@ package corba;
 
 @SuppressWarnings("unchecked")
 public abstract class RecordManagerCORBAPOA extends org.omg.PortableServer.Servant
- implements corba.RecordManagerCORBAOperations, org.omg.CORBA.portable.InvokeHandler
+ implements frontEnd.RecordManagerCORBAOperations, org.omg.CORBA.portable.InvokeHandler
 {
 
   // Constructors

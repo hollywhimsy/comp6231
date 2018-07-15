@@ -1,4 +1,4 @@
-package corba;
+package frontEnd;
 
 
 /**
@@ -12,7 +12,7 @@ abstract public class RecordManagerCORBAHelper
 {
   private static String  _id = "IDL:corba/RecordManagerCORBA:1.0";
 
-  public static void insert (org.omg.CORBA.Any a, corba.RecordManagerCORBA that)
+  public static void insert (org.omg.CORBA.Any a, frontEnd.RecordManagerCORBA that)
   {
     org.omg.CORBA.portable.OutputStream out = a.create_output_stream ();
     a.type (type ());
@@ -20,7 +20,7 @@ abstract public class RecordManagerCORBAHelper
     a.read_value (out.create_input_stream (), type ());
   }
 
-  public static corba.RecordManagerCORBA extract (org.omg.CORBA.Any a)
+  public static frontEnd.RecordManagerCORBA extract (org.omg.CORBA.Any a)
   {
     return read (a.create_input_stream ());
   }
@@ -30,7 +30,7 @@ abstract public class RecordManagerCORBAHelper
   {
     if (__typeCode == null)
     {
-      __typeCode = org.omg.CORBA.ORB.init ().create_interface_tc (corba.RecordManagerCORBAHelper.id (), "RecordManagerCORBA");
+      __typeCode = org.omg.CORBA.ORB.init ().create_interface_tc (frontEnd.RecordManagerCORBAHelper.id (), "RecordManagerCORBA");
     }
     return __typeCode;
   }
@@ -40,43 +40,43 @@ abstract public class RecordManagerCORBAHelper
     return _id;
   }
 
-  public static corba.RecordManagerCORBA read (org.omg.CORBA.portable.InputStream istream)
+  public static frontEnd.RecordManagerCORBA read (org.omg.CORBA.portable.InputStream istream)
   {
     return narrow (istream.read_Object (_RecordManagerCORBAStub.class));
   }
 
-  public static void write (org.omg.CORBA.portable.OutputStream ostream, corba.RecordManagerCORBA value)
+  public static void write (org.omg.CORBA.portable.OutputStream ostream, frontEnd.RecordManagerCORBA value)
   {
     ostream.write_Object ((org.omg.CORBA.Object) value);
   }
 
-  public static corba.RecordManagerCORBA narrow (org.omg.CORBA.Object obj)
+  public static frontEnd.RecordManagerCORBA narrow (org.omg.CORBA.Object obj)
   {
     if (obj == null)
       return null;
-    else if (obj instanceof corba.RecordManagerCORBA)
-      return (corba.RecordManagerCORBA)obj;
+    else if (obj instanceof frontEnd.RecordManagerCORBA)
+      return (frontEnd.RecordManagerCORBA)obj;
     else if (!obj._is_a (id ()))
       throw new org.omg.CORBA.BAD_PARAM ();
     else
     {
       org.omg.CORBA.portable.Delegate delegate = ((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate ();
-      corba._RecordManagerCORBAStub stub = new corba._RecordManagerCORBAStub ();
+      frontEnd._RecordManagerCORBAStub stub = new frontEnd._RecordManagerCORBAStub ();
       stub._set_delegate(delegate);
       return stub;
     }
   }
 
-  public static corba.RecordManagerCORBA unchecked_narrow (org.omg.CORBA.Object obj)
+  public static frontEnd.RecordManagerCORBA unchecked_narrow (org.omg.CORBA.Object obj)
   {
     if (obj == null)
       return null;
-    else if (obj instanceof corba.RecordManagerCORBA)
-      return (corba.RecordManagerCORBA)obj;
+    else if (obj instanceof frontEnd.RecordManagerCORBA)
+      return (frontEnd.RecordManagerCORBA)obj;
     else
     {
       org.omg.CORBA.portable.Delegate delegate = ((org.omg.CORBA.portable.ObjectImpl)obj)._get_delegate ();
-      corba._RecordManagerCORBAStub stub = new corba._RecordManagerCORBAStub ();
+      frontEnd._RecordManagerCORBAStub stub = new frontEnd._RecordManagerCORBAStub ();
       stub._set_delegate(delegate);
       return stub;
     }

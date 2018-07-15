@@ -1,7 +1,6 @@
-package runner;
+package frontEnd;
 
 import common.Constants;
-import corba.CenterServerCORBA;
 
 public class ServerRunnerAll_CORBA
 {

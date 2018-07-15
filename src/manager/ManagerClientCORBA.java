@@ -11,8 +11,8 @@ import org.omg.CosNaming.NamingContextPackage.NotFound;
 import common.Constants;
 import common.Infrastucture;
 import common.Logger;
-import corba.RecordManagerCORBA;
-import corba.RecordManagerCORBAHelper;
+import frontEnd.RecordManagerCORBA;
+import frontEnd.RecordManagerCORBAHelper;
 
 public class ManagerClientCORBA extends Thread
 {

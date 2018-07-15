@@ -1,4 +1,4 @@
-package corba;
+package frontEnd;
 
 
 /**
@@ -8,7 +8,7 @@ package corba;
 * Thursday, June 14, 2018 9:28:07 AM EDT
 */
 
-public class _RecordManagerCORBAStub extends org.omg.CORBA.portable.ObjectImpl implements corba.RecordManagerCORBA
+public class _RecordManagerCORBAStub extends org.omg.CORBA.portable.ObjectImpl implements frontEnd.RecordManagerCORBA
 {
 
   public boolean createTRecord (String firstName, String lastName, String address, String phoneNumber, String specialization, String location, String managerId)

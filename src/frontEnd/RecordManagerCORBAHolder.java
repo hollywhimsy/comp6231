@@ -1,4 +1,4 @@
-package corba;
+package frontEnd;
 
 /**
 * corba/RecordManagerCORBAHolder.java .
@@ -9,30 +9,30 @@ package corba;
 
 public final class RecordManagerCORBAHolder implements org.omg.CORBA.portable.Streamable
 {
-  public corba.RecordManagerCORBA value = null;
+  public frontEnd.RecordManagerCORBA value = null;
 
   public RecordManagerCORBAHolder ()
   {
   }
 
-  public RecordManagerCORBAHolder (corba.RecordManagerCORBA initialValue)
+  public RecordManagerCORBAHolder (frontEnd.RecordManagerCORBA initialValue)
   {
     value = initialValue;
   }
 
   public void _read (org.omg.CORBA.portable.InputStream i)
   {
-    value = corba.RecordManagerCORBAHelper.read (i);
+    value = frontEnd.RecordManagerCORBAHelper.read (i);
   }
 
   public void _write (org.omg.CORBA.portable.OutputStream o)
   {
-    corba.RecordManagerCORBAHelper.write (o, value);
+    frontEnd.RecordManagerCORBAHelper.write (o, value);
   }
 
   public org.omg.CORBA.TypeCode _type ()
   {
-    return corba.RecordManagerCORBAHelper.type ();
+    return frontEnd.RecordManagerCORBAHelper.type ();
   }
 
 }

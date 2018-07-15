@@ -1,4 +1,4 @@
-package gui;
+package client;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.JScrollPane;
 
-public class ClientInterfaceCORBA
+public class ClientInterfaceGUI_CORBA
 {
 	private JFrame frameDCMS1;
 	private final ButtonGroup rdbtnGroupMainFunctions = new ButtonGroup();
@@ -92,7 +92,7 @@ public class ClientInterfaceCORBA
 			{
 				try
 				{
-					ClientInterfaceCORBA window = new ClientInterfaceCORBA();
+					ClientInterfaceGUI_CORBA window = new ClientInterfaceGUI_CORBA();
 					window.frameDCMS1.setVisible(true);
 				} catch (Exception e)
 				{
@@ -105,7 +105,7 @@ public class ClientInterfaceCORBA
 	/**
 	 * Create the application.
 	 */
-	public ClientInterfaceCORBA()
+	public ClientInterfaceGUI_CORBA()
 	{
 		initialize();
 		invisibleAll();
