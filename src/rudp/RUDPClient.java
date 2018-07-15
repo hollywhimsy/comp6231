@@ -57,11 +57,19 @@ public class RUDPClient
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 			socket.setSoTimeout(timeout); // makes the "receive" non-blocking
 			socket.receive(reply);
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
-			
 			String rep = new String(reply.getData());
+			String[] parts = rep.split("^");
+			String respons = null;			
+			if (parts.length == 2)
+			{
+				if (parts[1].equals(generateChecksum(parts[0])))
+				{
+					respons = parts[0];
+					logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
+				}
+			}			
 			
-			return rep;
+			return respons;
 		} 
 		catch (UnknownHostException e) 
 		{

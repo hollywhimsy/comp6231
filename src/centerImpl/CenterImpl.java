@@ -20,15 +20,167 @@ public class CenterImpl
 	private String cityAbbr;
 	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
-	
+		
 	public CenterImpl(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, String cityAbbr, Logger logger)
 	{
 		super();
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
 		this.cityAbbr = cityAbbr;
-		this.logger = logger;
+		this.logger = logger;		
 		this.otherServersUDPPorts = Infrastucture.getOtherServersUDPPorts(cityAbbr);
+	}
+	
+	/*
+	 * request can be:
+	 * 		HeartBit: server returns ACK to show it's alive
+	 * 		createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean
+	 * 		createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean
+	 * 		getRecordsCount~[String]: the [String] gives the parameters and server returns the records count
+	 * 		editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
+	 * 		recordExist~[String]: the [String] gives the parameters and server returns true/false
+	 * 		transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
+	 */
+	public String processRequest(String request)
+	{
+		if (request.trim().toLowerCase().contains("HeartBit".toLowerCase()))
+		{
+			return "ACK";
+		}
+		
+		if (request.trim().toLowerCase().contains("createTRecord".toLowerCase()))
+		{
+			//[String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 8)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}			
+			
+			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
+			{
+				return "ACK";
+			}
+			else
+			{
+				//fail to create
+				return "NAK";
+			}				
+		}
+		
+		if (request.trim().toLowerCase().contains("createSRecord".toLowerCase()))
+		{
+			//[String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 7)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}
+			
+			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
+			{
+				return "ACK";
+			}
+			else
+			{
+				//fail to create
+				return "NAK";
+			}			
+		}
+		
+		if (request.trim().toLowerCase().contains("editRecord".toLowerCase()))
+		{
+			//[String]: recordID~fieldName~newValue~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 5)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}
+			
+			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
+			{
+				return "ACK";
+			}
+			else
+			{
+				//fail to create
+				return "NAK";
+			}		
+		}
+		
+		if (request.trim().toLowerCase().contains("recordExist".toLowerCase()))
+		{
+			//[String]: recordId~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 3)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}
+			
+			if (recordExist(parts[1], parts[2]))
+			{
+				return "ACK";
+			}
+			else
+			{
+				//fail to create
+				return "NAK";
+			}		
+		}
+		
+		if (request.trim().toLowerCase().contains("transferRecord".toLowerCase()))
+		{
+			//[String]: recordId~remoteCenterServerName~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 4)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}
+			
+			if (transferRecord(parts[1], parts[2], parts[3]))
+			{
+				return "ACK";
+			}
+			else
+			{
+				//fail to create
+				return "NAK";
+			}		
+		}
+		
+		if (request.trim().toLowerCase().contains("getRecordsCount".toLowerCase()))
+		{
+			//[String]: managerId
+			String[] parts = request.split("~");
+			if (parts.length != 2)
+				return "NAK";
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+					return "NAK";						
+			}
+			
+			return getRecordsCount(parts[1]);		
+		}
+		
+		logger.logToFile(cityAbbr + "[CenterImpl.processRequest()]: Request Was Invalid!");
+			
+		return "NAK";		
 	}
 	
 	public boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location, 
@@ -73,7 +225,7 @@ public class CenterImpl
 	}
 
 	@SuppressWarnings({ "static-access", "deprecation" })
-	public boolean createSRecord(String firstName, String lastName, String coursesRegistred, boolean status, String statusDate, String managerId)
+	public boolean createSRecord(String firstName, String lastName, String coursesRegistred, String status, String statusDate, String managerId)
 	{
 		if ((firstName == null) || (lastName == null) || (coursesRegistred == null) || (statusDate == null))
 		{
@@ -88,10 +240,13 @@ public class CenterImpl
 		String[] parts = coursesRegistred.split(",");
 		for (int i = 0; i < parts.length; i++)
 			courses.add(parts[i]);
+		boolean stat = false;
+		if (status.toLowerCase().equals("true"))
+			stat = true;
 		String id = produceNewId("SR", managerId);
 		if (id != null)
 		{
-			StudentRecord student = new StudentRecord(id, firstName, lastName, courses, status, date);
+			StudentRecord student = new StudentRecord(id, firstName, lastName, courses, stat, date);
 
 			synchronized (recordsMap)
 			{
@@ -288,7 +443,7 @@ public class CenterImpl
 		}
 	}
 
-	public boolean transferRecord(String managerId, String recordId, String remoteCenterServerName)
+	public boolean transferRecord(String recordId, String remoteCenterServerName, String managerId)
 	{
 		if (!(isIdFormatCorrect(recordId)))
 		{
@@ -435,12 +590,6 @@ public class CenterImpl
 		return true;
 	}
 
-	
-	/*
-	 * Create new id for the new record, for both TeacherRecord and StudentRecord
-	 * The id cannot be greater than 99999 since there are only 5 digits for id
-	 * format make id from integer to string by adding zeros at front of the id
-	 */
 	private String produceNewId(String prefix, String managerId)
 	{
 		if (prefix.toUpperCase().equals("TR"))

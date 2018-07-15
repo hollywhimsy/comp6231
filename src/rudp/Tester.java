@@ -1,8 +1,5 @@
 package rudp;
 
-import java.awt.geom.GeneralPath;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,29 +38,8 @@ public class Tester
 		System.out.println(rudpClient.requestRemote("MTL", "createTRecord~Bob~dsasd~Montreal~564564~Network,Programing~MTL~MTL0001"));
 		System.out.println(rudpClient.requestRemote("MTL", "getRecordsCount"));
 		
-		System.out.println("End");
-		System.out.println(generateChecksum("createTRecord~Siamak~Azadi~Montreal~12345~Network,Programing~MTL~MTL0001"));
+		System.out.println("End");		
 	}
 	
-	static String generateChecksum(String str)
-    {
-		MessageDigest md;
-		StringBuffer sb = null;
-		try
-		{
-			md = MessageDigest.getInstance("MD5");
-			md.update(str.getBytes());
-			byte[] digest = md.digest();
-			sb = new StringBuffer();
-			for (byte b : digest) 
-			{
-				sb.append(String.format("%02x", b & 0xff));
-			}
-		} catch (NoSuchAlgorithmException e)
-		{
-			e.printStackTrace();
-		}	
-		
-        return sb.toString();
-    }	
+	
 }
