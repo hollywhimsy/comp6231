@@ -17,7 +17,7 @@ import record.StudentRecord;
 import record.TeacherRecord;
 import udp.UDPClient;
 
-public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
+public class RecordManagerImpl extends FrontEndPOA
 {
 	private ORB orb;
 	private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
@@ -34,7 +34,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 	}
 
 	// Constructor
-	public RecordManagerCORBAImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbr, Logger logger)
+	public RecordManagerImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbr, Logger logger)
 	{
 		super();
 		this.recordsMap = recordsMap;
@@ -344,7 +344,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 			return false; // Given city name is incorrect
 		}
 
-		RecordManagerCORBA recMng;
+		FrontEnd recMng;
 		String city = remoteCenterServerName.toUpperCase().trim();
 		String[] configuration = { "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
 
@@ -362,7 +362,7 @@ public class RecordManagerCORBAImpl extends RecordManagerCORBAPOA
 
 			// resolve the Object Reference in Naming
 			String name1 = "RecordManagerCORBA_" + city;
-			recMng = RecordManagerCORBAHelper.narrow(ncRef.resolve_str(name1));
+			recMng = FrontEndHelper.narrow(ncRef.resolve_str(name1));
 
 			if (recordId.toUpperCase().trim().charAt(0) == 'T') // Teacher record
 			{

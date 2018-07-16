@@ -1,6 +1,6 @@
-module corba
+module frontEnd
 {
-	interface RecordManagerCORBA
+	interface FrontEnd
 	{
 		 boolean createTRecord(in string firstName, 
                           in string lastName,
@@ -32,12 +32,3 @@ module corba
 		oneway void shutdown();
 	};	
 };
-
-/*
-supported data type:
-string
-boolean
-(int)
-
-
-*/

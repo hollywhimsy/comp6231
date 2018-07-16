@@ -11,8 +11,8 @@ import org.omg.CosNaming.NamingContextPackage.NotFound;
 import common.Constants;
 import common.Infrastucture;
 import common.Logger;
-import frontEnd.RecordManagerCORBA;
-import frontEnd.RecordManagerCORBAHelper;
+import frontEnd.FrontEnd;
+import frontEnd.FrontEndHelper;
 
 public class ManagerClientCORBA extends Thread
 {
@@ -21,7 +21,7 @@ public class ManagerClientCORBA extends Thread
 	private ORB orb;
 	private org.omg.CORBA.Object objRef;
 	private NamingContextExt ncRef;
-	private RecordManagerCORBA recordManager;
+	private FrontEnd recordManager;
 	private boolean corbaInitiation = true;
 	private String managerId;
 	private String city;
@@ -348,7 +348,7 @@ public class ManagerClientCORBA extends Thread
 			objRef = orb.resolve_initial_references("NameService");
 			ncRef = NamingContextExtHelper.narrow(objRef);
 			String name1 = "RecordManagerCORBA_" + city.toUpperCase().trim(); // resolve the Object Reference in Naming
-			recordManager = RecordManagerCORBAHelper.narrow(ncRef.resolve_str(name1));
+			recordManager = FrontEndHelper.narrow(ncRef.resolve_str(name1));
 
 		} catch (InvalidName e1)
 		{

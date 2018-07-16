@@ -20,7 +20,7 @@ import common.Logger;
 import record.Record;
 import udp.UDPServer;
 
-public class CenterServerCORBA extends Thread
+public class CenterServer extends Thread
 {
 	private String[] configuration = new String[4];
 	private String city;
@@ -28,7 +28,7 @@ public class CenterServerCORBA extends Thread
 	private HashMap<Character, List<Record>> recordsMap = new HashMap<>();
 
 	// Constructor
-	public CenterServerCORBA(String city)
+	public CenterServer(String city)
 	{
 		super();
 
@@ -69,12 +69,12 @@ public class CenterServerCORBA extends Thread
 			/*
 			 * each city has one separate hashmap for records
 			 */
-			RecordManagerCORBAImpl recMngImp = new RecordManagerCORBAImpl(recordsMap, city, logger);
+			RecordManagerImpl recMngImp = new RecordManagerImpl(recordsMap, city, logger);
 			recMngImp.setOrb(orb);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Servant with ORB is registered");
 
 			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);
-			RecordManagerCORBA href = RecordManagerCORBAHelper.narrow(ref);
+			FrontEnd href = FrontEndHelper.narrow(ref);
 			logger.logToFile(city + "[CenterServerCORBA.run()]: Object reference from Servant recieved");
 
 			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
