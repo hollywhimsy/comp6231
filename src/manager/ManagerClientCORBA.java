@@ -16,8 +16,7 @@ import frontEnd.FrontEndHelper;
 
 public class ManagerClientCORBA extends Thread
 {
-	private String[] configuration =
-	{ "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
+	private String[] configuration = { "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
 	private ORB orb;
 	private org.omg.CORBA.Object objRef;
 	private NamingContextExt ncRef;
@@ -330,7 +329,7 @@ public class ManagerClientCORBA extends Thread
 		logger = new Logger("MNG_" + managerId.toUpperCase().trim() + ".log");
 		operationResultLogger = new Logger("Result.log");
 
-		if (isIdFormatCorrect(managerId))
+		if (isManagerIdFormatCorrect(managerId))
 		{
 			city = managerId.substring(0, 3).toUpperCase();
 		} else
@@ -369,7 +368,7 @@ public class ManagerClientCORBA extends Thread
 		}
 	}
 
-	private boolean isIdFormatCorrect(String id)
+	private boolean isManagerIdFormatCorrect(String id)
 	{
 		if (id == null)
 		{

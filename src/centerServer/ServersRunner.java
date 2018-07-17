@@ -15,13 +15,11 @@ import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
-import common.Infrastucture;
 import common.Logger;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
 import frontEnd.RecordManagerImpl;
 import record.Record;
-import udp.UDPServer;
 
 public class ServersRunner
 {
@@ -60,14 +58,9 @@ public class ServersRunner
 		HashMap<String, Record> indexPerId3 = new HashMap<>();
 		Logger logger3 = new Logger("SRV_" + "DDO" + ".log");
 		CenterServerCore rudpServer3 = new CenterServerCore(recordsMap3, indexPerId3, 3730, "DDO", logger3, ports.get(0));
-		rudpServer3.start();
-		
+		rudpServer3.start();		
 		
 		String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
-		String city;
-		Logger logger;
-		HashMap<Character, List<Record>> recordsMap = new HashMap<>();
-		
 		try
 		{
 			ORB orb = ORB.init(configuration, null);

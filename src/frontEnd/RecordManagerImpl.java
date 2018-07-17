@@ -1,29 +1,19 @@
 package frontEnd;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.CosNaming.NamingContextExt;
-import org.omg.CosNaming.NamingContextExtHelper;
-import org.omg.CosNaming.NamingContextPackage.CannotProceed;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import centerServer.RudpClient;
 import common.Infrastucture;
 import common.Logger;
-import record.Record;
-import record.StudentRecord;
-import record.TeacherRecord;
-import udp.UDPClient;
 
 public class RecordManagerImpl extends FrontEndPOA
 {
 	private ORB orb;
 	private String cityAbbr;
 	private Logger logger;
-	private List<String> requests = new ArrayList<>();
+	private List<String> requests = new ArrayList<>(); // to store requests in case of a server failure to send the request to a chosen replica next
 	private List<HashMap<String, Integer>> ports; // RUDP ports for the 9 servers, each List entry for 3 servers
 	private HashMap<String, Integer> activeServers = new HashMap<>(); // indicates active server of each city: {0, 1, 2}
 	

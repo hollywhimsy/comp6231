@@ -148,20 +148,20 @@ public class CenterServerCore extends Thread
 			// firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 8)
-				return "NAK1";
+				return "INVALID"; // Invalid request
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID"; // Invalid request
 			}
 
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
-				return "ACK";
+				return "ACK"; // Valid request + the process is done
 			} else
 			{
-				// fail to create
-				return "NAK3";
+				// fail to do
+				return "ERROR"; // Valid request + Error in processing the request
 			}
 		}
 
@@ -170,11 +170,11 @@ public class CenterServerCore extends Thread
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 7)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
@@ -182,8 +182,8 @@ public class CenterServerCore extends Thread
 				return "ACK";
 			} else
 			{
-				// fail to create
-				return "NAK3";
+				// fail to do
+				return "ERROR";
 			}
 		}
 
@@ -192,11 +192,11 @@ public class CenterServerCore extends Thread
 			// [String]: recordID~fieldName~newValue~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 5)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
@@ -204,8 +204,8 @@ public class CenterServerCore extends Thread
 				return "ACK";
 			} else
 			{
-				// fail to create
-				return "NAK3";
+				// fail to do
+				return "ERROR";
 			}
 		}
 
@@ -214,11 +214,11 @@ public class CenterServerCore extends Thread
 			// [String]: recordId~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 3)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			if (recordExist(parts[1], parts[2]))
@@ -226,8 +226,8 @@ public class CenterServerCore extends Thread
 				return "ACK";
 			} else
 			{
-				// fail to create
-				return "NAK3";
+				// fail to do
+				return "ERROR";
 			}
 		}
 
@@ -236,11 +236,11 @@ public class CenterServerCore extends Thread
 			// [String]: recordId~remoteCenterServerName~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 4)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			if (transferRecord(parts[1], parts[2], parts[3]))
@@ -248,8 +248,8 @@ public class CenterServerCore extends Thread
 				return "ACK";
 			} else
 			{
-				// fail to create
-				return "NAK3";
+				// fail to do
+				return "ERROR";
 			}
 		}
 
@@ -258,11 +258,11 @@ public class CenterServerCore extends Thread
 			// [String]: managerId
 			String[] parts = request.split("~");
 			if (parts.length != 2)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			String result = getRecordsCount(parts[1]);
@@ -271,8 +271,7 @@ public class CenterServerCore extends Thread
 			{
 				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 				{
-					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);// create a UDPClient by itself, connect to the UDPServer by
-																							// udpPort
+					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);
 					String tempStr = client.requestRemote("getMyRecordsCount~" + parts[1]).trim();
 
 					if (tempStr == null)
@@ -294,11 +293,11 @@ public class CenterServerCore extends Thread
 			// [String]: managerId
 			String[] parts = request.split("~");
 			if (parts.length != 2)
-				return "NAK1";
+				return "INVALID";
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "NAK2";
+					return "INVALID";
 			}
 
 			String result = getRecordsCount(parts[1]);
@@ -308,7 +307,7 @@ public class CenterServerCore extends Thread
 
 		logger.logToFile(cityAbbr + "[CenterImpl.processRequest()]: Request Was Invalid!");
 
-		return "NAK4";
+		return "INVALID"; // Invalid request
 	}
 
 	private boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location,

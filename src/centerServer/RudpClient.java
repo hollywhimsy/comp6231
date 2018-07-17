@@ -15,7 +15,7 @@ public class RudpClient
 	private int serverPort; // CenterServer listen port that client should connect to
 	private Logger logger;
 	private String cityAbbreviation = new String();
-	private int timeout = 500; // Millisecond
+	private int timeout = 1000; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
 
 	// Constructor
 	public RudpClient(int serverPort, String cityAbbreviation, Logger logger)
@@ -57,18 +57,40 @@ public class RudpClient
 
 			byte[] buffer = new byte[1000];
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-			socket.setSoTimeout(timeout); // makes the "receive" non-blocking
+			socket.setSoTimeout(timeout); // makes the "receive" non-blocking and wait only for "timeout" milliseconds
 			socket.receive(reply);
 			String rep = new String(reply.getData());
-			String[] parts = rep.split("#");
 			String respons = null;
-			if (parts.length == 2)
+			boolean isValid = true;
+			
+			if (rep != null)
 			{
-				if (parts[1].trim().equals(generateChecksum(parts[0])))
+				String[] parts = rep.split("#");				
+				if (parts.length == 2)
 				{
-					respons = parts[0];
-					logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
+					if (parts[1].trim().equals(generateChecksum(parts[0])))
+					{
+						respons = parts[0];
+						logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
+					}
+					else
+					{
+						isValid = false; // Corrupt reply
+					}
 				}
+				else
+				{
+					isValid = false; // Corrupt reply
+				}
+			}
+			else
+			{
+				isValid = false; //packet loss
+			}
+			
+			if (!isValid)
+			{
+				//we need to retry sending the request again to receive a correct response
 			}
 
 			return respons;
