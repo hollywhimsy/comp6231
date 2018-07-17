@@ -8,13 +8,15 @@ package frontEnd;
 * Sunday, July 15, 2018 9:35:29 PM EDT
 */
 
+@SuppressWarnings("unchecked")
 public abstract class FrontEndPOA extends org.omg.PortableServer.Servant
  implements frontEnd.FrontEndOperations, org.omg.CORBA.portable.InvokeHandler
 {
 
   // Constructors
 
-  private static java.util.Hashtable _methods = new java.util.Hashtable ();
+  @SuppressWarnings("rawtypes")
+private static java.util.Hashtable _methods = new java.util.Hashtable ();
   static
   {
     _methods.put ("createTRecord", new java.lang.Integer (0));

@@ -10,6 +10,7 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
+import centerServer.RudpClient;
 import common.Infrastucture;
 import common.Logger;
 import record.Record;
@@ -20,315 +21,196 @@ import udp.UDPClient;
 public class RecordManagerImpl extends FrontEndPOA
 {
 	private ORB orb;
-	private HashMap<Character, List<Record>> recordsMap; // Needs synchronization
-	private HashMap<String, Record> indexPerId = new HashMap<>(); // Needs synchronization
-	private Integer lastTeacherId = 0; // Needs synchronization
-	private Integer lastStudentId = 0; // Needs synchronization
 	private String cityAbbr;
-	private List<Integer> otherServersUDPPorts;
 	private Logger logger;
-
-	public void setOrb(ORB orb)
-	{
-		this.orb = orb;
-	}
-
+	private List<String> requests = new ArrayList<>();
+	private List<HashMap<String, Integer>> ports; // RUDP ports for the 9 servers, each List entry for 3 servers
+	private HashMap<String, Integer> activeServers = new HashMap<>(); // indicates active server of each city: {0, 1, 2}
+	
 	// Constructor
-	public RecordManagerImpl(HashMap<Character, List<Record>> recordsMap, String cityAbbr, Logger logger)
+	public RecordManagerImpl(List<HashMap<String, Integer>> ports)
 	{
 		super();
-		this.recordsMap = recordsMap;
-		this.cityAbbr = cityAbbr;
-		this.otherServersUDPPorts = Infrastucture.getOtherServersUDPPorts(cityAbbr);
-		this.logger = logger;
+		this.cityAbbr = "FE";
+		this.ports = ports;
+		activeServers.put("MTL", 0);
+		activeServers.put("LVL", 0);
+		activeServers.put("DDO", 0);
+		
+		this.logger = new Logger("SRV_" + "FE" + ".log");
 
 		logger.logToFile(cityAbbr + "[RecordManagerImpl Constructor]: An instance of RecordManagerImpl is created");
 	}
 
 	@Override
-	public boolean createTRecord(String firstName, String lastName, String address, String phoneNumber,
+	public boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, 
 			String specialization, // the sign ',' is the separator
 			String location, String managerId)
 	{
 		if ((firstName == null) || (lastName == null) || (address == null) || (phoneNumber == null)
-				|| (specialization == null) || (location == null))
+				|| (specialization == null) || (location == null) || (managerId == null))
 		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.createTRecord()]: createTRecord failed (at least one property was NULL)"
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
-		Integer phone = Integer.parseInt(phoneNumber);
-		List<String> spec = new ArrayList<>();
-		String[] parts = specialization.split(",");
-		for (int i = 0; i < parts.length; i++)
-			spec.add(parts[i]);
-		String id = produceNewId("TR", managerId);
-		if (id != null)
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			TeacherRecord teacher = new TeacherRecord(id, firstName, lastName, address, phone, spec, location);
-
-			synchronized (recordsMap)
-			{
-				synchronized (indexPerId)
-				{
-					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).add(teacher);
-					/*
-					 * support new key for hashmap if it is not in the map yet
-					 */
-					indexPerId.put(id, teacher);
-				}
-			}
-
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord is successfully done (ID: " + id + ")"
+			//Manager ID incorrect
+			return false;
+		}
+		
+		String city = managerId.substring(0,3);
+		
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
+		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + address + "~" + phoneNumber + "~" 
+				+ specialization + "~" + location + "~" + managerId);
+				
+		if (result.contains("ACK"))
+		{
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord is successfully done "
 					+ " {CallerManagerID: " + managerId + "}");
 			return true;
 		}
-		return false;
+		else
+		{
+			return false;
+		}		
 	}
 
-	@SuppressWarnings({ "static-access", "deprecation" })
 	@Override
-	public boolean createSRecord(String firstName, String lastName, String coursesRegistred, boolean status,
-			String statusDate, String managerId)
+	public boolean createSRecord(String firstName, String lastName, String coursesRegistred, boolean status, String statusDate, String managerId)
 	{
-		if ((firstName == null) || (lastName == null) || (coursesRegistred == null) || (statusDate == null))
+		if ((firstName == null) || (lastName == null) || (coursesRegistred == null) || (statusDate == null) || (managerId == null))
 		{
 			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createSRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
-		Date date = new Date();
-		date.parse(statusDate);
-		List<String> courses = new ArrayList<>();
-		String[] parts = coursesRegistred.split(",");
-		for (int i = 0; i < parts.length; i++)
-			courses.add(parts[i]);
-		String id = produceNewId("SR", managerId);
-		if (id != null)
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			StudentRecord student = new StudentRecord(id, firstName, lastName, courses, status, date);
-
-			synchronized (recordsMap)
-			{
-				synchronized (indexPerId)
-				{
-					indexPerId.put(id, student);
-					/*
-					 * same for the TR hashmap
-					 */
-					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).add(student);
-				}
-			}
-
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createSRecord is successfully done (ID: " + id + ")"
-					+ " {CallerManagerID: " + managerId + "}");
+			//Manager ID incorrect
+			return false;
+		}
+		
+		String city = managerId.substring(0,3);
+		
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
+		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + coursesRegistred + "~" + status + "~" 
+				+ statusDate + "~" + managerId);
+				
+		if (result.contains("ACK"))
+		{
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createTRecord is successfully done " + " {CallerManagerID: " 
+					+ managerId + "}");
 			return true;
 		}
-		return false;
+		else
+		{
+			return false;
+		}				
 	}
 
 	@Override
 	public String getRecordCounts(String managerId)
 	{
-		int count = 0;
-		synchronized (recordsMap)
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			synchronized (indexPerId)
-			{
-				/*
-				 * needs to be changed into: (Character ch: recordsMap.keySet()){}
-				 */
-				for (Character ch = 'A'; ch <= 'Z'; ch++)
-				{
-					count += recordsMap.get(ch).size();
-				}
-			}
+			//Manager ID incorrect
+			return null;
 		}
-
-		String result = cityAbbr + " " + count;
-
-		for (Integer udpPort : otherServersUDPPorts)
+		
+		String city = managerId.substring(0,3);
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		String result = rudpClient.requestRemote("getRecordsCount~"+ managerId);
+		
+		if (result.contains("ACK"))
 		{
-			UDPClient client = new UDPClient(udpPort);// create a UDPClient by itself, connect to the UDPServer by udpPort
-			String tempStr = client.requestCount().trim();
-
-			if (tempStr == null)
-			{
-				logger.logToFile(
-						cityAbbr + "[RecordManagerImpl.getRecordCounts()]: UDP server did not respond on port:" + udpPort + " {CallerManagerID: "
-								+ managerId + "}");
-			} else
-			{
-				result = result + ", " + tempStr;
-			}
+			return result;
 		}
-
-		logger.logToFile(
-				cityAbbr + "[RecordManagerImpl.getRecordCounts()]: getRecordCounts is successfully done" + " {CallerManagerID: " + managerId + "}");
-		return result;
+		else
+		{
+			return null;
+		}
 	}
 
-	@SuppressWarnings({ "deprecation", "static-access" })
 	@Override
 	public boolean editRecord(String recordID, String fieldName, String newValue, String managerId)
 	{
-		if ((recordID == null) || (fieldName == null) || (newValue == null))
+		if ((recordID == null) || (fieldName == null) || (newValue == null) || (managerId == null))
 		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
-		if (!(isIdFormatCorrect(recordID)))// efficiency
+		if (!(isRecordIdFormatCorrect(recordID)))
 		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " + managerId + "}");
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " 
+					+ managerId + "}");
 			return false;
 		}
-
-		String oldValue = null;
-		Character ch = recordID.toUpperCase().charAt(0);
-		// If the record is Teacher type
-		if (ch.equals('T'))
+		
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			synchronized (recordsMap)
-			{
-				synchronized (indexPerId)
-				{
-					TeacherRecord teacher = (TeacherRecord) indexPerId.get(recordID);
-					if (teacher == null)
-					{
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)" + " {CallerManagerID: " + managerId
-								+ "}");
-						return false;
-					}
-
-					switch (fieldName)
-					{
-					case "address":
-						oldValue = teacher.getAddress();
-						teacher.setAddress(newValue);
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: address" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					case "phoneNumber":
-						oldValue = teacher.getPhone().toString();
-						teacher.setPhoneNumber(Integer.parseInt(newValue));
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					case "location":
-						oldValue = teacher.getLocation();
-						teacher.setLocation(newValue);
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: location" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					default:
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)" + " {CallerManagerID: " + managerId
-								+ "}");
-						return false;
-					}
-				}
-			}
+			//Manager ID incorrect
+			return false;
 		}
+		
+		String city = managerId.substring(0,3);
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		// [String]: recordID~fieldName~newValue~managerId
+		String result = rudpClient.requestRemote("editRecord~" + recordID + "~" + fieldName + "~" + newValue + "~" + managerId);
 
-		// If the record is Student type
-		if (ch.equals('S'))
+		if (result.contains("ACK"))
 		{
-			synchronized (recordsMap)
-			{
-				synchronized (indexPerId)
-				{
-					StudentRecord student = (StudentRecord) indexPerId.get(recordID);
-					if (student == null)
-					{
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)" + " {CallerManagerID: " + managerId
-								+ "}");
-						return false;
-					}
-
-					switch (fieldName)
-					{
-					case "coursesRegistred":
-						List<String> courses = new ArrayList<>();
-						String[] parts = newValue.split(",");
-						for (int i = 0; i < parts.length; i++)
-							courses.add(parts[i]);
-						student.setCoursesRegistred(courses);// set the course status as well
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					case "status":
-						boolean status;
-						if (newValue.equals("true"))
-							status = true;
-						else
-							status = false;
-						oldValue = String.valueOf(student.getStatus());
-						student.setStatus(status);
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: status" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					case "statusDate":
-						Date date = new Date();
-						date.parse(newValue);
-						oldValue = student.getStatusDate().toString();
-						student.setStatusDate(date);
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: statusDate" + " oldValue: " + oldValue
-								+ " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
-						break;
-					default:
-						logger.logToFile(cityAbbr
-								+ "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)" + " {CallerManagerID: " + managerId
-								+ "}");
-						return false;
-					}
-				}
-			}
+			return true;
 		}
-
-		return true;
+		else
+		{
+			return false;
+		}		
 	}
 
 	@Override
 	public boolean recordExist(String recordId, String managerId)
 	{
-		if (!(isIdFormatCorrect(recordId)))
+		if (!(isRecordIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.recordExist()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " + managerId + "}");
+					+ "[RecordManagerImpl.recordExist()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
-		synchronized (recordsMap)
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			synchronized (indexPerId)
-			{
-				if (indexPerId.containsKey(recordId))
-					return true;
-				else
-					return false;
-			}
+			//Manager ID incorrect
+			return false;
 		}
+		
+		String city = managerId.substring(0,3);
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		// [String]: recordId~managerId
+		String result = rudpClient.requestRemote("recordExist~" + recordId + "~" + managerId);
+
+		if (result.contains("ACK"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}		
 	}
 
 	@Override
 	public boolean transferRecord(String managerId, String recordId, String remoteCenterServerName)
 	{
-		if (!(isIdFormatCorrect(recordId)))
+		if (!(isRecordIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(
 					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
@@ -344,134 +226,25 @@ public class RecordManagerImpl extends FrontEndPOA
 			return false; // Given city name is incorrect
 		}
 
-		FrontEnd recMng;
-		String city = remoteCenterServerName.toUpperCase().trim();
-		String[] configuration = { "-ORBInitialPort", "1050", "-ORBInitialHost", "localhost" };
-
-		try
+		if (!isManagerIdFormatCorrect(managerId))
 		{
-			// create and initialize the ORB
-			ORB orb = ORB.init(configuration, null);
-
-			// get the root naming context
-			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
-
-			// Use NamingContextExtinstead of NamingContext. This is part of the
-			// Interoperable naming Service.
-			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-
-			// resolve the Object Reference in Naming
-			String name1 = "RecordManagerCORBA_" + city;
-			recMng = FrontEndHelper.narrow(ncRef.resolve_str(name1));
-
-			if (recordId.toUpperCase().trim().charAt(0) == 'T') // Teacher record
-			{
-				TeacherRecord teacher;
-				synchronized (recordsMap)
-				{
-					synchronized (indexPerId)
-					{
-						teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-						if (teacher == null)
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
-									+ " {CallerManagerID: " + managerId + "}");
-							return false; // The given record dosen't exist in this server
-						}
-						recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
-						indexPerId.remove(recordId.toUpperCase().trim(), teacher); // Delete the record from the Index
-					}
-				}
-
-				String spec = "";
-				String spliter = "";
-				for (int i = 0; i < teacher.getSpecialization().size(); i++)
-				{
-					// form the acceptable format by remote CORBA server
-					spec = spec + spliter + teacher.getSpecialization().get(i);
-					spliter = ",";
-				}
-				// Call the remote server to add this record on that
-				// By calling createTRecord on the remote server, new record ID will be assigned
-				// to the record
-				if (!(recMng.createTRecord(teacher.getFirstName(), teacher.getLastName(), teacher.getAddress(),
-						teacher.getPhone().toString(), spec, city, city + "0001")))// default remoteCenterServerManager
-				{
-					logger.logToFile(cityAbbr
-							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server" + " {CallerManagerID: "
-							+ managerId + "}");
-					return false; // The given record dosen't exist in this server
-				}
-
-				// recMng.shutdown();
-			}
-
-			if (recordId.toUpperCase().trim().charAt(0) == 'S') // Student record
-			{
-				StudentRecord student;
-				synchronized (recordsMap)
-				{
-					synchronized (indexPerId)
-					{
-						student = (StudentRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-						if (student == null)
-						{
-							logger.logToFile(cityAbbr
-									+ "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
-									+ " {CallerManagerID: " + managerId + "}");
-							return false; // The given record dosen't exist in this server
-						}
-						recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
-						indexPerId.remove(recordId.toUpperCase().trim(), student); // Delete the record from the Index
-					}
-				}
-
-				String courses = "";
-				String spliter = "";
-				for (int i = 0; i < student.getCoursesRegistred().size(); i++)
-				{
-					// form the acceptable format by remote CORBA server
-					courses = courses + spliter + student.getCoursesRegistred().get(i);
-					spliter = ",";
-				}
-				// Call the remote server to add this record on that
-				if (!(recMng.createSRecord(student.getFirstName(), student.getLastName(), courses, student.getStatus(), student.getDate().toString(),
-						city + "0001")))
-				{
-					logger.logToFile(cityAbbr
-							+ "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server" + " {CallerManagerID: "
-							+ managerId + "}");
-					return false; // The given record dosen't exist in this server
-				}
-
-				// recMng.shutdown();
-			}
-
-		} catch (InvalidName e)
-		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! Invalid Context Name" + " {CallerManagerID: " + managerId + "}");
-		} catch (NotFound e)
-		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! Context NotFound" + " {CallerManagerID: " + managerId + "}");
-		} catch (CannotProceed e)
-		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! CannotProceed" + " {CallerManagerID: " + managerId + "}");
-		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
-		{
-			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.transferRecord()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName" + " {CallerManagerID: "
-					+ managerId + "}");
+			//Manager ID incorrect
+			return false;
 		}
+		
+		String city = managerId.substring(0,3);
+		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		// [String]: recordId~remoteCenterServerName~managerId
+		String result = rudpClient.requestRemote("transferRecord~" + recordId + "~" + remoteCenterServerName + "~" + managerId);
 
-		logger.logToFile(cityAbbr
-				+ "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully to: " + city + " {CallerManagerID: " + managerId
-				+ "}");
-
-		return true;
+		if (result.contains("ACK"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}				
 	}
 
 	@Override
@@ -480,73 +253,12 @@ public class RecordManagerImpl extends FrontEndPOA
 		orb.shutdown(false);
 	}
 
-	/*
-	 * Create new id for the new record, for both TeacherRecord and StudentRecord
-	 * The id cannot be greater than 99999 since there are only 5 digits for id
-	 * format make id from integer to string by adding zeros at front of the id
-	 */
-	private String produceNewId(String prefix, String managerId)
+	public void setOrb(ORB orb)
 	{
-		if (prefix.toUpperCase().equals("TR"))
-		{
-			if (lastTeacherId >= 99999) // ID can have 5 digits only not more
-			{
-				logger.logToFile(cityAbbr
-						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Teachers record number reached 99999)" + " {CallerManagerID: "
-						+ managerId + "}");
-				return null;
-			}
-
-			// Need to be locked & Synchronized
-			String tId = null;
-			synchronized (lastTeacherId)
-			{
-				lastTeacherId++;
-				tId = lastTeacherId.toString();
-			}
-
-			int zeroNum = 5 - tId.length();
-			for (int i = 1; i <= zeroNum; i++)
-			{
-				tId = "0" + tId;
-			}
-			tId = "TR" + tId;
-
-			return tId;
-		}
-
-		if (prefix.toUpperCase().equals("SR"))
-		{
-			if (lastStudentId >= 99999) // ID can have 5 digits only not more
-			{
-				logger.logToFile(cityAbbr
-						+ "[RecordManagerClass.produceNewId()]: produceNewId failed (Students record number reached 99999)" + " {CallerManagerID: "
-						+ managerId + "}");
-				return null;
-			}
-
-			// Need to be locked & Synchronized
-			String sId = null;
-			synchronized (lastStudentId)
-			{
-				lastStudentId++;
-				sId = lastStudentId.toString();
-			}
-
-			int zeroNum = 5 - sId.length();
-			for (int i = 1; i <= zeroNum; i++)
-			{
-				sId = "0" + sId;
-			}
-			sId = "SR" + sId;
-
-			return sId;
-		}
-
-		return null;
+		this.orb = orb;
 	}
-
-	private boolean isIdFormatCorrect(String id)
+	
+	private boolean isRecordIdFormatCorrect(String id)
 	{
 		if (id == null)
 		{
@@ -572,6 +284,32 @@ public class RecordManagerImpl extends FrontEndPOA
 		}
 
 		if (!(id.substring(2, 5).chars().allMatch(Character::isDigit)))
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	private boolean isManagerIdFormatCorrect(String id)
+	{
+		if (id == null)
+		{
+			return false;
+		}
+
+		if (id.length() != 7)
+		{
+			return false;
+		}
+
+		String srvName = id.substring(0, 3).toUpperCase();
+		if (!Infrastucture.isSystemServerName(srvName))
+		{
+			return false;
+		}
+
+		if (!(id.substring(3, 4).chars().allMatch(Character::isDigit)))
 		{
 			return false;
 		}

@@ -347,7 +347,7 @@ public class ManagerClientCORBA extends Thread
 
 			objRef = orb.resolve_initial_references("NameService");
 			ncRef = NamingContextExtHelper.narrow(objRef);
-			String name1 = "RecordManagerCORBA_" + city.toUpperCase().trim(); // resolve the Object Reference in Naming
+			String name1 = "FrontEnd"; // resolve the Object Reference in Naming
 			recordManager = FrontEndHelper.narrow(ncRef.resolve_str(name1));
 
 		} catch (InvalidName e1)

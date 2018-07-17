@@ -27,16 +27,14 @@ public class RudpClient
 	}
 
 	/*
-	 * request can be: HeartBit: server returns ACK to show it's alive
-	 * createTRecord~[String]: the [String] gives the parameters and server creates
-	 * a teacher record and returns a boolean createSRecord~[String]: the [String]
-	 * gives the parameters and server creates a student record and returns a
-	 * boolean getRecordsCount~[String]: the [String] gives the parameters and
-	 * server returns the records count editRecord~[String]: the [String] gives the
-	 * parameters and server edits the record and returns a boolean
+	 * request can be: 
+	 * HeartBit: server returns ACK to show it's alive
+	 * createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean 
+	 * createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean 
+	 * getRecordsCount~[String]: the [String] gives the parameters and server returns the records count 
+	 * editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
 	 * recordExist~[String]: the [String] gives the parameters and server returns
-	 * true/false transferRecord~[String]: the [String] gives the parameters and
-	 * server transfers the record and returns a boolean
+	 * true/false transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
 	public String requestRemote(String request)
 	{
