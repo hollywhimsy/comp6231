@@ -1,0 +1,8 @@
+Wed Jul 18 22:29:15 EDT 2018 ==> MTL[RUDPServer Constructor]: UDPServer is initialized
+Wed Jul 18 22:29:15 EDT 2018 ==> MTL[RUDPServer.run()]: Listening on 3710 UDP Port
+Wed Jul 18 22:35:34 EDT 2018 ==> MTL[RUDPServer Constructor]: UDPServer is initialized
+Wed Jul 18 22:35:34 EDT 2018 ==> MTL[RUDPServer.run()]: UDP Socket Exception Error!
+Wed Jul 18 22:35:34 EDT 2018 ==> MTL[RUDPServer.run()]: UDP Socket is Closed!
+Wed Jul 18 22:35:48 EDT 2018 ==> MTL[RUDPServer.run()]: UDP CenterServer Recieved a Request!
+Wed Jul 18 22:35:48 EDT 2018 ==> MTL[MtlCenter.createTRecord()]: createTRecord is successfully done (ID: TR00001) {CallerManagerID: MTL0002}
+Wed Jul 18 22:35:48 EDT 2018 ==> MTL[RUDPServer.run()]: UDP CenterServer Replyed To /127.0.0.1:49334

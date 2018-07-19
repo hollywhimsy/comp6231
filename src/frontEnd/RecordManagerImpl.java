@@ -13,9 +13,17 @@ public class RecordManagerImpl extends FrontEndPOA
 	private ORB orb;
 	private String cityAbbr;
 	private Logger logger;
-	private List<String> requests = new ArrayList<>(); // to store requests in case of a server failure to send the request to a chosen replica next
-	private List<HashMap<String, Integer>> ports; // RUDP ports for the 9 servers, each List entry for 3 servers
-	private HashMap<String, Integer> activeServers = new HashMap<>(); // indicates active server of each city: {0, 1, 2}
+	
+	// to store requests in case of a server failure to send the request to a chosen 
+	// replica next
+	private List<String> requests = new ArrayList<>(); 
+	
+	// RUDP ports for the 9 servers, each List entry for 3 servers
+	private List<HashMap<String, Integer>> ports; 	
+
+	// indicates active server of each city: {0, 1, 2}
+	private HashMap<String, Integer> activeServers = new HashMap<>(); 
+	
 	
 	// Constructor
 	public RecordManagerImpl(List<HashMap<String, Integer>> ports)
@@ -53,7 +61,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		
 		String city = managerId.substring(0,3);
 		
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
 		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + address + "~" + phoneNumber + "~" 
 				+ specialization + "~" + location + "~" + managerId);
@@ -88,7 +96,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		
 		String city = managerId.substring(0,3);
 		
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + coursesRegistred + "~" + status + "~" 
 				+ statusDate + "~" + managerId);
@@ -115,7 +123,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		}
 		
 		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		String result = rudpClient.requestRemote("getRecordsCount~"+ managerId);
 		
 		if (result.contains("ACK"))
@@ -126,6 +134,14 @@ public class RecordManagerImpl extends FrontEndPOA
 		{
 			return null;
 		}
+	}
+	
+    // Returns the UDP port of the master server instance 
+	
+	private Integer getMasterPortUDPByCity(String city) {
+		// TODO 
+		// refactor  this when decide the appropriate data structure
+		return ports.get(activeServers.get(city)).get(city);
 	}
 
 	@Override
@@ -152,7 +168,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		}
 		
 		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		// [String]: recordID~fieldName~newValue~managerId
 		String result = rudpClient.requestRemote("editRecord~" + recordID + "~" + fieldName + "~" + newValue + "~" + managerId);
 
@@ -183,7 +199,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		}
 		
 		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		// [String]: recordId~managerId
 		String result = rudpClient.requestRemote("recordExist~" + recordId + "~" + managerId);
 
@@ -223,7 +239,7 @@ public class RecordManagerImpl extends FrontEndPOA
 		}
 		
 		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(ports.get(activeServers.get(city)).get(city), cityAbbr, logger);
+		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
 		// [String]: recordId~remoteCenterServerName~managerId
 		String result = rudpClient.requestRemote("transferRecord~" + recordId + "~" + remoteCenterServerName + "~" + managerId);
 
