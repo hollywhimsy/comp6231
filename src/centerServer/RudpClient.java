@@ -15,16 +15,16 @@ public class RudpClient
 {
 	private int serverPort; // CenterServer listen port that client should connect to
 	private Logger logger;
-	private String cityAbbreviation = new String();
-	private int timeout = 1000; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
+	private String cityAbbr = new String();
+	private int timeout = 1500; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
 
 	// Constructor
-	public RudpClient(int serverPort, String cityAbbreviation, Logger logger)
+	public RudpClient(int serverPort, String cityAbbr, Logger logger)
 	{
 		super();
 		this.serverPort = serverPort;
 		this.logger = logger;
-		this.cityAbbreviation = cityAbbreviation;
+		this.cityAbbr = cityAbbr;
 	}
 
 	/*
@@ -48,7 +48,8 @@ public class RudpClient
 		
 		String response = sender("REQ", id, request); // Send the request and receive the response
 		
-		sender("DEL", id, ""); // Ask the receiver to delete the response
+		if (response.substring(0, 3).equals("ACK"))
+			sender("DEL", id, ""); // Ask the receiver to delete the response
 		
 		return response;
 	}
@@ -56,17 +57,19 @@ public class RudpClient
 	private String sender(String code, String id, String request)
 	{
 		DatagramSocket socket = null;
-		String respons = null;
+		String respons = "";
 
 		try
 		{
 			socket = new DatagramSocket();
-			
+						
 			String req = generateChecksum(code + id + request.trim()) + code + id + request.trim();
 
 			byte[] message = req.getBytes(); // client must send "Count" as request
 
-			InetAddress serverIP = InetAddress.getByName("localhost"); // CenterServer and client have same IP address
+			InetAddress serverIP = null;
+			
+			serverIP = InetAddress.getByName("localhost"); // CenterServer and client have same IP address
 			DatagramPacket udpRequest = new DatagramPacket(message, message.length, serverIP, serverPort);
 			
 			boolean isValid = false;
@@ -78,26 +81,26 @@ public class RudpClient
 			while (!isValid)
 			{
 				socket.send(udpRequest);
-				logger.logToFile(cityAbbreviation + "[RUDPClient]: Request " + code + " is sent! Iteration: " + iteration);		
+				
+				logger.logToFile(cityAbbr + "[RUDPClient]: Request " + code + " is sent! Iteration: " + iteration);		
 				iteration ++;
 					
 				byte[] buffer = new byte[1024];
 				DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 				
 				// makes the "receive" non-blocking and wait only for "timeout" milliseconds
+				socket.setSoTimeout(timeout);
+								
 				try
 				{
-					socket.setSoTimeout(timeout);
-				} catch (SocketException e)
+					socket.receive(reply);
+				} catch (IOException e)
 				{
-					// the receiver is down and didn't reply
-					return "DWN"; 
-				} 
+					logger.logToFile(cityAbbr + "[RUDPClient]: Server is Down!");
+					return "DWN";
+				}
 				
-				socket.receive(reply);
 				String rep = new String(reply.getData());				
-				
-//				logger.logToFile("Rep: " + rep.trim());
 				
 				if (rep.trim().length() >= 41)
 				{
@@ -115,22 +118,22 @@ public class RudpClient
 			
 			respons = parts[1] + parts[3];
 						
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received! Response: " + respons);
+			logger.logToFile(cityAbbr + "[RUDPClient]: Reply received! Response: " + respons);
 		} 
 		catch (UnknownHostException e)
 		{
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: UnknownHostException Error!");
+			logger.logToFile(cityAbbr + "[RUDPClient]: UnknownHostException Error!");
 		} catch (SocketException e)
 		{
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: Exception Error!");
+			logger.logToFile(cityAbbr + "[RUDPClient]: Exception Error!");
 		} catch (IOException e)
 		{
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: IOException Error!");
+			logger.logToFile(cityAbbr + "[RUDPClient]: IOException Error!");
 		} finally
 		{
 			if (socket != null)
 				socket.close();
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: Socket is closed!");
+			logger.logToFile(cityAbbr + "[RUDPClient]: Socket is closed!");
 		}
 		return 	respons;
 	}
@@ -172,14 +175,11 @@ public class RudpClient
 	
 	private String[] splitMessage(String message)
 	{
-//		System.out.println(message);
 		String[] result = new String[4];
+		
 		result[0] = message.substring(0, 32);
-//		System.out.println(result[0]);
 		result[1] = message.substring(32, 35);
-//		System.out.println(result[1]);
 		result[2] = message.substring(35, 41);
-//		System.out.println(result[2]);
 		result[3] = message.substring(41, message.length());
 		
 		return result;		

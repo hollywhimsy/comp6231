@@ -59,8 +59,6 @@ public class CenterServerCore extends Thread
 				String req = new String(request.getData()); // Extract the request data
 				logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Recieved a Request!");
 				
-//				System.out.println(req.trim());
-								
 				if (req.trim().length() < 41)
 				{
 					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
@@ -153,16 +151,11 @@ public class CenterServerCore extends Thread
 	
 	private String[] splitMessage(String message)
 	{
-//		System.out.println(message);
 		String[] result = new String[4];
 		result[0] = message.substring(0, 32);
-//		System.out.println(result[0]);
 		result[1] = message.substring(32, 35);
-//		System.out.println(result[1]);
 		result[2] = message.substring(35, 41);
-//		System.out.println(result[2]);
 		result[3] = message.substring(41, message.length());
-//		System.out.println(result[3]);		
 		
 		return result;		
 	}
@@ -392,7 +385,6 @@ public class CenterServerCore extends Thread
 				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 				{
 					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);
-					System.out.println("getMyRecordsCount~" + srv + "0001");
 					String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
 
 					if (tempStr == null)
