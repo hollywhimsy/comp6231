@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import common.Logger;
 
 public class RudpClient
@@ -33,68 +34,90 @@ public class RudpClient
 	 * createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean 
 	 * getRecordsCount~[String]: the [String] gives the parameters and server returns the records count 
 	 * editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
-	 * recordExist~[String]: the [String] gives the parameters and server returns
-	 * true/false transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
+	 * recordExist~[String]: the [String] gives the parameters and server returns true/false 
+	 * transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
 	public String requestRemote(String request)
 	{
+		if (request.trim().length() > 983)
+		{
+			return "LNG";
+		}
+		
+		String id = randomIdGenerator();
+		
+		String response = sender("REQ", id, request); // Send the request and receive the response
+		
+		sender("DEL", id, ""); // Ask the receiver to delete the response
+		
+		return response;
+	}
+
+	private String sender(String code, String id, String request)
+	{
 		DatagramSocket socket = null;
+		String respons = null;
 
 		try
 		{
 			socket = new DatagramSocket();
+			
+			String req = generateChecksum(code + id + request.trim()) + code + id + request.trim();
 
-			String str = request + "#" + generateChecksum(request);
-
-			// System.out.println(str);
-
-			byte[] message = str.getBytes(); // client must send "Count" as request
+			byte[] message = req.getBytes(); // client must send "Count" as request
 
 			InetAddress serverIP = InetAddress.getByName("localhost"); // CenterServer and client have same IP address
 			DatagramPacket udpRequest = new DatagramPacket(message, message.length, serverIP, serverPort);
-			socket.send(udpRequest);
-			logger.logToFile(cityAbbreviation + "[RUDPClient]: Request is sent!");
-
-			byte[] buffer = new byte[1000];
-			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-			socket.setSoTimeout(timeout); // makes the "receive" non-blocking and wait only for "timeout" milliseconds
-			socket.receive(reply);
-			String rep = new String(reply.getData());
-			String respons = null;
-			boolean isValid = true;
 			
-			if (rep != null)
+			boolean isValid = false;
+			
+			String[] parts = new String[4];
+			int iteration = 1;
+			
+			// Try to send the request until receive ACK in reply
+			while (!isValid)
 			{
-				String[] parts = rep.split("#");				
-				if (parts.length == 2)
+				socket.send(udpRequest);
+				logger.logToFile(cityAbbreviation + "[RUDPClient]: Request " + code + " is sent! Iteration: " + iteration);		
+				iteration ++;
+					
+				byte[] buffer = new byte[1024];
+				DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+				
+				// makes the "receive" non-blocking and wait only for "timeout" milliseconds
+				try
 				{
-					if (parts[1].trim().equals(generateChecksum(parts[0])))
-					{
-						respons = parts[0];
-						logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received!");
-					}
-					else
-					{
-						isValid = false; // Corrupt reply
-					}
-				}
-				else
+					socket.setSoTimeout(timeout);
+				} catch (SocketException e)
 				{
-					isValid = false; // Corrupt reply
-				}
-			}
-			else
-			{
-				isValid = false; //packet loss
+					// the receiver is down and didn't reply
+					return "DWN"; 
+				} 
+				
+				socket.receive(reply);
+				String rep = new String(reply.getData());				
+				
+//				logger.logToFile("Rep: " + rep.trim());
+				
+				if (rep.trim().length() >= 41)
+				{
+					parts = splitMessage(rep.trim());
+									
+					if (parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
+					{
+						if (!parts[1].equals("NAK"))
+						{							
+							isValid = true;
+						}
+					}								
+				}				
 			}
 			
-			if (!isValid)
-			{
-				//we need to retry sending the request again to receive a correct response
-			}
-
-			return respons;
-		} catch (UnknownHostException e)
+			respons = parts[1] + parts[3];
+						
+			logger.logToFile(cityAbbreviation + "[RUDPClient]: Reply received! Response: " + respons);
+		} 
+		catch (UnknownHostException e)
 		{
 			logger.logToFile(cityAbbreviation + "[RUDPClient]: UnknownHostException Error!");
 		} catch (SocketException e)
@@ -109,9 +132,9 @@ public class RudpClient
 				socket.close();
 			logger.logToFile(cityAbbreviation + "[RUDPClient]: Socket is closed!");
 		}
-		return null;
+		return 	respons;
 	}
-
+	
 	private String generateChecksum(String str)
 	{
 		MessageDigest md;
@@ -132,5 +155,33 @@ public class RudpClient
 		}
 
 		return sb.toString();
+	}
+	
+	private String randomIdGenerator()
+	{
+		String result = "";
+		for (int i = 0; i < 6; i++)
+		{
+			Random rand = new Random();
+			int  n = rand.nextInt(10);
+			result += n;
+		}
+		
+		return result;	
+	}
+	
+	private String[] splitMessage(String message)
+	{
+//		System.out.println(message);
+		String[] result = new String[4];
+		result[0] = message.substring(0, 32);
+//		System.out.println(result[0]);
+		result[1] = message.substring(32, 35);
+//		System.out.println(result[1]);
+		result[2] = message.substring(35, 41);
+//		System.out.println(result[2]);
+		result[3] = message.substring(41, message.length());
+		
+		return result;		
 	}
 }

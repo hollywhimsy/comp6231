@@ -7,6 +7,7 @@ import record.TeacherRecord;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,6 +26,7 @@ public class CenterServerCore extends Thread
 	private Integer lastStudentId = 0; // Needs synchronization
 	private Logger logger;
 	private HashMap<String, Integer> ports;
+	private HashMap<String, String[]> responses = new HashMap<>();
 
 	// Constructor
 	public CenterServerCore(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, int listenPort, String cityAbbr,
@@ -51,31 +53,57 @@ public class CenterServerCore extends Thread
 
 			while (true) // Always receive the requests and response accordingly
 			{
-				byte[] buffer = new byte[1000]; // Buffer which receives the request
+				byte[] buffer = new byte[1024]; // Buffer which receives the request
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				socket.receive(request); // Receive request
 				String req = new String(request.getData()); // Extract the request data
 				logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Recieved a Request!");
-				String[] parts = req.trim().split("#");
-				if (parts.length != 2)
+				
+//				System.out.println(req.trim());
+								
+				if (req.trim().length() < 41)
 				{
-					socket.send(prepareRespons("NAK", request)); // Send the reply
+					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
 					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (length)! NAK sent to the requester");
 					continue;
 				}
-				if (!parts[1].trim().equals(generateChecksum(parts[0])))
+				
+				String[] parts = splitMessage(req.trim());
+					
+				if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
 				{
-					socket.send(prepareRespons("NAK", request)); // Send the reply
-					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (checksum)! NAK sent to the requester");
-					// corrupted request
+					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
+					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (chksm)! NAK sent to the requester");
 					continue;
 				}
+				
+				if(parts[1].equals("REQ"))
+				{
+					if (!responses.containsKey(parts[2])) // if it's the first time
+					{					
+						String[] result = processRequest(parts[3].trim());
+						socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
+						logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Replyed To " + request.getAddress().toString() + ":"
+								+ request.getPort());
+						
+						responses.put(parts[2], result);
+					}
+					else
+					{
+						socket.send(prepareRespons(responses.get(parts[2])[0], parts[2], responses.get(parts[2])[1], request.getAddress(), 
+								request.getPort())); 
+					}
+				}
 
-				String result = processRequest(parts[0].trim());
-				socket.send(prepareRespons(result, request)); // Send the reply
-
-				logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Replyed To " + request.getAddress().toString() + ":"
-						+ request.getPort());
+				if(parts[1].equals("DEL"))
+				{
+					if (responses.containsKey(parts[2]))
+					{
+						responses.remove(parts[2]);
+					}
+					
+					socket.send(prepareRespons("ACK", parts[2], "", request.getAddress(), request.getPort())); // Send the reply
+				}				
 			}
 		} catch (SocketException e)
 		{
@@ -113,33 +141,51 @@ public class CenterServerCore extends Thread
 		return sb.toString();
 	}
 
-	private DatagramPacket prepareRespons(String rep, DatagramPacket request)
+	private DatagramPacket prepareRespons(String code, String id, String msg, InetAddress addr, int port)
 	{
-		String str = rep + "#" + generateChecksum(rep);
-		byte[] replyBuffer = new byte[512];
-		replyBuffer = str.getBytes(); // Convert String to Byte to send to the client
-		DatagramPacket reply = new DatagramPacket(replyBuffer, replyBuffer.length, request.getAddress(), request.getPort());
+		String rep = generateChecksum(code + id + msg) + code + id + msg;
+		byte[] replyBuffer = new byte[1024];
+		replyBuffer = rep.getBytes(); // Convert String to Byte to send to the client
+		DatagramPacket reply = new DatagramPacket(replyBuffer, replyBuffer.length, addr, port);
 
 		return reply;
 	}
+	
+	private String[] splitMessage(String message)
+	{
+//		System.out.println(message);
+		String[] result = new String[4];
+		result[0] = message.substring(0, 32);
+//		System.out.println(result[0]);
+		result[1] = message.substring(32, 35);
+//		System.out.println(result[1]);
+		result[2] = message.substring(35, 41);
+//		System.out.println(result[2]);
+		result[3] = message.substring(41, message.length());
+//		System.out.println(result[3]);		
+		
+		return result;		
+	}
 
 	/*
-	 * request can be: HeartBit: server returns ACK to show it's alive
-	 * createTRecord~[String]: the [String] gives the parameters and server creates
-	 * a teacher record and returns a boolean createSRecord~[String]: the [String]
-	 * gives the parameters and server creates a student record and returns a
-	 * boolean getRecordsCount~[String]: the [String] gives the parameters and
-	 * server returns the records count editRecord~[String]: the [String] gives the
-	 * parameters and server edits the record and returns a boolean
-	 * recordExist~[String]: the [String] gives the parameters and server returns
-	 * true/false transferRecord~[String]: the [String] gives the parameters and
-	 * server transfers the record and returns a boolean
+	 * request can be: 
+	 * HeartBit: server returns ACK to show it's alive
+	 * createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean 
+	 * createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean 
+	 * getRecordsCount~[String]: the [String] gives the parameters and server returns the records count 
+	 * editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
+	 * recordExist~[String]: the [String] gives the parameters and server returns true/false 
+	 * transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
-	private String processRequest(String request)
+	private String[] processRequest(String request)
 	{
+		String[] response = new String[2];
+		
 		if (request.trim().toLowerCase().contains("HeartBit".toLowerCase()))
 		{
-			return "ACK";
+			response[0] = "ACK";
+			response[1] = "";
+ 			return response;
 		}
 
 		if (request.trim().toLowerCase().contains("createTRecord".toLowerCase()))
@@ -148,20 +194,33 @@ public class CenterServerCore extends Thread
 			// firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 8)
-				return "INVALID"; // Invalid request
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;				
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID"; // Invalid request
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
-				return "ACK"; // Valid request + the process is done
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
 			} else
 			{
 				// fail to do
-				return "ERROR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
 			}
 		}
 
@@ -170,20 +229,33 @@ public class CenterServerCore extends Thread
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 7)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
 			{
-				return "ACK";
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
 			} else
 			{
 				// fail to do
-				return "ERROR";
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
 			}
 		}
 
@@ -192,20 +264,33 @@ public class CenterServerCore extends Thread
 			// [String]: recordID~fieldName~newValue~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 5)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
 			{
-				return "ACK";
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
 			} else
 			{
 				// fail to do
-				return "ERROR";
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
 			}
 		}
 
@@ -214,20 +299,33 @@ public class CenterServerCore extends Thread
 			// [String]: recordId~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 3)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			if (recordExist(parts[1], parts[2]))
 			{
-				return "ACK";
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
 			} else
 			{
 				// fail to do
-				return "ERROR";
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
 			}
 		}
 
@@ -236,20 +334,33 @@ public class CenterServerCore extends Thread
 			// [String]: recordId~remoteCenterServerName~managerId
 			String[] parts = request.split("~");
 			if (parts.length != 4)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			if (transferRecord(parts[1], parts[2], parts[3]))
 			{
-				return "ACK";
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
 			} else
 			{
 				// fail to do
-				return "ERROR";
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
 			}
 		}
 
@@ -258,11 +369,20 @@ public class CenterServerCore extends Thread
 			// [String]: managerId
 			String[] parts = request.split("~");
 			if (parts.length != 2)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			String result = getRecordsCount(parts[1]);
@@ -272,7 +392,8 @@ public class CenterServerCore extends Thread
 				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 				{
 					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);
-					String tempStr = client.requestRemote("getMyRecordsCount~" + parts[1]).trim();
+					System.out.println("getMyRecordsCount~" + srv + "0001");
+					String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
 
 					if (tempStr == null)
 					{
@@ -280,12 +401,17 @@ public class CenterServerCore extends Thread
 								+ " {CallerManagerID: " + parts[1] + "}");
 					} else
 					{
-						result = result + ", " + tempStr;
+						if (tempStr.contains("ACK"))
+						{
+							result = result + ", " + tempStr.substring(3, tempStr.length());
+						}
 					}
 				}
 			}
 
-			return result;
+			response[0] = "ACK"; // Valid request + the process is done
+			response[1] = result;
+ 			return response;
 		}
 
 		if (request.trim().toLowerCase().contains("getMyRecordsCount".toLowerCase()))
@@ -293,21 +419,34 @@ public class CenterServerCore extends Thread
 			// [String]: managerId
 			String[] parts = request.split("~");
 			if (parts.length != 2)
-				return "INVALID";
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
 			for (int i = 0; i < parts.length; i++)
 			{
 				if (parts[i] == null)
-					return "INVALID";
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
 			}
 
 			String result = getRecordsCount(parts[1]);
 
-			return result;
+			response[0] = "ACK"; // Valid request + the process is done
+			response[1] = result;
+ 			return response;
 		}
 
 		logger.logToFile(cityAbbr + "[CenterImpl.processRequest()]: Request Was Invalid!");
 
-		return "INVALID"; // Invalid request
+		response[0] = "INV"; // Invalid request
+		response[1] = "";
+		return response;
 	}
 
 	private boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location,
