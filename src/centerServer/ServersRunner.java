@@ -60,50 +60,50 @@ public class ServersRunner
 		CenterServerCore rudpServer3 = new CenterServerCore(recordsMap3, indexPerId3, 3730, "DDO", logger3, ports.get(0));
 		rudpServer3.start();		
 		
-//		String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
-//		try
-//		{
-//			ORB orb = ORB.init(configuration, null);
-//			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
-//			rootPOA.the_POAManager().activate();
-//			
-//			RecordManagerImpl recMngImp = new RecordManagerImpl(ports);
-//			recMngImp.setOrb(orb);
-//			
-//			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);
-//			FrontEnd href = FrontEndHelper.narrow(ref);
-//			
-//			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
-//			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-//			
-//			String name = "FrontEnd";
-//			NameComponent path[] = ncRef.to_name(name);
-//			ncRef.rebind(path, href);
-//			
-//			// wait for invocations from clients
-//			orb.run();
-//
-//		} catch (InvalidName e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! InvalidName");
-//		} catch (AdapterInactive e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! AdapterInactive");
-//		} catch (ServantNotActive e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! ServantNotActive");
-//		} catch (WrongPolicy e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! WrongPolicy");
-//		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
-//		} catch (NotFound e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! NotFound");
-//		} catch (CannotProceed e)
-//		{
-//			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! CannotProceed");
-//		}
+		String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
+		try
+		{
+			ORB orb = ORB.init(configuration, null);
+			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+			rootPOA.the_POAManager().activate();
+			
+			RecordManagerImpl recMngImp = new RecordManagerImpl(ports);
+			recMngImp.setOrb(orb);
+			
+			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);
+			FrontEnd href = FrontEndHelper.narrow(ref);
+			
+			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+			
+			String name = "FrontEnd";
+			NameComponent path[] = ncRef.to_name(name);
+			ncRef.rebind(path, href);
+			
+			// wait for invocations from clients
+			orb.run();
+
+		} catch (InvalidName e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! InvalidName");
+		} catch (AdapterInactive e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! AdapterInactive");
+		} catch (ServantNotActive e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! ServantNotActive");
+		} catch (WrongPolicy e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! WrongPolicy");
+		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
+		} catch (NotFound e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! NotFound");
+		} catch (CannotProceed e)
+		{
+			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! CannotProceed");
+		}
 	}
 }
