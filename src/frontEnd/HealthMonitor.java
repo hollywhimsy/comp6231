@@ -6,12 +6,14 @@ import centerServer.RudpClient;
 // for heart beats from the clients and decide and make the appropriate decision 
 // in electing the new leader if the current crashes crashes
 public class HealthMonitor extends Thread {
-	
-	
-	
-	public HealthMonitor() {
-		
+
+	RecordManagerImpl frontEndInstance;
+
+	public HealthMonitor(RecordManagerImpl frontEndInstance) {
+		this.frontEndInstance = frontEndInstance;
+
 	}
+
 	public void run() {
 		try {
 
