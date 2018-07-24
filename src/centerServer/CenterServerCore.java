@@ -25,12 +25,13 @@ public class CenterServerCore extends Thread
 	private Integer lastTeacherId = 0; // Needs synchronization
 	private Integer lastStudentId = 0; // Needs synchronization
 	private Logger logger;
-	private HashMap<String, Integer> ports;
+	private List<HashMap<String, Integer>> ports = new ArrayList<>();
+	private HashMap<String, Integer> myGroupPorts;
 	private HashMap<String, String[]> responses = new HashMap<>();
 
 	// Constructor
 	public CenterServerCore(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, int listenPort, String cityAbbr,
-			Logger logger, HashMap<String, Integer> ports)
+			Logger logger, List<HashMap<String, Integer>> ports, int groupIndex)
 	{
 		super();
 		this.recordsMap = recordsMap;
@@ -39,6 +40,8 @@ public class CenterServerCore extends Thread
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
 		this.ports = ports;
+		
+		myGroupPorts = ports.get(groupIndex);
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
 	}
@@ -380,16 +383,16 @@ public class CenterServerCore extends Thread
 
 			String result = getRecordsCount(parts[1]);
 
-			for (String srv : ports.keySet())
+			for (String srv : myGroupPorts.keySet())
 			{
 				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 				{
-					RudpClient client = new RudpClient(ports.get(srv), cityAbbr, logger);
+					RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
 					String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
 
 					if (tempStr == null)
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + ports.get(srv)
+						logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + myGroupPorts.get(srv)
 								+ " {CallerManagerID: " + parts[1] + "}");
 					} else
 					{
@@ -733,7 +736,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(ports.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
 			// [String]:
 			// firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String reply = rudpClient.requestRemote("createTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~"
@@ -777,7 +780,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(ports.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 			String reply = rudpClient.requestRemote("createSRecord~" + student.getFirstName() + "~" + student.getLastName() + "~" + courses
 					+ "~" + student.getStatus() + "~" + student.getDate().toString() + "~" + city + "0001");
