@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 // This class should run in a separate thread on each server center core as a child thread
 // if the parent process will crash then it will be killed as well 
 // the system will not get any heartbeat signals from this process 
-public class HealthServer extends Thread {
+public class HealthClient extends Thread {
 
 	public void run() {
 		try {
