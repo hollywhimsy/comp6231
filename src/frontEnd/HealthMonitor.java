@@ -2,8 +2,8 @@ package frontEnd;
 
 import centerServer.RudpClient;
 
-// this class implements a non blocking socket listening 
-// for heart beats from the clients and decide and make the appropriate decision 
+// This class will call each runnning server 
+// to check if they are alive and make the appropriate decision 
 // in electing the new leader if the current crashes crashes
 public class HealthMonitor extends Thread {
 
@@ -16,10 +16,16 @@ public class HealthMonitor extends Thread {
 
 	public void run() {
 		try {
-
+			checkHealthStatus();
+			Thread.sleep(3000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	// checks the helth of all servers in the distributed system
+	private void checkHealthStatus() {
 
 	}
 }
