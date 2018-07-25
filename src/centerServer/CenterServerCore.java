@@ -207,7 +207,7 @@ public class CenterServerCore extends Thread
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
-	 			return response;				
+	 			return response;
 			}
 			
 			for (int i = 0; i < parts.length; i++)
@@ -218,6 +218,12 @@ public class CenterServerCore extends Thread
 					response[1] = "";
 		 			return response;
 				}
+			}
+			
+			String broadcast = "createMyTRecord";
+			for (int j = 1; j < 8; j++)
+			{
+				broadcast = broadcast + "~" + parts[j];
 			}
 			
 //			logger.logToFile("Here1");
@@ -231,13 +237,14 @@ public class CenterServerCore extends Thread
 					{
 //						logger.logToFile("Here4 " + i);
 //						logger.logToFile(ports.get(i).get(cityAbbr).toString());
-						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
-						String result = client.requestRemote(request.trim()).trim();
+						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+						
+						String result = client.requestRemote(broadcast).trim();
 						
 						if (result.equals("DWN"))
 						{
 							alives.get(i).put(cityAbbr, 0); // this server is down
-							logger.logToFile(i + ":" + cityAbbr + ":" + alives.get(i).get(cityAbbr));
+							logger.logToFile(i + ":" + cityAbbr + ":" + alives.get(i).get(cityAbbr) + ":" + ports.get(i).get(cityAbbr));
 						}
 					}
 				}
@@ -258,6 +265,43 @@ public class CenterServerCore extends Thread
 	 			return response;
 			}
 		}
+		
+		if (request.trim().toLowerCase().contains("createMyTRecord".toLowerCase()))
+		{
+			// [String]:
+			// firstName~lastName~address~phoneNumber~specialization~location~managerId
+			String[] parts = request.split("~");
+			if (parts.length != 8)
+			{
+				response[0] = "INV"; // Invalid request
+				response[1] = "";
+	 			return response;
+			}
+			
+			for (int i = 0; i < parts.length; i++)
+			{
+				if (parts[i] == null)
+				{
+					response[0] = "INV"; // Invalid request
+					response[1] = "";
+		 			return response;
+				}
+			}
+			
+			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
+			{
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "";
+	 			return response;
+			} else
+			{
+				// fail to do
+				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[1] = "";
+	 			return response;
+			}
+		}
+
 
 		if (request.trim().toLowerCase().contains("createSRecord".toLowerCase()))
 		{

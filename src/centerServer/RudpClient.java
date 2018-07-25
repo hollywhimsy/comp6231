@@ -96,11 +96,11 @@ public class RudpClient
 					socket.receive(reply);
 				} catch (IOException e)
 				{
-					logger.logToFile(cityAbbr + "[RUDPClient]: Server is Down!");
+					logger.logToFile(cityAbbr + "[RUDPClient]: Server is Down! Port: " + serverPort);
 					return "DWN";
 				}
 				
-				String rep = new String(reply.getData());				
+				String rep = new String(reply.getData());
 				
 				if (rep.trim().length() >= 41)
 				{
