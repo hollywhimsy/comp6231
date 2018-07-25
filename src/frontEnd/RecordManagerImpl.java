@@ -330,4 +330,15 @@ public class RecordManagerImpl extends FrontEndPOA
 
 		return true;
 	}
+	
+	// elects a new lead in the group for the passed city
+	private void electNewLeadForCity(String city)
+	{
+		
+	}
+	
+	// checks the server health statuses
+	public void checkServerStatuses() {
+		
+	}
 }
