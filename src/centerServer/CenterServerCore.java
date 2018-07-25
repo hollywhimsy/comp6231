@@ -198,60 +198,43 @@ public class CenterServerCore extends Thread
  			return response;
 		}
 
-		if (request.trim().toLowerCase().contains("createTRecord".toLowerCase()))
+		if (request.toLowerCase().contains("createtrecord") || request.toLowerCase().contains("createmytrecord"))
 		{
-			// [String]:
-			// firstName~lastName~address~phoneNumber~specialization~location~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 8)
+			// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
+			String[] parts = isRequestValid(request, 8);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
+			if (request.toLowerCase().contains("createtrecord"))
 			{
-				if (parts[i] == null)
+				String broadcast = "createMyTRecord";
+				for (int j = 1; j < 8; j++)
 				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
+					broadcast = broadcast + "~" + parts[j];
 				}
-			}
-			
-			String broadcast = "createMyTRecord";
-			for (int j = 1; j < 8; j++)
-			{
-				broadcast = broadcast + "~" + parts[j];
-			}
-			
-//			logger.logToFile("Here1");
-			for (int i = 0; i < 3; i++)
-			{
-//				logger.logToFile("Here2");
-				if (i != groupIndex)
+				
+				for (int i = 0; i < 3; i++)
 				{
-//					logger.logToFile("Here3");
-					if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+					if (i != groupIndex)
 					{
-//						logger.logToFile("Here4 " + i);
-//						logger.logToFile(ports.get(i).get(cityAbbr).toString());
-						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-						
-						String result = client.requestRemote(broadcast).trim();
-						
-						if (result.equals("DWN"))
+						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
 						{
-							alives.get(i).put(cityAbbr, 0); // this server is down
-							logger.logToFile(i + ":" + cityAbbr + ":" + alives.get(i).get(cityAbbr) + ":" + ports.get(i).get(cityAbbr));
+							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+							String result = client.requestRemote(broadcast).trim();
+							
+							if (result.equals("DWN"))
+							{
+								alives.get(i).put(cityAbbr, 0); // this server is down							
+							}
 						}
 					}
-				}
-			}			
+				}	
+			}
 
-//			logger.logToFile("Here5");
-			
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
@@ -266,81 +249,43 @@ public class CenterServerCore extends Thread
 			}
 		}
 		
-		if (request.trim().toLowerCase().contains("createMyTRecord".toLowerCase()))
-		{
-			// [String]:
-			// firstName~lastName~address~phoneNumber~specialization~location~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 8)
-			{
-				response[0] = "INV"; // Invalid request
-				response[1] = "";
-	 			return response;
-			}
-			
-			for (int i = 0; i < parts.length; i++)
-			{
-				if (parts[i] == null)
-				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
-				}
-			}
-			
-			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
-			{
-				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
-	 			return response;
-			} else
-			{
-				// fail to do
-				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
-	 			return response;
-			}
-		}
-
-
-		if (request.trim().toLowerCase().contains("createSRecord".toLowerCase()))
+		if (request.toLowerCase().contains("createsrecord") || request.toLowerCase().contains("createmysrecord"))
 		{
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 7)
+			String[] parts = isRequestValid(request, 7);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
+			if (request.toLowerCase().contains("createsrecord"))
 			{
-				if (parts[i] == null)
+				String broadcast = "createMySRecord";
+				for (int j = 1; j < 7; j++)
 				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
+					broadcast = broadcast + "~" + parts[j];
 				}
+				
+				for (int i = 0; i < 3; i++)
+				{
+					if (i != groupIndex)
+					{
+						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+						{
+							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+							String result = client.requestRemote(broadcast).trim();
+							
+							if (result.equals("DWN"))
+							{
+								alives.get(i).put(cityAbbr, 0); // this server is down							
+							}
+						}
+					}
+				}	
 			}
 			
-//			for (int i = 0; i < 3; i++)
-//			{
-//				if (i != groupIndex)
-//				{
-//					if (alives.get(i).get(cityAbbr) == 1)
-//					{
-//						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
-//						String result = client.requestRemote(request.trim()).trim();
-//						
-//						if (result.equals("DWN"))
-//						{
-//							alives.get(i).put(cityAbbr, 0); // this server is down
-//						}
-//					}
-//				}
-//			}
-
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
@@ -354,25 +299,41 @@ public class CenterServerCore extends Thread
 	 			return response;
 			}
 		}
-
-		if (request.trim().toLowerCase().contains("editRecord".toLowerCase()))
+		
+		if (request.toLowerCase().contains("editrecord") || request.toLowerCase().contains("editmyrecord"))
 		{
 			// [String]: recordID~fieldName~newValue~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 5)
+			String[] parts = isRequestValid(request, 5);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
+			if (request.toLowerCase().contains("editrecord"))
 			{
-				if (parts[i] == null)
+				String broadcast = "editMyRecord";
+				for (int j = 1; j < 5; j++)
 				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
+					broadcast = broadcast + "~" + parts[j];
+				}
+				
+				for (int i = 0; i < 3; i++)
+				{
+					if (i != groupIndex)
+					{
+						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+						{
+							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+							String result = client.requestRemote(broadcast).trim();
+							
+							if (result.equals("DWN"))
+							{
+								alives.get(i).put(cityAbbr, 0); // this server is down							
+							}
+						}
+					}
 				}
 			}
 
@@ -389,28 +350,18 @@ public class CenterServerCore extends Thread
 	 			return response;
 			}
 		}
-
-		if (request.trim().toLowerCase().contains("recordExist".toLowerCase()))
+		
+		if (request.toLowerCase().contains("recordExist".toLowerCase()))
 		{
 			// [String]: recordId~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 3)
+			String[] parts = isRequestValid(request, 3);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
-			{
-				if (parts[i] == null)
-				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
-				}
-			}
-
 			if (recordExist(parts[1], parts[2]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
@@ -425,24 +376,40 @@ public class CenterServerCore extends Thread
 			}
 		}
 
-		if (request.trim().toLowerCase().contains("transferRecord".toLowerCase()))
+		if (request.toLowerCase().contains("transferrecord") || request.toLowerCase().contains("transfermyrecord"))
 		{
 			// [String]: recordId~remoteCenterServerName~managerId
-			String[] parts = request.split("~");
-			if (parts.length != 4)
+			String[] parts = isRequestValid(request, 4);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
+			if (request.toLowerCase().contains("transferrecord"))
 			{
-				if (parts[i] == null)
+				String broadcast = "transferMyRecord";
+				for (int j = 1; j < 4; j++)
 				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
+					broadcast = broadcast + "~" + parts[j];
+				}
+				
+				for (int i = 0; i < 3; i++)
+				{
+					if (i != groupIndex)
+					{
+						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+						{
+							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+							String result = client.requestRemote(broadcast).trim();
+							
+							if (result.equals("DWN"))
+							{
+								alives.get(i).put(cityAbbr, 0); // this server is down							
+							}
+						}
+					}
 				}
 			}
 
@@ -460,77 +427,42 @@ public class CenterServerCore extends Thread
 			}
 		}
 
-		if (request.trim().toLowerCase().contains("getRecordsCount".toLowerCase()))
+		if (request.toLowerCase().contains("getrecordscount") || request.toLowerCase().contains("getmyrecordscount"))
 		{
 			// [String]: managerId
-			String[] parts = request.split("~");
-			if (parts.length != 2)
+			String[] parts = isRequestValid(request, 2);
+			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
 			}
 			
-			for (int i = 0; i < parts.length; i++)
-			{
-				if (parts[i] == null)
-				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
-				}
-			}
-
 			String result = getRecordsCount(parts[1]);
 
-			for (String srv : myGroupPorts.keySet())
+			if (request.toLowerCase().contains("getrecordscount"))
 			{
-				if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
+				for (String srv : myGroupPorts.keySet())
 				{
-					RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
-					String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
-
-					if (tempStr == null)
+					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + myGroupPorts.get(srv)
-								+ " {CallerManagerID: " + parts[1] + "}");
-					} else
-					{
-						if (tempStr.contains("ACK"))
+						RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
+						String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
+	
+						if (tempStr == null)
 						{
-							result = result + ", " + tempStr.substring(3, tempStr.length());
+							logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + myGroupPorts.get(srv)
+									+ " {CallerManagerID: " + parts[1] + "}");
+						} else
+						{
+							if (tempStr.contains("ACK"))
+							{
+								result = result + ", " + tempStr.substring(3, tempStr.length());
+							}
 						}
 					}
 				}
 			}
-
-			response[0] = "ACK"; // Valid request + the process is done
-			response[1] = result;
- 			return response;
-		}
-
-		if (request.trim().toLowerCase().contains("getMyRecordsCount".toLowerCase()))
-		{
-			// [String]: managerId
-			String[] parts = request.split("~");
-			if (parts.length != 2)
-			{
-				response[0] = "INV"; // Invalid request
-				response[1] = "";
-	 			return response;
-			}
-			
-			for (int i = 0; i < parts.length; i++)
-			{
-				if (parts[i] == null)
-				{
-					response[0] = "INV"; // Invalid request
-					response[1] = "";
-		 			return response;
-				}
-			}
-
-			String result = getRecordsCount(parts[1]);
 
 			response[0] = "ACK"; // Valid request + the process is done
 			response[1] = result;
@@ -544,6 +476,28 @@ public class CenterServerCore extends Thread
 		return response;
 	}
 
+	private String[] isRequestValid(String request, int argsNum)
+	{
+		String[] parts = request.trim().split("~");
+		if (parts.length != argsNum)
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < parts.length; i++)
+		{
+			if (parts[i] == null)
+			{
+				return null;
+			}
+			if (parts[i].length() <= 0)
+			{
+				return null;
+			}
+		}
+		
+		return parts;
+	}
 	private boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location,
 			String managerId)
 	{
@@ -658,7 +612,7 @@ public class CenterServerCore extends Thread
 			return false;
 		}
 
-		if (!(isIdFormatCorrect(recordID)))
+		if (!(isRecordIdFormatCorrect(recordID)))
 		{
 			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: "
 					+ managerId + "}");
@@ -770,7 +724,7 @@ public class CenterServerCore extends Thread
 
 	private boolean recordExist(String recordId, String managerId)
 	{
-		if (!(isIdFormatCorrect(recordId)))
+		if (!(isRecordIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(cityAbbr + "[RecordManagerImpl.recordExist()]: editRecord failed (recordId format is incorrect)"
 					+ " {CallerManagerID: " + managerId + "}");
@@ -791,7 +745,7 @@ public class CenterServerCore extends Thread
 
 	private boolean transferRecord(String recordId, String remoteCenterServerName, String managerId)
 	{
-		if (!(isIdFormatCorrect(recordId)))
+		if (!(isRecordIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: "
 					+ managerId + "}");
@@ -958,7 +912,7 @@ public class CenterServerCore extends Thread
 		return null;
 	}
 
-	private boolean isIdFormatCorrect(String id)
+	private boolean isRecordIdFormatCorrect(String id)
 	{
 		if (id == null)
 		{
@@ -983,7 +937,7 @@ public class CenterServerCore extends Thread
 			return false;
 		}
 
-		if (!isNumeric(id.substring(2, 5)))
+		if (!isNumeric(id.substring(2, 7)))
 		{
 			return false;
 		}
