@@ -16,7 +16,7 @@ public class RudpClient
 	private int serverPort; // CenterServer listen port that client should connect to
 	private Logger logger;
 	private String cityAbbr = new String();
-	private int timeout = 1500; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
+	private int timeout = 3000; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
 
 	// Constructor
 	public RudpClient(int serverPort, String cityAbbr, Logger logger)

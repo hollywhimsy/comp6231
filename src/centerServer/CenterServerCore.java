@@ -49,12 +49,12 @@ public class CenterServerCore extends Thread
 		String[] cities = {"MTL", "LVL", "DDO"};
 		for (int i = 0; i < 3; i++)
 		{		
-			HashMap<String, Integer> alives = new HashMap<>();
+			HashMap<String, Integer> aliveGroup = new HashMap<>();
 			for (int j = 0; j < 3; j++)
 			{			
-				alives.put(cities[j], 1);				
+				aliveGroup.put(cities[j], 1);				
 			}
-			ports.add(alives);
+			alives.add(aliveGroup);
 		}
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
@@ -220,23 +220,31 @@ public class CenterServerCore extends Thread
 				}
 			}
 			
-//			for (int i = 0; i < 3; i++)
-//			{
-//				if (i != groupIndex)
-//				{
-//					if (alives.get(i).get(cityAbbr) == 1)
-//					{
-//						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
-//						String result = client.requestRemote(request.trim()).trim();
-//						
-//						if (result.equals("DWN"))
-//						{
-//							alives.get(i).put(cityAbbr, 0); // this server is down
-//						}
-//					}
-//				}
-//			}			
+//			logger.logToFile("Here1");
+			for (int i = 0; i < 3; i++)
+			{
+//				logger.logToFile("Here2");
+				if (i != groupIndex)
+				{
+//					logger.logToFile("Here3");
+					if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+					{
+//						logger.logToFile("Here4 " + i);
+//						logger.logToFile(ports.get(i).get(cityAbbr).toString());
+						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
+						String result = client.requestRemote(request.trim()).trim();
+						
+						if (result.equals("DWN"))
+						{
+							alives.get(i).put(cityAbbr, 0); // this server is down
+							logger.logToFile(i + ":" + cityAbbr + ":" + alives.get(i).get(cityAbbr));
+						}
+					}
+				}
+			}			
 
+//			logger.logToFile("Here5");
+			
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
