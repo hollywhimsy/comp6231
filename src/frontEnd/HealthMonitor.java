@@ -24,7 +24,7 @@ public class HealthMonitor extends Thread {
 
 	}
 
-	// checks the helth of all servers in the distributed system
+	// checks the health of all servers in the distributed system
 	private void checkHealthStatus() {
 
 	}

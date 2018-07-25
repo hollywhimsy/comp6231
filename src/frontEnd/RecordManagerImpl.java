@@ -7,6 +7,7 @@ import org.omg.CORBA.ORB;
 import centerServer.RudpClient;
 import common.Infrastucture;
 import common.Logger;
+import common.ServerInfo;
 
 public class RecordManagerImpl extends FrontEndPOA
 {
@@ -23,6 +24,13 @@ public class RecordManagerImpl extends FrontEndPOA
 
 	// indicates active server of each city: {0, 1, 2}
 	private HashMap<String, Integer> activeServers = new HashMap<>(); 
+	
+	
+	// indicates master server of each city: {MTL, DDO, LVL}
+	private HashMap<String, ServerInfo> masterServers = new HashMap<>();
+	
+	private HashMap<String, ServerInfo> actServers = new HashMap<>();
+	
 	
 	
 	// Constructor
