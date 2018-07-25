@@ -26,8 +26,10 @@ public class CenterServerCore extends Thread
 	private Integer lastStudentId = 0; // Needs synchronization
 	private Logger logger;
 	private List<HashMap<String, Integer>> ports = new ArrayList<>();
+	private List<HashMap<String, Integer>> alives = new ArrayList<>(); // 0 -> dead, 1 -> alive
 	private HashMap<String, Integer> myGroupPorts;
 	private HashMap<String, String[]> responses = new HashMap<>();
+	private int groupIndex;
 
 	// Constructor
 	public CenterServerCore(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, int listenPort, String cityAbbr,
@@ -40,8 +42,20 @@ public class CenterServerCore extends Thread
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
 		this.ports = ports;
+		this.groupIndex = groupIndex;
 		
-		myGroupPorts = ports.get(groupIndex);
+		myGroupPorts = this.ports.get(this.groupIndex);
+		
+		String[] cities = {"MTL", "LVL", "DDO"};
+		for (int i = 0; i < 3; i++)
+		{		
+			HashMap<String, Integer> alives = new HashMap<>();
+			for (int j = 0; j < 3; j++)
+			{			
+				alives.put(cities[j], 1);				
+			}
+			ports.add(alives);
+		}
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
 	}
@@ -205,6 +219,23 @@ public class CenterServerCore extends Thread
 		 			return response;
 				}
 			}
+			
+//			for (int i = 0; i < 3; i++)
+//			{
+//				if (i != groupIndex)
+//				{
+//					if (alives.get(i).get(cityAbbr) == 1)
+//					{
+//						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
+//						String result = client.requestRemote(request.trim()).trim();
+//						
+//						if (result.equals("DWN"))
+//						{
+//							alives.get(i).put(cityAbbr, 0); // this server is down
+//						}
+//					}
+//				}
+//			}			
 
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
@@ -240,6 +271,23 @@ public class CenterServerCore extends Thread
 		 			return response;
 				}
 			}
+			
+//			for (int i = 0; i < 3; i++)
+//			{
+//				if (i != groupIndex)
+//				{
+//					if (alives.get(i).get(cityAbbr) == 1)
+//					{
+//						RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
+//						String result = client.requestRemote(request.trim()).trim();
+//						
+//						if (result.equals("DWN"))
+//						{
+//							alives.get(i).put(cityAbbr, 0); // this server is down
+//						}
+//					}
+//				}
+//			}
 
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
 			{

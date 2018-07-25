@@ -29,6 +29,12 @@ public class SimpleFrontEnd
 
 		RudpClient rudpClient3 = new RudpClient(3730, "DDO", logger);
 		System.out.println(rudpClient3.requestRemote("getRecordsCount~DDO0001"));
+		
+		RudpClient rudpClient4 = new RudpClient(4730, "DDO", logger);
+		System.out.println(rudpClient4.requestRemote("getRecordsCount~DDO0001"));
+		
+		RudpClient rudpClient5 = new RudpClient(5730, "DDO", logger);
+		System.out.println(rudpClient5.requestRemote("getRecordsCount~DDO0001"));
 
 	}
 
