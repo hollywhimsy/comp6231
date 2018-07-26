@@ -38,6 +38,7 @@ public class CenterServerCore extends Thread
 		super();
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
+		
 		this.listenPort = listenPort;
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
