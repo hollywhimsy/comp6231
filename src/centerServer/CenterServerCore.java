@@ -57,6 +57,9 @@ public class CenterServerCore extends Thread
 			}
 			alives.add(aliveGroup);
 		}
+		
+		HealthChecker healthChecker = new HealthChecker(ports, alives, logger, cityAbbr, groupIndex);
+		healthChecker.start();
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
 	}
@@ -456,7 +459,9 @@ public class CenterServerCore extends Thread
 					
 					if (result.equals("DWN"))
 					{
-						alives.get(i).put(cityAbbr, 0); // this server is down							
+						alives.get(i).put(cityAbbr, 0); // this server is down	
+						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
+								+ ports.get(i).get(cityAbbr) + ". This server is Dead");
 					}
 					else
 					{
