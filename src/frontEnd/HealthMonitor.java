@@ -16,8 +16,10 @@ public class HealthMonitor extends Thread {
 
 	public void run() {
 		try {
-			checkHealthStatus();
-			Thread.sleep(3000);
+			while (true) {
+				checkHealthStatus();
+				Thread.sleep(3000);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -26,6 +28,6 @@ public class HealthMonitor extends Thread {
 
 	// checks the health of all servers in the distributed system
 	private void checkHealthStatus() {
-
+		frontEndInstance.checkServerStatuses();
 	}
 }
