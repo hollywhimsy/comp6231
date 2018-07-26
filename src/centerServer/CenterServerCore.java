@@ -212,28 +212,13 @@ public class CenterServerCore extends Thread
 			
 			if (request.toLowerCase().contains("createtrecord"))
 			{
-				String broadcast = "createMyTRecord";
+				String msg = "createMyTRecord";
 				for (int j = 1; j < 8; j++)
 				{
-					broadcast = broadcast + "~" + parts[j];
+					msg = msg + "~" + parts[j];
 				}
 				
-				for (int i = 0; i < 3; i++)
-				{
-					if (i != groupIndex)
-					{
-						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
-						{
-							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-							String result = client.requestRemote(broadcast).trim();
-							
-							if (result.equals("DWN"))
-							{
-								alives.get(i).put(cityAbbr, 0); // this server is down							
-							}
-						}
-					}
-				}	
+				broadcast(msg);
 			}
 
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
@@ -263,28 +248,14 @@ public class CenterServerCore extends Thread
 			
 			if (request.toLowerCase().contains("createsrecord"))
 			{
-				String broadcast = "createMySRecord";
+				String msg = "createMySRecord";
 				for (int j = 1; j < 7; j++)
 				{
-					broadcast = broadcast + "~" + parts[j];
+					msg = msg + "~" + parts[j];
 				}
 				
-				for (int i = 0; i < 3; i++)
-				{
-					if (i != groupIndex)
-					{
-						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
-						{
-							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-							String result = client.requestRemote(broadcast).trim();
-							
-							if (result.equals("DWN"))
-							{
-								alives.get(i).put(cityAbbr, 0); // this server is down							
-							}
-						}
-					}
-				}	
+				broadcast(msg);
+				
 			}
 			
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
@@ -314,28 +285,14 @@ public class CenterServerCore extends Thread
 			
 			if (request.toLowerCase().contains("editrecord"))
 			{
-				String broadcast = "editMyRecord";
+				String msg = "editMyRecord";
 				for (int j = 1; j < 5; j++)
 				{
-					broadcast = broadcast + "~" + parts[j];
+					msg = msg + "~" + parts[j];
 				}
 				
-				for (int i = 0; i < 3; i++)
-				{
-					if (i != groupIndex)
-					{
-						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
-						{
-							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-							String result = client.requestRemote(broadcast).trim();
-							
-							if (result.equals("DWN"))
-							{
-								alives.get(i).put(cityAbbr, 0); // this server is down							
-							}
-						}
-					}
-				}
+				broadcast(msg);
+				
 			}
 
 			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
@@ -390,28 +347,14 @@ public class CenterServerCore extends Thread
 			
 			if (request.toLowerCase().contains("transferrecord"))
 			{
-				String broadcast = "transferMyRecord";
+				String msg = "transferMyRecord";
 				for (int j = 1; j < 4; j++)
 				{
-					broadcast = broadcast + "~" + parts[j];
+					msg = msg + "~" + parts[j];
 				}
 				
-				for (int i = 0; i < 3; i++)
-				{
-					if (i != groupIndex)
-					{
-						if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
-						{
-							RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-							String result = client.requestRemote(broadcast).trim();
-							
-							if (result.equals("DWN"))
-							{
-								alives.get(i).put(cityAbbr, 0); // this server is down							
-							}
-						}
-					}
-				}
+				broadcast(msg);
+				
 			}
 
 			if (transferRecord(parts[1], parts[2], parts[3]))
@@ -499,6 +442,37 @@ public class CenterServerCore extends Thread
 		
 		return parts;
 	}
+	
+	private void broadcast(String msg)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (i != groupIndex)
+			{
+				if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+				{
+					RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+					String result = client.requestRemote(msg).trim();
+					
+					if (result.equals("DWN"))
+					{
+						alives.get(i).put(cityAbbr, 0); // this server is down							
+					}
+					else
+					{
+						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
+								+ ports.get(i).get(cityAbbr));
+					}
+				}
+				else
+				{
+					logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the " + cityAbbr + " listening on " + ports.get(i).get(cityAbbr) 
+							+ " is DOWN! => No broadcast to it!");
+				}
+			}
+		}
+	}
+	
 	private boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location,
 			String managerId)
 	{
