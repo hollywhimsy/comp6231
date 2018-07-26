@@ -1,6 +1,7 @@
 package centerServer;
 
 import common.Logger;
+import common.ServerInfo;
 import record.Record;
 import record.StudentRecord;
 import record.TeacherRecord;
@@ -25,43 +26,85 @@ public class CenterServerCore extends Thread
 	private Integer lastTeacherId = 0; // Needs synchronization
 	private Integer lastStudentId = 0; // Needs synchronization
 	private Logger logger;
-	private List<HashMap<String, Integer>> ports = new ArrayList<>();
-	private List<HashMap<String, Integer>> alives = new ArrayList<>(); // 0 -> dead, 1 -> alive
-	private HashMap<String, Integer> myGroupPorts;
+//	private List<HashMap<String, Integer>> ports = new ArrayList<>();
+//	private List<HashMap<String, Integer>> alives = new ArrayList<>(); // 0 -> dead, 1 -> alive
+//	private HashMap<String, Integer> myGroupPorts;
+	private HashMap<String, ServerInfo> myStackServers ;
+	private List<ServerInfo> myGroupServers ;
+	private Integer serverId ;
+	private Integer stackId;
 	private HashMap<String, String[]> responses = new HashMap<>();
-	private int groupIndex;
+	//private int groupIndex;
+	List<ServerInfo> servers ;
+	ServerInfo currentServerInfo;
+	
 
 	// Constructor
-	public CenterServerCore(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, int listenPort, String cityAbbr,
-			Logger logger, List<HashMap<String, Integer>> ports, int groupIndex)
+	public CenterServerCore(HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId,
+			Logger logger, List<ServerInfo> servers, Integer serverId)
 	{
 		super();
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
+		this.servers = servers;
+		this.serverId = serverId;
+		this.currentServerInfo = getCurrentServerInfo();
 		
-		this.listenPort = listenPort;
-		this.cityAbbr = cityAbbr;
+		this.listenPort = currentServerInfo.getUdpPort();
+		this.cityAbbr = currentServerInfo.getLocation();
+		
+		this.stackId = currentServerInfo.getStackId();
+		
 		this.logger = logger;
-		this.ports = ports;
-		this.groupIndex = groupIndex;
 		
-		myGroupPorts = this.ports.get(this.groupIndex);
+	//	this.ports = ports;
+	//	this.groupIndex = groupIndex;
 		
-		String[] cities = {"MTL", "LVL", "DDO"};
-		for (int i = 0; i < 3; i++)
-		{		
-			HashMap<String, Integer> aliveGroup = new HashMap<>();
-			for (int j = 0; j < 3; j++)
-			{			
-				aliveGroup.put(cities[j], 1);				
-			}
-			alives.add(aliveGroup);
-		}
+//		myGroupPorts = this.ports.get(this.groupIndex);
+        for(ServerInfo srv :servers)
+        {
+        	srv.markAlive();
+        }
 		
-		HealthChecker healthChecker = new HealthChecker(ports, alives, logger, cityAbbr, groupIndex);
+		this.myStackServers = buildMyStack();
+		this.myGroupServers = buildMyGroup();
+		
+
+		
+		HealthChecker healthChecker = new HealthChecker(myGroupServers, logger, cityAbbr, this.serverId);
 		healthChecker.start();
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
+	}
+
+	private List<ServerInfo> buildMyGroup() {
+		List< ServerInfo> group = new ArrayList<>();
+		for(ServerInfo srv: servers)
+		{
+			if (srv.getLocation() == currentServerInfo.getLocation())
+				group.add(srv);
+		}
+		return group;
+	}
+
+	private HashMap<String, ServerInfo> buildMyStack() {
+		HashMap<String, ServerInfo> stack = new HashMap<>();
+		for(ServerInfo srv: servers)
+		{
+			if (srv.getStackId() == currentServerInfo.getServerId())
+				 stack.put(srv.getLocation(), srv);
+		}
+		return stack;
+	}
+
+	private ServerInfo getCurrentServerInfo() {
+		
+		for(ServerInfo srv: servers)
+		{
+			if (srv.getServerId() == this.serverId)
+				return srv;
+		}
+		return null;
 	}
 
 	public void run()
@@ -389,16 +432,16 @@ public class CenterServerCore extends Thread
 
 			if (request.toLowerCase().contains("getrecordscount"))
 			{
-				for (String srv : myGroupPorts.keySet())
+				for (ServerInfo srv : myStackServers.values())
 				{
-					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
+					if (srv.getServerId() != this.serverId)
 					{
-						RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
+						RudpClient client = new RudpClient(srv.getUdpPort(), cityAbbr, logger);
 						String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
 	
 						if (tempStr == null)
 						{
-							logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + myGroupPorts.get(srv)
+							logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + srv.getUdpPort()
 									+ " {CallerManagerID: " + parts[1] + "}");
 						} else
 						{
@@ -448,30 +491,30 @@ public class CenterServerCore extends Thread
 	
 	private void broadcast(String msg)
 	{
-		for (int i = 0; i < 3; i++)
+		for (ServerInfo srv : myGroupServers)
 		{
-			if (i != groupIndex)
+			if (srv.getServerId() != currentServerInfo.getServerId())
 			{
-				if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
+				if (srv.isAlive())
 				{
-					RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+					RudpClient client = new RudpClient(srv.getUdpPort(), cityAbbr, logger);						
 					String result = client.requestRemote(msg).trim();
 					
 					if (result.equals("DWN"))
 					{
-						alives.get(i).put(cityAbbr, 0); // this server is down	
+						srv.markDead(); // this server is down	
 						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
-								+ ports.get(i).get(cityAbbr) + ". This server is Dead");
+								+ srv.getUdpPort() + ". This server is Dead");
 					}
 					else
 					{
 						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
-								+ ports.get(i).get(cityAbbr));
+								+ srv.getUdpPort());
 					}
 				}
 				else
 				{
-					logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the " + cityAbbr + " listening on " + ports.get(i).get(cityAbbr) 
+					logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the " + cityAbbr + " listening on " + srv.getUdpPort() 
 							+ " is DOWN! => No broadcast to it!");
 				}
 			}
@@ -770,7 +813,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(myStackServers.get(city).getUdpPort(), cityAbbr, logger);
 			// [String]:
 			// firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String reply = rudpClient.requestRemote("createTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~"
@@ -814,7 +857,7 @@ public class CenterServerCore extends Thread
 				spliter = ",";
 			}
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
+			RudpClient rudpClient = new RudpClient(myStackServers.get(city).getUdpPort(), cityAbbr, logger);
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
 			String reply = rudpClient.requestRemote("createSRecord~" + student.getFirstName() + "~" + student.getLastName() + "~" + courses
 					+ "~" + student.getStatus() + "~" + student.getDate().toString() + "~" + city + "0001");
@@ -934,4 +977,5 @@ public class CenterServerCore extends Thread
 		}
 		return true;
 	}
+	
 }

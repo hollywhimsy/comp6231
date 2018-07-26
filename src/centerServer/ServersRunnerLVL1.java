@@ -3,6 +3,9 @@ package centerServer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NameComponent;
@@ -16,6 +19,7 @@ import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 import common.Logger;
+import common.ServerInfo;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
 import frontEnd.RecordManagerImpl;
@@ -25,76 +29,35 @@ public class ServersRunnerLVL1
 {
 	public static void main(String[] args)
 	{
-		String[] cities = {"MTL", "LVL", "DDO"};
-		List<HashMap<String, Integer>> ports = new ArrayList<>();
-		
-		for (int i = 0; i < 3; i++)
-		{		
-			HashMap<String, Integer> ports1 = new HashMap<>();
-			for (int j = 0; j < 3; j++)
-			{			
-				ports1.put(cities[j], 3710 + i*1000 + j*10);				
-			}
-			ports.add(ports1);
-		}
-		
-		for (int i = 0; i < 3; i++)
-		{		
-			for (int j = 0; j < 3; j++)
-			{			
-				HashMap<Character, List<Record>> recordsMap1 = new HashMap<>();
-				HashMap<String, Record> indexPerId1 = new HashMap<>();
-				Logger logger1 = new Logger("SRV_" + cities[j] + i + ".log");
-				CenterServerCore rudpServer1 = new CenterServerCore(recordsMap1, indexPerId1, ports.get(i).get(cities[j]), cities[j], logger1, 
-						ports, i);
-				rudpServer1.start();
-			}
-		}
-		
-		String[] configuration = {"-ORBInitialPort", "1050", "-ORBInitialHost", "localhost"};
-		try
-		{
-			ORB orb = ORB.init(configuration, null);
-			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
-			rootPOA.the_POAManager().activate();
-			
-			RecordManagerImpl recMngImp = new RecordManagerImpl(ports);
-			recMngImp.setOrb(orb);
-			
-			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);
-			FrontEnd href = FrontEndHelper.narrow(ref);
-			
-			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
-			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-			
-			String name = "FrontEnd";
-			NameComponent path[] = ncRef.to_name(name);
-			ncRef.rebind(path, href);
-			
-			// wait for invocations from clients
-			orb.run();
+		ConcurrentHashMap<String, List<ServerInfo>> servers = new ConcurrentHashMap<String, List<ServerInfo>>();
 
-		} catch (InvalidName e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! InvalidName");
-		} catch (AdapterInactive e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! AdapterInactive");
-		} catch (ServantNotActive e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! ServantNotActive");
-		} catch (WrongPolicy e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! WrongPolicy");
-		} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! org.omg.CosNaming.NamingContextPackage.InvalidName");
-		} catch (NotFound e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! NotFound");
-		} catch (CannotProceed e)
-		{
-			//logger.logToFile(city + "[CenterServerCORBA.run()]: Error! CannotProceed");
-		}
+		List<ServerInfo> mtlServers = new CopyOnWriteArrayList<ServerInfo>();
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3101, 11, 1));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3102, 22, 2));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3103, 33, 3));
+
+		List<ServerInfo> lvlServers = new CopyOnWriteArrayList<ServerInfo>();
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4101, 14, 1));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4102, 25, 2));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4103, 36, 3));
+
+		List<ServerInfo> ddoServers = new CopyOnWriteArrayList<ServerInfo>();
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5101, 17, 1));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5102, 28, 2));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5103, 39, 3));
+		
+		List<ServerInfo> allServers = new ArrayList<>();
+		allServers.addAll(mtlServers);
+		allServers.addAll(lvlServers);
+		allServers.addAll(ddoServers);
+
+		
+		HashMap<Character, List<Record>> recordsMap14 = new HashMap<>();
+		HashMap<String, Record> indexPerId14 = new HashMap<>();
+		Logger logger14 = new Logger("SRV_LVL1.log");
+		CenterServerCore rudpServer14 = new CenterServerCore(recordsMap14, indexPerId14, logger14, allServers, 14 );
+		rudpServer14.start();
+		
+		
 	}
 }

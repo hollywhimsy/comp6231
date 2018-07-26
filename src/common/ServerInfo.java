@@ -1,15 +1,37 @@
 package common;
 
-public class ServerInfo {
+public class ServerInfo implements Comparable {
 
 	private String location;
 	private Integer udpPort;
 	private String host;
 
-	public ServerInfo(String location, String host, Integer udpPort) {
+	private Boolean isAlive;
+	private Integer stackId;
+	private Integer serverId;
+
+	public Integer getStackId() {
+		return stackId;
+	}
+
+	public void setStackId(Integer stackId) {
+		this.stackId = stackId;
+	}
+
+	public Integer getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(Integer serverId) {
+		this.serverId = serverId;
+	}
+
+	public ServerInfo(String location, String host, Integer udpPort, Integer serverId, Integer stackId) {
 		this.location = location;
 		this.host = host;
 		this.udpPort = udpPort;
+		this.serverId = serverId;
+		this.stackId = stackId;
 	}
 
 	public String getLocation() {
@@ -35,6 +57,18 @@ public class ServerInfo {
 	public void setHost(String host) {
 		this.host = host;
 	}
+	
+	public Boolean isAlive() {
+		return isAlive;
+	}
+	
+	public void markDead() {
+		isAlive = false;
+	}
+	
+	public void markAlive() {
+		isAlive = false;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -51,10 +85,19 @@ public class ServerInfo {
 
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "  Location: " + location + "  host: " + host + "  port: " + udpPort.toString();
+	}
+	
+
+
+	@Override
+	public int compareTo(Object o) {
+		Integer srvId=((ServerInfo)o).getServerId();
+        /* For Ascending order*/
+        return this.getServerId()-srvId;
 	}
 
 }

@@ -2,6 +2,7 @@ package frontEnd;
 
 import java.security.KeyStore.Entry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,9 +60,9 @@ public class RecordManagerImpl extends FrontEndPOA {
 		logger.logToFile(cityAbbr + "[RecordManagerImpl Constructor]: An instance of RecordManagerImpl is created");
 
 		// elect our master servers
-		electNewLeadForCity("MTL");
-		// electNewLeadForCity("LVL");
-		// electNewLeadForCity("DDO");
+		electNewLeadForCity("MTL", 0);
+		electNewLeadForCity("LVL", 0);
+		electNewLeadForCity("DDO", 0);
 
 		HealthMonitor monitor = new HealthMonitor(this);
 		monitor.start();
@@ -311,13 +312,30 @@ public class RecordManagerImpl extends FrontEndPOA {
 	}
 
 	// elects a new lead in the group for the passed city
-	private void electNewLeadForCity(String city) {
+	private  void electNewLeadForCity(String city, Integer crachedServerId) {
 		List<ServerInfo> cityActiveSrvs = actServers.get(city);
 		if (cityActiveSrvs.isEmpty()) {
 			logger.logToFile(cityAbbr + "[RecordManagerImpl.electNewLeadForCity()]: " + city
 					+ " can not elect leader no active servers");
 		} else {
-			ServerInfo si = cityActiveSrvs.get(0);
+			
+			ServerInfo beforeCurrentId = null;
+			ServerInfo afterCurrentId = null;
+			Collections.sort( cityActiveSrvs);
+			ServerInfo si = null;
+			for(ServerInfo s: cityActiveSrvs) {
+				if ((beforeCurrentId == null) && s.getServerId() < crachedServerId)
+					beforeCurrentId = s;
+				
+				if((afterCurrentId == null) && (s.getServerId() > crachedServerId))
+				   afterCurrentId = s;
+				
+			}
+			if (afterCurrentId !=null)
+				si = afterCurrentId;
+			else
+				si = afterCurrentId;
+					
 			masterServers.put(city, si);
 
 			// log election
@@ -335,18 +353,6 @@ public class RecordManagerImpl extends FrontEndPOA {
 			String city = e.getKey();
 			List<ServerInfo> cityServers = e.getValue();
 
-			
-//			Iterator<String> it1 = actServers.keySet().iterator();
-//			while (it1.hasNext()) {
-//				String key = it1.next();
-//				System.out.println(key);
-////				System.out.println("Map Value:" + actServers.get(key));
-////				if (key.equals("1")) {
-////					myMap.remove("3");
-////					myMap.put("4", "4");
-////					myMap.put("5", "5");
-////				}
-//			}
 			System.out.println("CHECKING city: " +city );
 			
 			
@@ -363,7 +369,7 @@ public class RecordManagerImpl extends FrontEndPOA {
 					System.out.println("down city: " +city + " server" + si);
 					if (isLeadServer(si)) {
 						System.out.println("Electing lead city: " +city );
-						electNewLeadForCity(city);
+						electNewLeadForCity(city, si.getServerId());
 					}
 				}
 

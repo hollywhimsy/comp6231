@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import common.Logger;
+import common.ServerInfo;
 
 public class HealthChecker extends Thread
 {
-	private List<HashMap<String, Integer>> ports = new ArrayList<>();
-	private List<HashMap<String, Integer>> alives = new ArrayList<>(); // 0 -> dead, 1 -> alive
+	private List<ServerInfo> myGroupServers = new ArrayList<>();
+	
 	private Logger logger;
-	private int myGroupIndex;
+	private int serverId;
 	private String myCity;
 	
-	public HealthChecker(List<HashMap<String, Integer>> ports, List<HashMap<String, Integer>> alives, Logger logger, String myCity, int myGroupIndex)
+	public HealthChecker(List<ServerInfo> myGroupServers, Logger logger, String myCity, Integer serverId)
 	{
 		super();
-		this.ports = ports;
-		this.alives = alives;
+		this.myGroupServers = myGroupServers;
 		this.logger = logger;
-		this.myGroupIndex = myGroupIndex;
+		this.serverId = serverId;
 		this.myCity = myCity.trim().toUpperCase();
 	}
 	
@@ -41,33 +41,32 @@ public class HealthChecker extends Thread
 	
 	private void updateAlivesList()
 	{
-		for (int i = 0; i < 3; i++)
+		for (ServerInfo srv : myGroupServers)
 		{
-			for (String srv : alives.get(i).keySet())
-			{
-				if ((srv.toUpperCase().equals(myCity)) && (i == myGroupIndex))
+			
+				if (srv.getServerId() == serverId)
 				{
 					continue;
 				}
 				
-				if(alives.get(i).get(srv) == 1)
+				if(srv.isAlive())
 				{
-					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
+					RudpClient client = new RudpClient(srv.getUdpPort(), myCity, logger);
 					String result = client.requestRemote("HeartBit").trim();
 	
 					if (result.equals("DWN"))
 					{
-						alives.get(i).put(srv, 0); // this server is down	
+						srv.markDead();; // this server is down	
 						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: Heartbit cheked for " + srv + " listening on " 
-								+ ports.get(i).get(srv) + ". Result: Dead");
+								+ srv.getUdpPort() + ". Result: Dead");
 					}
 					else
 					{
 						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: Heartbit cheked for " + srv + " listening on " 
-								+ ports.get(i).get(srv) + ". Result: Live");
+								+ srv.getUdpPort() + ". Result: Live");
 					}
 				}				
 			}
-		}		
+				
 	}
 }

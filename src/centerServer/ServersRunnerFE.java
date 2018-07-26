@@ -31,19 +31,19 @@ public class ServersRunnerFE {
 		ConcurrentHashMap<String, List<ServerInfo>> servers = new ConcurrentHashMap<String, List<ServerInfo>>();
 
 		List<ServerInfo> mtlServers = new CopyOnWriteArrayList<ServerInfo>();
-		mtlServers.add(new ServerInfo("MTL", "localhost", 3101));
-		mtlServers.add(new ServerInfo("MTL", "localhost", 3102));
-		mtlServers.add(new ServerInfo("MTL", "localhost", 3103));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3101, 11, 1));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3102, 22, 2));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3103, 33, 3));
 
 		List<ServerInfo> lvlServers = new CopyOnWriteArrayList<ServerInfo>();
-		lvlServers.add(new ServerInfo("LVL", "localhost", 4101));
-		lvlServers.add(new ServerInfo("LVL", "localhost", 4102));
-		lvlServers.add(new ServerInfo("LVL", "localhost", 4103));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4101, 14, 1));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4102, 25, 2));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4103, 36, 3));
 
 		List<ServerInfo> ddoServers = new CopyOnWriteArrayList<ServerInfo>();
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5101));
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5102));
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5103));
+		lvlServers.add(new ServerInfo("DDO", "localhost", 5101, 17, 1));
+		lvlServers.add(new ServerInfo("DDO", "localhost", 5102, 28, 2));
+		lvlServers.add(new ServerInfo("DDO", "localhost", 5103, 39, 3));
 
 		servers.put("MTL", mtlServers);
 		servers.put("LVL", lvlServers);

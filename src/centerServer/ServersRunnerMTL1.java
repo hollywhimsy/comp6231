@@ -3,6 +3,9 @@ package centerServer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NameComponent;
@@ -16,6 +19,7 @@ import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 import common.Logger;
+import common.ServerInfo;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
 import frontEnd.RecordManagerImpl;
@@ -24,12 +28,36 @@ import record.Record;
 public class ServersRunnerMTL1 {
 	public static void main(String[] args) {
 		
-		HashMap<Character, List<Record>> recordsMap1 = new HashMap<>();
-		HashMap<String, Record> indexPerId1 = new HashMap<>();
-		List<HashMap<String, Integer>> ports = new ArrayList<>();
-		Logger logger1 = new Logger("SRV_MTL_" + 1 + ".log");
-		CenterServerCore rudpServer1 = new CenterServerCore(recordsMap1, indexPerId1, 3101, "MTL", logger1, ports, 0);
-		rudpServer1.start();
+		ConcurrentHashMap<String, List<ServerInfo>> servers = new ConcurrentHashMap<String, List<ServerInfo>>();
+
+		List<ServerInfo> mtlServers = new CopyOnWriteArrayList<ServerInfo>();
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3101, 11, 1));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3102, 22, 2));
+		mtlServers.add(new ServerInfo("MTL", "localhost", 3103, 33, 3));
+
+		List<ServerInfo> lvlServers = new CopyOnWriteArrayList<ServerInfo>();
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4101, 14, 1));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4102, 25, 2));
+		lvlServers.add(new ServerInfo("LVL", "localhost", 4103, 36, 3));
+
+		List<ServerInfo> ddoServers = new CopyOnWriteArrayList<ServerInfo>();
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5101, 17, 1));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5102, 28, 2));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5103, 39, 3));
+		
+		List<ServerInfo> allServers = new ArrayList<>();
+		allServers.addAll(mtlServers);
+		allServers.addAll(lvlServers);
+		allServers.addAll(ddoServers);
+
+		// MTL group
+		HashMap<Character, List<Record>> recordsMap11 = new HashMap<>();
+		HashMap<String, Record> indexPerId11 = new HashMap<>();
+		Logger logger11 = new Logger("SRV_MTL1.log");
+		CenterServerCore rudpServer11 = new CenterServerCore(recordsMap11, indexPerId11, logger11, allServers, 11 );
+		rudpServer11.start();
+		
+		
 
 	}
 }
