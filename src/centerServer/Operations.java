@@ -17,13 +17,13 @@ public class Operations
 	private Logger logger;
 	private List<HashMap<String, Integer>> alives; // 0 -> dead, 1 -> alive
 	private List<HashMap<String, Integer>> ports;
-	private HashMap<Character, List<Record>> recordsMap; // The map which contains the records
+	private HashMap<Character, List<Record>> recordsMap;
 	private HashMap<String, Record> indexPerId;
-	private Integer lastTeacherId = 0; // Needs synchronization
-	private Integer lastStudentId = 0; // Needs synchronization
-	// private Multicast multicast;
+	private Integer lastTeacherId = 0;
+	private Integer lastStudentId = 0;
 	private List<String> brdcMsgQueue;
 
+	// Constructor
 	public Operations(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports,
 			HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, List<String> brdcMsgQueue)
 	{
@@ -38,53 +38,56 @@ public class Operations
 		this.brdcMsgQueue = brdcMsgQueue;
 
 		myGroupPorts = this.ports.get(this.groupIndex);
-
-		// multicast = new Multicast(groupIndex, alives, ports, cityAbbr, logger);
 	}
 
 	/*
-	 * request can be: HeartBit: server returns ACK to show it's alive createTRecord~[String]: the [String] gives the parameters and server creates a
-	 * teacher record and returns a boolean createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a
-	 * boolean getRecordsCount~[String]: the [String] gives the parameters and server returns the records count editRecord~[String]: the [String] gives
-	 * the parameters and server edits the record and returns a boolean recordExist~[String]: the [String] gives the parameters and server returns
-	 * true/false transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
+	 * request can be:
+	 * HeartBit: server returns ACK to show it's alive
+	 * createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean
+	 * createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean
+	 * getRecordsCount~[String]: the [String] gives the parameters and server returns the records count
+	 * editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
+	 * recordExist~[String]: the [String] gives the parameters and server returns true/false
+	 * transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
 	 */
 	public String[] processRequest(String request)
 	{
-		String[] response = new String[2];
+		String[] response = { "", "" };
 
+		// HeartBit
 		if (request.trim().toLowerCase().contains("HeartBit".toLowerCase()))
 		{
 			response[0] = "ACK";
-			response[1] = "";
 			return response;
 		}
 
+		// createTRecord
 		if (request.toLowerCase().contains("createtrecord") || request.toLowerCase().contains("createmytrecord"))
 		{
 			// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
-			String[] parts = isRequestValid(request, 8);
+			String[] parts = isRequestFormatValid(request, 8);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
 
+				// if we are the Master server, we should multicast the request to the others
 				if (request.toLowerCase().contains("createtrecord"))
 				{
+					// Build the request
 					String msg = "createMyTRecord";
 					for (int j = 1; j < 8; j++)
 					{
 						msg = msg + "~" + parts[j];
 					}
 
-					// multicast.send(msg);
+					// Add the request to the Multicast Queue. Multicaster is running as a different thread
 					synchronized (brdcMsgQueue)
 					{
 						brdcMsgQueue.add(msg);
@@ -94,28 +97,26 @@ public class Operations
 				return response;
 			} else
 			{
-				// fail to do
 				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
 				return response;
 			}
 		}
 
+		// createSRecord
 		if (request.toLowerCase().contains("createsrecord") || request.toLowerCase().contains("createmysrecord"))
 		{
 			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
-			String[] parts = isRequestValid(request, 7);
+			String[] parts = isRequestFormatValid(request, 7);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
 
 				if (request.toLowerCase().contains("createsrecord"))
 				{
@@ -125,7 +126,7 @@ public class Operations
 						msg = msg + "~" + parts[j];
 					}
 
-					// multicast.send(msg);
+					// Add the request to the Multicast Queue. Multicaster is running as a different thread
 					synchronized (brdcMsgQueue)
 					{
 						brdcMsgQueue.add(msg);
@@ -135,28 +136,26 @@ public class Operations
 				return response;
 			} else
 			{
-				// fail to do
 				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
 				return response;
 			}
 		}
 
+		// editRecord
 		if (request.toLowerCase().contains("editrecord") || request.toLowerCase().contains("editmyrecord"))
 		{
 			// [String]: recordID~fieldName~newValue~managerId
-			String[] parts = isRequestValid(request, 5);
+			String[] parts = isRequestFormatValid(request, 5);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
 			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
 
 				if (request.toLowerCase().contains("editrecord"))
 				{
@@ -166,7 +165,7 @@ public class Operations
 						msg = msg + "~" + parts[j];
 					}
 
-					// multicast.send(msg);
+					// Add the request to the Multicast Queue. Multicaster is running as a different thread
 					synchronized (brdcMsgQueue)
 					{
 						brdcMsgQueue.add(msg);
@@ -176,53 +175,49 @@ public class Operations
 				return response;
 			} else
 			{
-				// fail to do
 				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
 				return response;
 			}
 		}
 
+		// recordExist
 		if (request.toLowerCase().contains("recordExist".toLowerCase()))
 		{
 			// [String]: recordId~managerId
-			String[] parts = isRequestValid(request, 3);
+			String[] parts = isRequestFormatValid(request, 3);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
 			if (recordExist(parts[1], parts[2]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
 				return response;
 			} else
 			{
-				// fail to do
 				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
 				return response;
 			}
 		}
 
+		// transferRecord
 		if (request.toLowerCase().contains("transferrecord") || request.toLowerCase().contains("transfermyrecord"))
 		{
 			// [String]: recordId~remoteCenterServerName~managerId
-			String[] parts = isRequestValid(request, 4);
+			String[] parts = isRequestFormatValid(request, 4);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
 			if (transferRecord(parts[1], parts[2], parts[3]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-				response[1] = "";
 
 				if (request.toLowerCase().contains("transferrecord"))
 				{
@@ -232,7 +227,7 @@ public class Operations
 						msg = msg + "~" + parts[j];
 					}
 
-					// multicast.send(msg);
+					// Add the request to the Multicast Queue. Multicaster is running as a different thread
 					synchronized (brdcMsgQueue)
 					{
 						brdcMsgQueue.add(msg);
@@ -242,50 +237,52 @@ public class Operations
 				return response;
 			} else
 			{
-				// fail to do
 				response[0] = "ERR"; // Valid request + Error in processing the request
-				response[1] = "";
 				return response;
 			}
 		}
 
+		// getRecordsCount
 		if (request.toLowerCase().contains("getrecordscount") || request.toLowerCase().contains("getmyrecordscount"))
 		{
 			// [String]: managerId
-			String[] parts = isRequestValid(request, 2);
+			String[] parts = isRequestFormatValid(request, 2);
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				response[1] = "";
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 				return response;
 			}
 
-			String result = getRecordsCount(parts[1]);
+			String result = getRecordsCount(parts[1]); // My records count
 
+			// we should ask other cities to gather the records count, but we need to prevent making loop
 			if (request.toLowerCase().contains("getrecordscount"))
 			{
-				for (String srv : myGroupPorts.keySet())
+				for (String srv : myGroupPorts.keySet()) // For all servers in my group
 				{
-					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
+					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase())) // All servers except myself
 					{
-						if (alives.get(groupIndex).get(srv) == 1)
+						if (alives.get(groupIndex).get(srv) == 1) // if the server is alive
 						{
+							// Ask for the records count
 							RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
-							String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
+							String remoteCount = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
 
-							if (tempStr.equals("DWN"))
+							if (remoteCount.equals("DWN")) // if the server went down during this request processing
 							{
-								// logger.logToFile(cityAbbr + "[Operations.processRequest()]: " + myGroupPorts.get(srv) + " Server did not respond on:"
-								// + " {CallerManagerID: " + parts[1] + "}");
-								result = result + ", " + srv + " D";
+								result = result + ", " + srv + " D"; // Return "D" instead of the count
 							} else
 							{
-								if (tempStr.contains("ACK"))
+								if (remoteCount.contains("ACK")) // if request is processed successfully
 								{
-									result = result + ", " + tempStr.substring(3, tempStr.length());
+									result = result + ", " + remoteCount.substring(3, remoteCount.length());
+								} else // message delivered successfully, but error happened during processing the request
+								{
+									result = result + ", " + srv + " E";
 								}
 							}
-						} else
+						} else // the server was DEAD
 						{
 							result = result + ", " + srv + " D";
 						}
@@ -293,19 +290,20 @@ public class Operations
 				}
 			}
 
+			// build the response
 			response[0] = "ACK"; // Valid request + the process is done
 			response[1] = result;
 			return response;
 		}
 
-		logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
-
+		// if the request does not match at least to one of the above
 		response[0] = "INV"; // Invalid request
-		response[1] = "";
+		logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 		return response;
 	}
 
-	private String[] isRequestValid(String request, int argsNum)
+	// Check the request format validity and return the split request
+	private String[] isRequestFormatValid(String request, int argsNum)
 	{
 		String[] parts = request.trim().split("~");
 		if (parts.length != argsNum)
@@ -621,19 +619,16 @@ public class Operations
 			}
 			// Call the remote server to add this record on that
 			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
-			// [String]:
-			// firstName~lastName~address~phoneNumber~specialization~location~managerId
+			// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
 			String reply = rudpClient.requestRemote("createTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~"
 					+ teacher.getAddress() + "~" + teacher.getPhone().toString() + "~" + spec + "~" + city + "~" + city + "0001");
 
-			if (reply.toUpperCase().contains("NAK"))
+			if (reply.toUpperCase().contains("ERR"))
 			{
 				logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record is not added to thenew server"
 						+ " {CallerManagerID: " + managerId + "}");
 				return false; // The given record dosen't exist in this server
 			}
-
-			// recMng.shutdown();
 		}
 
 		if (recordId.toUpperCase().trim().charAt(0) == 'S') // Student record

@@ -13,8 +13,6 @@ public class RequestManager extends Thread
 {
 	private DatagramPacket request;
 	private DatagramSocket socket;
-//	private String cityAbbr;
-//	private Logger logger;
 	private HashMap<String, String[]> responses;
 	private Operations operations;
 
@@ -24,8 +22,6 @@ public class RequestManager extends Thread
 		super();
 		this.request = request;
 		this.socket = socket;
-//		this.cityAbbr = cityAbbr;
-//		this.logger = logger;
 		this.responses = responses;
 		this.operations = operations;
 	}
@@ -36,54 +32,51 @@ public class RequestManager extends Thread
 
 		try
 		{
-			if (req.trim().length() < 41)
+			if (req.trim().length() < 41) // Request is corrupted
 			{
-				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort()));
-				// logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (length)! NAK sent to the requester");
+				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort()));				
 				return;
 			}
-
+			
 			String[] parts = splitMessage(req.trim());
-
-			if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
+			
+			if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3]))) // Request is corrupted
 			{
-				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
-				// logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (chksm)! NAK sent to the requester");
+				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); 		
 				return;
 			}
 
-			if (parts[1].equals("REQ"))
+			if (parts[1].equals("REQ")) // Code = "REQ"
 			{
-				if (!responses.containsKey(parts[2])) // if it's the first time
+				if (!responses.containsKey(parts[2])) // if it's the first time to process this request
 				{
-					String[] result = operations.processRequest(parts[3].trim());
-					socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
-					// logger.logToFile(cityAbbr + "[RequestManager.run()]: CenterServer Replyed To " + request.getAddress().toString() + ":"
-					// + request.getPort());
-
-					responses.put(parts[2], result);
-				} else
+					String[] result = operations.processRequest(parts[3].trim()); // Call operations to process the request and return the result
+					socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); 
+					
+					responses.put(parts[2], result); // Save the result for the future if retransmission is required
+				} else // The request was processed before, we need to retransmit the previous result
 				{
-					socket.send(prepareRespons(responses.get(parts[2])[0], parts[2], responses.get(parts[2])[1], request.getAddress(),
+					socket.send(prepareRespons(responses.get(parts[2])[0], parts[2], responses.get(parts[2])[1], request.getAddress(), 
 							request.getPort()));
 				}
 			}
 
-			if (parts[1].equals("DEL"))
+			if (parts[1].equals("DEL")) // Code = "DEL" -> client ACK, when the result is received, so we can delete the result from "responses"
 			{
-				if (responses.containsKey(parts[2]))
+				if (responses.containsKey(parts[2])) // if there is an entry with the DEL request key
 				{
-					responses.remove(parts[2]);
+					responses.remove(parts[2]); // Remove the entry
 				}
 
-				socket.send(prepareRespons("ACK", parts[2], "", request.getAddress(), request.getPort())); // Send the reply
+				socket.send(prepareRespons("ACK", parts[2], "", request.getAddress(), request.getPort())); // Send ACK
 			}
 		} catch (IOException e)
 		{
 			// e.printStackTrace();
-		} // Send the reply
+		}
 	}
 
+	// Assemble parts of the response to a UDP message
 	private DatagramPacket prepareRespons(String code, String id, String msg, InetAddress addr, int port)
 	{
 		String rep = generateChecksum(code + id + msg) + code + id + msg;
@@ -94,6 +87,7 @@ public class RequestManager extends Thread
 		return reply;
 	}
 
+	// Split parts of the request 
 	private String[] splitMessage(String message)
 	{
 		String[] result = new String[4];
@@ -105,6 +99,7 @@ public class RequestManager extends Thread
 		return result;
 	}
 
+	// Generate Checksum for a given message
 	private String generateChecksum(String str)
 	{
 		MessageDigest md;
@@ -121,7 +116,7 @@ public class RequestManager extends Thread
 			}
 		} catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		return sb.toString();

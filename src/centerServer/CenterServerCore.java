@@ -14,7 +14,7 @@ import java.util.List;
 public class CenterServerCore extends Thread
 {
 	private int listenPort; // UDP Port number to listen on that
-	private String cityAbbr;// = new String(); // City abbreviation like "MTL"
+	private String cityAbbr;// City abbreviation like "MTL"
 	private HashMap<Character, List<Record>> recordsMap = new HashMap<>(); // The map which contains the records
 	private HashMap<String, Record> indexPerId = new HashMap<>();
 	private Logger logger;
@@ -31,6 +31,7 @@ public class CenterServerCore extends Thread
 		this.logger = logger;
 		this.listenPort = ports.get(groupIndex).get(cityAbbr);
 
+		// Initialize "alives"
 		String[] cities = { "MTL", "LVL", "DDO" };
 		for (int i = 0; i < 3; i++)
 		{
@@ -42,12 +43,15 @@ public class CenterServerCore extends Thread
 			alives.add(aliveGroup);
 		}
 
+		// Start health checker
 		HealthChecker healthChecker = new HealthChecker(ports, alives, logger, cityAbbr, groupIndex);
 		healthChecker.start();
 
+		// Start multicaster
 		Multicast multicast = new Multicast(groupIndex, alives, ports, cityAbbr, logger, brdcMsgQueue);
 		multicast.start();
 
+		// Instantiate "operations" to give to the "requestManager"
 		operations = new Operations(groupIndex, cityAbbr, logger, alives, ports, recordsMap, indexPerId, brdcMsgQueue);
 
 		logger.logToFile(cityAbbr + "[CenterServerCore Constructor]: CenterServerCore is initialized");
@@ -55,7 +59,7 @@ public class CenterServerCore extends Thread
 
 	public void run()
 	{
-		DatagramSocket socket = null; // Socket declaration
+		DatagramSocket socket = null;
 		try
 		{
 			socket = new DatagramSocket(listenPort); // Socket initiation by given UDP port number
@@ -66,8 +70,10 @@ public class CenterServerCore extends Thread
 				byte[] buffer = new byte[1024]; // Buffer which receives the request
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				socket.receive(request); // Receive request
+
+				// Call requestManager to manage the request
 				RequestManager requestManager = new RequestManager(request, socket, cityAbbr, logger, responses, operations);
-				requestManager.start();				
+				requestManager.start();
 			}
 		} catch (SocketException e)
 		{

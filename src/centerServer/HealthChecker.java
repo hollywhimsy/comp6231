@@ -41,23 +41,24 @@ public class HealthChecker extends Thread
 
 	private void updateAlivesList()
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++) // for all the groups
 		{
-			for (String srv : alives.get(i).keySet())
+			for (String srv : alives.get(i).keySet()) // for all the servers inside each group
 			{
-				if ((srv.toUpperCase().equals(myCity)) && (i == myGroupIndex))
+				if ((srv.toUpperCase().equals(myCity)) && (i == myGroupIndex)) // if this is myself
 				{
-					continue;
+					continue; // do not check healthiness
 				}
 
-				if (alives.get(i).get(srv) == 1)
+				if (alives.get(i).get(srv) == 1) // if the server was alive based on the previous health check
 				{
+					// Heartbit the server
 					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
 					String result = client.requestRemote("HeartBit").trim();
 
-					if (result.equals("DWN"))
+					if (result.equals("DWN")) // if the server is down
 					{
-						alives.get(i).put(srv, 0); // this server is down
+						alives.get(i).put(srv, 0); // put this server is down
 						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv) + " is DEAD");
 					} else
 					{
