@@ -19,7 +19,6 @@ import common.Logger;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
 import frontEnd.RecordManagerImpl;
-import record.Record;
 
 public class ServersRunner
 {
@@ -42,11 +41,8 @@ public class ServersRunner
 		{		
 			for (int j = 0; j < 3; j++)
 			{			
-				HashMap<Character, List<Record>> recordsMap1 = new HashMap<>();
-				HashMap<String, Record> indexPerId1 = new HashMap<>();
 				Logger logger1 = new Logger("SRV_" + cities[j] + i + ".log");
-				CenterServerCore rudpServer1 = new CenterServerCore(recordsMap1, indexPerId1, ports.get(i).get(cities[j]), cities[j], logger1, 
-						ports, i);
+				CenterServerCore rudpServer1 = new CenterServerCore(cities[j], logger1, ports, i);
 				rudpServer1.start();
 			}
 		}
