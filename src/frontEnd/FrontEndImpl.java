@@ -9,7 +9,7 @@ import common.Infrastucture;
 import common.Logger;
 import common.ServerInfo;
 
-public class RecordManagerImpl extends FrontEndPOA
+public class FrontEndImpl extends FrontEndPOA
 {
 	private ORB orb;
 	private String cityAbbr;
@@ -34,7 +34,7 @@ public class RecordManagerImpl extends FrontEndPOA
 	
 	
 	// Constructor
-	public RecordManagerImpl(List<HashMap<String, Integer>> ports)
+	public FrontEndImpl(List<HashMap<String, Integer>> ports)
 	{
 		super();
 		this.cityAbbr = "FE";

@@ -10,9 +10,9 @@ public class Multicast extends Thread
 	private List<HashMap<String, Integer>> alives;
 	private List<HashMap<String, Integer>> ports;
 	private String cityAbbr;
-	private Logger logger;	
+	private Logger logger;
 	private List<String> brdcMsgQueue;
-	
+
 	public Multicast(int groupIndex, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports, String cityAbbr, Logger logger,
 			List<String> brdcMsgQueue)
 	{
@@ -32,9 +32,9 @@ public class Multicast extends Thread
 			Thread.sleep(3000);
 		} catch (InterruptedException e)
 		{
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
-		
+
 		while (true)
 		{
 			try
@@ -42,9 +42,9 @@ public class Multicast extends Thread
 				Thread.sleep(500);
 			} catch (InterruptedException e)
 			{
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
-			
+
 			synchronized (brdcMsgQueue)
 			{
 				for (int k = 0; k < brdcMsgQueue.size(); k++)
@@ -56,27 +56,26 @@ public class Multicast extends Thread
 						{
 							if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
 							{
-								RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
+								RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
 								String result = client.requestRemote(msg).trim();
-								
+
 								if (result.equals("DWN"))
 								{
-									logger.logToFile(cityAbbr + "[Multicast.send()]: the request is multicasted to " + cityAbbr + " listening on " 
+									logger.logToFile(cityAbbr + "[Multicast.send()]: the request is multicasted to " + cityAbbr + " listening on "
 											+ ports.get(i).get(cityAbbr) + ". This server was DEAD recently");
-								}
-								else
+								} else
 								{
-									logger.logToFile(cityAbbr + "[Multicast.send()]: the request is multicasted to " + cityAbbr + " listening on " 
+									logger.logToFile(cityAbbr + "[Multicast.send()]: the request is multicasted to " + cityAbbr + " listening on "
 											+ ports.get(i).get(cityAbbr));
 								}
-							}			
+							}
 						}
 					}
-					
+
 					brdcMsgQueue.remove(0);
 				}
 			}
-			
+
 		}
 	}
 }

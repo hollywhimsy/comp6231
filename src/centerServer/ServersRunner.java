@@ -18,7 +18,7 @@ import org.omg.PortableServer.POAPackage.WrongPolicy;
 import common.Logger;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
-import frontEnd.RecordManagerImpl;
+import frontEnd.FrontEndImpl;
 
 public class ServersRunner
 {
@@ -54,7 +54,7 @@ public class ServersRunner
 			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 			rootPOA.the_POAManager().activate();
 			
-			RecordManagerImpl recMngImp = new RecordManagerImpl(ports);
+			FrontEndImpl recMngImp = new FrontEndImpl(ports);
 			recMngImp.setOrb(orb);
 			
 			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);

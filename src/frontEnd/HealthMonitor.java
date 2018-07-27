@@ -7,9 +7,9 @@ import centerServer.RudpClient;
 // in electing the new leader if the current crashes crashes
 public class HealthMonitor extends Thread {
 
-	RecordManagerImpl frontEndInstance;
+	FrontEndImpl frontEndInstance;
 
-	public HealthMonitor(RecordManagerImpl frontEndInstance) {
+	public HealthMonitor(FrontEndImpl frontEndInstance) {
 		this.frontEndInstance = frontEndInstance;
 
 	}

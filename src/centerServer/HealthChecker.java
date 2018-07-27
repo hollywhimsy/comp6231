@@ -12,7 +12,7 @@ public class HealthChecker extends Thread
 	private Logger logger;
 	private int myGroupIndex;
 	private String myCity;
-	
+
 	public HealthChecker(List<HashMap<String, Integer>> ports, List<HashMap<String, Integer>> alives, Logger logger, String myCity, int myGroupIndex)
 	{
 		super();
@@ -22,7 +22,7 @@ public class HealthChecker extends Thread
 		this.myGroupIndex = myGroupIndex;
 		this.myCity = myCity.trim().toUpperCase();
 	}
-	
+
 	public void run()
 	{
 		while (true)
@@ -32,13 +32,13 @@ public class HealthChecker extends Thread
 				Thread.sleep(3000);
 			} catch (InterruptedException e1)
 			{
-				//e1.printStackTrace();
+				// e1.printStackTrace();
 			}
-			
-			updateAlivesList();	
+
+			updateAlivesList();
 		}
 	}
-	
+
 	private void updateAlivesList()
 	{
 		for (int i = 0; i < 3; i++)
@@ -49,23 +49,22 @@ public class HealthChecker extends Thread
 				{
 					continue;
 				}
-				
-				if(alives.get(i).get(srv) == 1)
+
+				if (alives.get(i).get(srv) == 1)
 				{
 					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
 					String result = client.requestRemote("HeartBit").trim();
-	
+
 					if (result.equals("DWN"))
 					{
-						alives.get(i).put(srv, 0); // this server is down	
+						alives.get(i).put(srv, 0); // this server is down
 						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv) + " is DEAD");
-					}
-					else
+					} else
 					{
 						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv) + " is ALIVE");
 					}
-				}				
+				}
 			}
-		}		
+		}
 	}
 }

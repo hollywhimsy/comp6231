@@ -13,8 +13,8 @@ public class RequestManager extends Thread
 {
 	private DatagramPacket request;
 	private DatagramSocket socket;
-	private String cityAbbr;
-	private Logger logger;
+//	private String cityAbbr;
+//	private Logger logger;
 	private HashMap<String, String[]> responses;
 	private Operations operations;
 
@@ -24,22 +24,22 @@ public class RequestManager extends Thread
 		super();
 		this.request = request;
 		this.socket = socket;
-		this.cityAbbr = cityAbbr;
-		this.logger = logger;
+//		this.cityAbbr = cityAbbr;
+//		this.logger = logger;
 		this.responses = responses;
 		this.operations = operations;
 	}
 
 	public void run()
 	{
-		String req = new String(request.getData()); // Extract the request data		
+		String req = new String(request.getData()); // Extract the request data
 
 		try
 		{
 			if (req.trim().length() < 41)
 			{
 				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort()));
-//				logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (length)! NAK sent to the requester");
+				// logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (length)! NAK sent to the requester");
 				return;
 			}
 
@@ -48,7 +48,7 @@ public class RequestManager extends Thread
 			if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
 			{
 				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
-//				logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (chksm)! NAK sent to the requester");
+				// logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (chksm)! NAK sent to the requester");
 				return;
 			}
 
@@ -58,8 +58,8 @@ public class RequestManager extends Thread
 				{
 					String[] result = operations.processRequest(parts[3].trim());
 					socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
-//					logger.logToFile(cityAbbr + "[RequestManager.run()]: CenterServer Replyed To " + request.getAddress().toString() + ":"
-//							+ request.getPort());
+					// logger.logToFile(cityAbbr + "[RequestManager.run()]: CenterServer Replyed To " + request.getAddress().toString() + ":"
+					// + request.getPort());
 
 					responses.put(parts[2], result);
 				} else
@@ -80,8 +80,7 @@ public class RequestManager extends Thread
 			}
 		} catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
+			// e.printStackTrace();
 		} // Send the reply
 	}
 
