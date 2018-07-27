@@ -58,13 +58,13 @@ public class HealthChecker extends Thread
 					if (result.equals("DWN"))
 					{
 						alives.get(i).put(srv, 0); // this server is down	
-						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: Heartbit cheked for " + srv + " listening on " 
-								+ ports.get(i).get(srv) + ". Result: Dead");
+						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " 
+								+ ports.get(i).get(srv) + " is DEAD");
 					}
 					else
 					{
-						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: Heartbit cheked for " + srv + " listening on " 
-								+ ports.get(i).get(srv) + ". Result: Live");
+						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " 
+								+ ports.get(i).get(srv) + " is ALIVE");
 					}
 				}				
 			}

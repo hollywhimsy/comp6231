@@ -22,7 +22,7 @@ public class CenterServerCore extends Thread
 	private Logger logger;
 	private List<HashMap<String, Integer>> alives = new ArrayList<>(); // 0 -> dead, 1 -> alive
 	private HashMap<String, String[]> responses = new HashMap<>();
-	private RequestProcessor requestProcessor;
+	private Operations operations;
 
 	// Constructor
 	public CenterServerCore(String cityAbbr, Logger logger, List<HashMap<String, Integer>> ports, int groupIndex)
@@ -46,7 +46,7 @@ public class CenterServerCore extends Thread
 		HealthChecker healthChecker = new HealthChecker(ports, alives, logger, cityAbbr, groupIndex);
 		healthChecker.start();
 		
-		requestProcessor = new RequestProcessor(groupIndex, cityAbbr, logger, alives, ports, recordsMap, indexPerId);
+		operations = new Operations(groupIndex, cityAbbr, logger, alives, ports, recordsMap, indexPerId);
 
 		logger.logToFile(cityAbbr + "[RUDPServer Constructor]: UDPServer is initialized");
 	}
@@ -64,52 +64,54 @@ public class CenterServerCore extends Thread
 				byte[] buffer = new byte[1024]; // Buffer which receives the request
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				socket.receive(request); // Receive request
-				String req = new String(request.getData()); // Extract the request data
-				logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Recieved a Request!");
-				
-				if (req.trim().length() < 41)
-				{
-					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
-					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (length)! NAK sent to the requester");
-					continue;
-				}
-				
-				String[] parts = splitMessage(req.trim());
-					
-				if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
-				{
-					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
-					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (chksm)! NAK sent to the requester");
-					continue;
-				}
-				
-				if(parts[1].equals("REQ"))
-				{
-					if (!responses.containsKey(parts[2])) // if it's the first time
-					{	
-						String[] result = requestProcessor.processRequest(parts[3].trim());
-						socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
-						logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Replyed To " + request.getAddress().toString() + ":"
-								+ request.getPort());
-						
-						responses.put(parts[2], result);
-					}
-					else
-					{
-						socket.send(prepareRespons(responses.get(parts[2])[0], parts[2], responses.get(parts[2])[1], request.getAddress(), 
-								request.getPort())); 
-					}
-				}
-
-				if(parts[1].equals("DEL"))
-				{
-					if (responses.containsKey(parts[2]))
-					{
-						responses.remove(parts[2]);
-					}
-					
-					socket.send(prepareRespons("ACK", parts[2], "", request.getAddress(), request.getPort())); // Send the reply
-				}				
+				RequestPr requestProcessor = new RequestPr(request, socket, cityAbbr, logger, responses, operations);
+				requestProcessor.start();
+//				String req = new String(request.getData()); // Extract the request data
+////				logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Recieved a Request!");
+//				
+//				if (req.trim().length() < 41)
+//				{
+//					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
+//					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (length)! NAK sent to the requester");
+//					continue;
+//				}
+//				
+//				String[] parts = splitMessage(req.trim());
+//					
+//				if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
+//				{
+//					socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
+//					logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (chksm)! NAK sent to the requester");
+//					continue;
+//				}
+//				
+//				if(parts[1].equals("REQ"))
+//				{
+//					if (!responses.containsKey(parts[2])) // if it's the first time
+//					{	
+//						String[] result = operations.processRequest(parts[3].trim());
+//						socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
+//						logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Replyed To " + request.getAddress().toString() + ":"
+//								+ request.getPort());
+//						
+//						responses.put(parts[2], result);
+//					}
+//					else
+//					{
+//						socket.send(prepareRespons(responses.get(parts[2])[0], parts[2], responses.get(parts[2])[1], request.getAddress(), 
+//								request.getPort())); 
+//					}
+//				}
+//
+//				if(parts[1].equals("DEL"))
+//				{
+//					if (responses.containsKey(parts[2]))
+//					{
+//						responses.remove(parts[2]);
+//					}
+//					
+//					socket.send(prepareRespons("ACK", parts[2], "", request.getAddress(), request.getPort())); // Send the reply
+//				}				
 			}
 		} catch (SocketException e)
 		{
@@ -125,46 +127,46 @@ public class CenterServerCore extends Thread
 		}
 	}
 
-	private String generateChecksum(String str)
-	{
-		MessageDigest md;
-		StringBuffer sb = null;
-		try
-		{
-			md = MessageDigest.getInstance("MD5");
-			md.update(str.getBytes());
-			byte[] digest = md.digest();
-			sb = new StringBuffer();
-			for (byte b : digest)
-			{
-				sb.append(String.format("%02x", b & 0xff));
-			}
-		} catch (NoSuchAlgorithmException e)
-		{
-			e.printStackTrace();
-		}
-
-		return sb.toString();
-	}
-
-	private DatagramPacket prepareRespons(String code, String id, String msg, InetAddress addr, int port)
-	{
-		String rep = generateChecksum(code + id + msg) + code + id + msg;
-		byte[] replyBuffer = new byte[1024];
-		replyBuffer = rep.getBytes(); // Convert String to Byte to send to the client
-		DatagramPacket reply = new DatagramPacket(replyBuffer, replyBuffer.length, addr, port);
-
-		return reply;
-	}
-	
-	private String[] splitMessage(String message)
-	{
-		String[] result = new String[4];
-		result[0] = message.substring(0, 32);
-		result[1] = message.substring(32, 35);
-		result[2] = message.substring(35, 41);
-		result[3] = message.substring(41, message.length());
-		
-		return result;		
-	}
+//	private String generateChecksum(String str)
+//	{
+//		MessageDigest md;
+//		StringBuffer sb = null;
+//		try
+//		{
+//			md = MessageDigest.getInstance("MD5");
+//			md.update(str.getBytes());
+//			byte[] digest = md.digest();
+//			sb = new StringBuffer();
+//			for (byte b : digest)
+//			{
+//				sb.append(String.format("%02x", b & 0xff));
+//			}
+//		} catch (NoSuchAlgorithmException e)
+//		{
+//			e.printStackTrace();
+//		}
+//
+//		return sb.toString();
+//	}
+//
+//	private DatagramPacket prepareRespons(String code, String id, String msg, InetAddress addr, int port)
+//	{
+//		String rep = generateChecksum(code + id + msg) + code + id + msg;
+//		byte[] replyBuffer = new byte[1024];
+//		replyBuffer = rep.getBytes(); // Convert String to Byte to send to the client
+//		DatagramPacket reply = new DatagramPacket(replyBuffer, replyBuffer.length, addr, port);
+//
+//		return reply;
+//	}
+//	
+//	private String[] splitMessage(String message)
+//	{
+//		String[] result = new String[4];
+//		result[0] = message.substring(0, 32);
+//		result[1] = message.substring(32, 35);
+//		result[2] = message.substring(35, 41);
+//		result[3] = message.substring(41, message.length());
+//		
+//		return result;		
+//	}
 }

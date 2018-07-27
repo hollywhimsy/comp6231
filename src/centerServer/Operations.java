@@ -9,7 +9,7 @@ import record.Record;
 import record.StudentRecord;
 import record.TeacherRecord;
 
-public class RequestProcessor
+public class Operations
 {
 	private int groupIndex;
 	private HashMap<String, Integer> myGroupPorts;
@@ -25,7 +25,7 @@ public class RequestProcessor
 	
 	
 
-	public RequestProcessor(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports,
+	public Operations(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports,
 			HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId)
 	{
 		super();
