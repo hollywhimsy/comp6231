@@ -3,6 +3,7 @@ package centerServer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import common.Logger;
 import record.Record;
@@ -21,12 +22,11 @@ public class Operations
 	private HashMap<String, Record> indexPerId;
 	private Integer lastTeacherId = 0; // Needs synchronization
 	private Integer lastStudentId = 0; // Needs synchronization
-	private FifoMulticast fifoMulticast;
-	
-	
+//	private Multicast multicast;
+	private List<String> brdcMsgQueue;	
 
 	public Operations(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports,
-			HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId)
+			HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, List<String> brdcMsgQueue)
 	{
 		super();
 		this.groupIndex = groupIndex;
@@ -36,10 +36,11 @@ public class Operations
 		this.ports = ports;
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
+		this.brdcMsgQueue = brdcMsgQueue;
 		
 		myGroupPorts = this.ports.get(this.groupIndex);
 		
-		fifoMulticast = new FifoMulticast(groupIndex, alives, ports, cityAbbr, logger);
+//		multicast = new Multicast(groupIndex, alives, ports, cityAbbr, logger);
 	}
 
 	/*
@@ -74,21 +75,26 @@ public class Operations
 	 			return response;
 			}
 			
-			if (request.toLowerCase().contains("createtrecord"))
-			{
-				String msg = "createMyTRecord";
-				for (int j = 1; j < 8; j++)
-				{
-					msg = msg + "~" + parts[j];
-				}
-				
-				fifoMulticast.broadcast(msg);
-			}
-
 			if (createTRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
 				response[1] = "";
+				
+				if (request.toLowerCase().contains("createtrecord"))
+				{
+					String msg = "createMyTRecord";
+					for (int j = 1; j < 8; j++)
+					{
+						msg = msg + "~" + parts[j];
+					}
+					
+//					multicast.send(msg);
+					synchronized (brdcMsgQueue)
+					{
+						brdcMsgQueue.add(msg);
+					}
+				}
+				
 	 			return response;
 			} else
 			{
@@ -108,24 +114,28 @@ public class Operations
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
-			}
-			
-			if (request.toLowerCase().contains("createsrecord"))
-			{
-				String msg = "createMySRecord";
-				for (int j = 1; j < 7; j++)
-				{
-					msg = msg + "~" + parts[j];
-				}
-				
-				fifoMulticast.broadcast(msg);
-				
-			}
+			}			
 			
 			if (createSRecord(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
 				response[1] = "";
+				
+				if (request.toLowerCase().contains("createsrecord"))
+				{
+					String msg = "createMySRecord";
+					for (int j = 1; j < 7; j++)
+					{
+						msg = msg + "~" + parts[j];
+					}
+					
+//					multicast.send(msg);
+					synchronized (brdcMsgQueue)
+					{
+						brdcMsgQueue.add(msg);
+					}
+				}
+				
 	 			return response;
 			} else
 			{
@@ -147,22 +157,26 @@ public class Operations
 	 			return response;
 			}
 			
-			if (request.toLowerCase().contains("editrecord"))
-			{
-				String msg = "editMyRecord";
-				for (int j = 1; j < 5; j++)
-				{
-					msg = msg + "~" + parts[j];
-				}
-				
-				fifoMulticast.broadcast(msg);
-				
-			}
-
 			if (editRecord(parts[1], parts[2], parts[3], parts[4]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
 				response[1] = "";
+				
+				if (request.toLowerCase().contains("editrecord"))
+				{
+					String msg = "editMyRecord";
+					for (int j = 1; j < 5; j++)
+					{
+						msg = msg + "~" + parts[j];
+					}
+					
+//					multicast.send(msg);	
+					synchronized (brdcMsgQueue)
+					{
+						brdcMsgQueue.add(msg);
+					}
+				}
+				
 	 			return response;
 			} else
 			{
@@ -207,24 +221,28 @@ public class Operations
 				response[0] = "INV"; // Invalid request
 				response[1] = "";
 	 			return response;
-			}
-			
-			if (request.toLowerCase().contains("transferrecord"))
-			{
-				String msg = "transferMyRecord";
-				for (int j = 1; j < 4; j++)
-				{
-					msg = msg + "~" + parts[j];
-				}
-				
-				fifoMulticast.broadcast(msg);
-				
-			}
+			}			
 
 			if (transferRecord(parts[1], parts[2], parts[3]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
 				response[1] = "";
+				
+				if (request.toLowerCase().contains("transferrecord"))
+				{
+					String msg = "transferMyRecord";
+					for (int j = 1; j < 4; j++)
+					{
+						msg = msg + "~" + parts[j];
+					}
+					
+//					multicast.send(msg);		
+					synchronized (brdcMsgQueue)
+					{
+						brdcMsgQueue.add(msg);
+					}
+				}
+				
 	 			return response;
 			} else
 			{
@@ -254,19 +272,27 @@ public class Operations
 				{
 					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase()))
 					{
-						RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
-						String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
-	
-						if (tempStr == null)
+						if(alives.get(groupIndex).get(srv) == 1)
 						{
-							logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordsCount()]: UDP server did not respond on port:" + myGroupPorts.get(srv)
-									+ " {CallerManagerID: " + parts[1] + "}");
-						} else
-						{
-							if (tempStr.contains("ACK"))
+							RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
+							String tempStr = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
+		
+							if (tempStr.equals("DWN"))
 							{
-								result = result + ", " + tempStr.substring(3, tempStr.length());
+//								logger.logToFile(cityAbbr + "[Operations.processRequest()]: " + myGroupPorts.get(srv) + " Server did not respond on:" 
+//										+ " {CallerManagerID: " + parts[1] + "}");
+								result = result + ", " + srv + " D";
+							} else
+							{
+								if (tempStr.contains("ACK"))
+								{
+									result = result + ", " + tempStr.substring(3, tempStr.length());
+								}
 							}
+						}
+						else
+						{
+							result = result + ", " + srv + " D";
 						}
 					}
 				}
@@ -277,7 +303,7 @@ public class Operations
  			return response;
 		}
 
-		logger.logToFile(cityAbbr + "[CenterImpl.processRequest()]: Request Was Invalid!");
+		logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
 
 		response[0] = "INV"; // Invalid request
 		response[1] = "";
@@ -307,44 +333,12 @@ public class Operations
 		return parts;
 	}
 	
-//	private void broadcast(String msg)
-//	{
-//		for (int i = 0; i < 3; i++)
-//		{
-//			if (i != groupIndex)
-//			{
-//				if (alives.get(i).get(cityAbbr.toUpperCase()) == 1)
-//				{
-//					RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);						
-//					String result = client.requestRemote(msg).trim();
-//					
-//					if (result.equals("DWN"))
-//					{
-//						alives.get(i).put(cityAbbr, 0); // this server is down	
-//						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
-//								+ ports.get(i).get(cityAbbr) + ". This server is Dead");
-//					}
-//					else
-//					{
-//						logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the request is broadcasted to " + cityAbbr + " listening on " 
-//								+ ports.get(i).get(cityAbbr));
-//					}
-//				}
-//				else
-//				{
-//					logger.logToFile(cityAbbr + "[CenterServerCore.broadcast()]: the " + cityAbbr + " listening on " + ports.get(i).get(cityAbbr) 
-//							+ " is DOWN! => No broadcast to it!");
-//				}
-//			}
-//		}
-//	}
-	
 	private boolean createTRecord(String firstName, String lastName, String address, String phoneNumber, String specialization, String location,
 			String managerId)
 	{
 		if ((firstName == null) || (lastName == null) || (address == null) || (phoneNumber == null) || (specialization == null) || (location == null))
 		{
-			logger.logToFile(cityAbbr + "[MtlCenter.createTRecord()]: createTRecord failed (at least one property was NULL)"
+			logger.logToFile(cityAbbr + "[Operations.createTRecord()]: createTRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
@@ -373,7 +367,7 @@ public class Operations
 				}
 			}
 
-			logger.logToFile(cityAbbr + "[MtlCenter.createTRecord()]: createTRecord is successfully done (ID: " + id + ")"
+			logger.logToFile(cityAbbr + "[Operations.createTRecord()]: createTRecord is successfully done (ID: " + id + ")"
 					+ " {CallerManagerID: " + managerId + "}");
 			return true;
 		}
@@ -385,7 +379,7 @@ public class Operations
 	{
 		if ((firstName == null) || (lastName == null) || (coursesRegistred == null) || (statusDate == null))
 		{
-			logger.logToFile(cityAbbr + "[MtlCenter.createSRecord()]: createSRecord failed (at least one property was NULL)"
+			logger.logToFile(cityAbbr + "[Operations.createSRecord()]: createSRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
@@ -418,7 +412,7 @@ public class Operations
 				}
 			}
 
-			logger.logToFile(cityAbbr + "[MtlCenter.createSRecord()]: createSRecord is successfully done (ID: " + id + ")"
+			logger.logToFile(cityAbbr + "[Operations.createSRecord()]: createSRecord is successfully done (ID: " + id + ")"
 					+ " {CallerManagerID: " + managerId + "}");
 			return true;
 		}
@@ -438,7 +432,7 @@ public class Operations
 
 		String result = cityAbbr + " " + count;
 
-		logger.logToFile(cityAbbr + "[RecordManagerImpl.getRecordCounts()]: getRecordsCount is successfully done" + " {CallerManagerID: "
+		logger.logToFile(cityAbbr + "[Operations.getRecordCounts()]: getRecordsCount is successfully done" + " {CallerManagerID: "
 				+ managerId + "}");
 		return result;
 	}
@@ -448,14 +442,14 @@ public class Operations
 	{
 		if ((recordID == null) || (fieldName == null) || (newValue == null))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
+			logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
 		if (!(isRecordIdFormatCorrect(recordID)))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: "
+			logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: "
 					+ managerId + "}");
 			return false;
 		}
@@ -472,7 +466,7 @@ public class Operations
 					TeacherRecord teacher = (TeacherRecord) indexPerId.get(recordID);
 					if (teacher == null)
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (Given ID doesn't exist)"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false;
 					}
@@ -482,23 +476,23 @@ public class Operations
 					case "address":
 						oldValue = teacher.getAddress();
 						teacher.setAddress(newValue);
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: address" + " oldValue: "
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: address" + " oldValue: "
 								+ oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "phoneNumber":
 						oldValue = teacher.getPhone().toString();
 						teacher.setPhoneNumber(Integer.parseInt(newValue));
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: phoneNumber"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: phoneNumber"
 								+ " oldValue: " + oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "location":
 						oldValue = teacher.getLocation();
 						teacher.setLocation(newValue);
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: location"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: location"
 								+ " oldValue: " + oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (Given fieldName is invalid)"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false;
 					}
@@ -516,7 +510,7 @@ public class Operations
 					StudentRecord student = (StudentRecord) indexPerId.get(recordID);
 					if (student == null)
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (Given ID doesn't exist)"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (Given ID doesn't exist)"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false;
 					}
@@ -529,7 +523,7 @@ public class Operations
 						for (int i = 0; i < parts.length; i++)
 							courses.add(parts[i]);
 						student.setCoursesRegistred(courses);// set the course status as well
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: coursesRegistred"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: coursesRegistred"
 								+ " oldValue: " + oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "status":
@@ -540,7 +534,7 @@ public class Operations
 							status = false;
 						oldValue = String.valueOf(student.getStatus());
 						student.setStatus(status);
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: status"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: status"
 								+ " oldValue: " + oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					case "statusDate":
@@ -548,11 +542,11 @@ public class Operations
 						date.parse(newValue);
 						oldValue = student.getStatusDate().toString();
 						student.setStatusDate(date);
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord is successfully done for: statusDate"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord is successfully done for: statusDate"
 								+ " oldValue: " + oldValue + " newValue: " + newValue + " {CallerManagerID: " + managerId + "}");
 						break;
 					default:
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (Given fieldName is invalid)"
+						logger.logToFile(cityAbbr + "[Operations.editRecord()]: editRecord failed (Given fieldName is invalid)"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false;
 					}
@@ -567,7 +561,7 @@ public class Operations
 	{
 		if (!(isRecordIdFormatCorrect(recordId)))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.recordExist()]: editRecord failed (recordId format is incorrect)"
+			logger.logToFile(cityAbbr + "[Operations.recordExist()]: editRecord failed (recordId format is incorrect)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
@@ -588,7 +582,7 @@ public class Operations
 	{
 		if (!(isRecordIdFormatCorrect(recordId)))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: "
+			logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: "
 					+ managerId + "}");
 			return false;
 		}
@@ -596,7 +590,7 @@ public class Operations
 		if (!((remoteCenterServerName.toUpperCase().equals("MTL") || remoteCenterServerName.toUpperCase().equals("LVL")
 				|| remoteCenterServerName.toUpperCase().equals("DDO"))))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: "
+			logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: "
 					+ managerId + "}");
 			return false; // Given city name is incorrect
 		}
@@ -613,7 +607,7 @@ public class Operations
 					teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
 					if (teacher == null)
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
+						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false; // The given record dosen't exist in this server
 					}
@@ -639,7 +633,7 @@ public class Operations
 
 			if (reply.toUpperCase().contains("NAK"))
 			{
-				logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
+				logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record is not added to thenew server"
 						+ " {CallerManagerID: " + managerId + "}");
 				return false; // The given record dosen't exist in this server
 			}
@@ -657,7 +651,7 @@ public class Operations
 					student = (StudentRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
 					if (student == null)
 					{
-						logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Failed! The given record dosen't exist in this server"
+						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
 								+ " {CallerManagerID: " + managerId + "}");
 						return false; // The given record dosen't exist in this server
 					}
@@ -682,13 +676,13 @@ public class Operations
 
 			if (reply.toUpperCase().contains("NAK"))
 			{
-				logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Failed! The given record is not added to thenew server"
+				logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record is not added to thenew server"
 						+ " {CallerManagerID: " + managerId + "}");
 				return false; // The given record dosen't exist in this server
 			}
 		}
 
-		logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: The given record is transfered successfully to: " + city
+		logger.logToFile(cityAbbr + "[Operations.transferRecord()]: The given record is transfered successfully to: " + city
 				+ " {CallerManagerID: " + managerId + "}");
 
 		return true;
@@ -700,7 +694,7 @@ public class Operations
 		{
 			if (lastTeacherId >= 99999) // ID can have 5 digits only not more
 			{
-				logger.logToFile(cityAbbr + "[RecordManagerClass.produceNewId()]: produceNewId failed (Teachers record number reached 99999)"
+				logger.logToFile(cityAbbr + "[Operations.produceNewId()]: produceNewId failed (Teachers record number reached 99999)"
 						+ " {CallerManagerID: " + managerId + "}");
 				return null;
 			}
@@ -727,7 +721,7 @@ public class Operations
 		{
 			if (lastStudentId >= 99999) // ID can have 5 digits only not more
 			{
-				logger.logToFile(cityAbbr + "[RecordManagerClass.produceNewId()]: produceNewId failed (Students record number reached 99999)"
+				logger.logToFile(cityAbbr + "[Operations.produceNewId()]: produceNewId failed (Students record number reached 99999)"
 						+ " {CallerManagerID: " + managerId + "}");
 				return null;
 			}

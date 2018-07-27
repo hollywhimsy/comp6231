@@ -16,7 +16,7 @@ public class RudpClient
 	private int serverPort; // CenterServer listen port that client should connect to
 	private Logger logger;
 	private String cityAbbr = new String();
-	private int timeout = 3000; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
+	private int timeout = 4000; // (Millisecond) to wait for the reply, if don't receive, means packet is lost
 
 	// Constructor
 	public RudpClient(int serverPort, String cityAbbr, Logger logger)
@@ -26,17 +26,7 @@ public class RudpClient
 		this.logger = logger;
 		this.cityAbbr = cityAbbr;
 	}
-
-	/*
-	 * request can be: 
-	 * HeartBit: server returns ACK to show it's alive
-	 * createTRecord~[String]: the [String] gives the parameters and server creates a teacher record and returns a boolean 
-	 * createSRecord~[String]: the [String] gives the parameters and server creates a student record and returns a boolean 
-	 * getRecordsCount~[String]: the [String] gives the parameters and server returns the records count 
-	 * editRecord~[String]: the [String] gives the parameters and server edits the record and returns a boolean
-	 * recordExist~[String]: the [String] gives the parameters and server returns true/false 
-	 * transferRecord~[String]: the [String] gives the parameters and server transfers the record and returns a boolean
-	 */
+	
 	public String requestRemote(String request)
 	{
 		if (request.trim().length() > 983)
@@ -75,15 +65,16 @@ public class RudpClient
 			boolean isValid = false;
 			
 			String[] parts = new String[4];
-			int iteration = 1;
+//			int iteration = 1;
 			
 			// Try to send the request until receive ACK in reply
 			while (!isValid)
 			{
 				socket.send(udpRequest);
 				
-				logger.logToFile(cityAbbr + "[RUDPClient]: Request " + code + " is sent! Iteration: " + iteration);		
-				iteration ++;
+//				if (code.equals("REQ"))
+//					logger.logToFile(cityAbbr + "[RUDPClient]: Request is sent! Iteration: " + iteration);		
+//				iteration ++;
 					
 				byte[] buffer = new byte[1024];
 				DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
@@ -96,7 +87,7 @@ public class RudpClient
 					socket.receive(reply);
 				} catch (IOException e)
 				{
-					logger.logToFile(cityAbbr + "[RUDPClient]: Server is Down! Port: " + serverPort);
+//					logger.logToFile(cityAbbr + "[RUDPClient]: Server is Down! Port: " + serverPort);
 					return "DWN";
 				}
 				
@@ -117,8 +108,9 @@ public class RudpClient
 			}
 			
 			respons = parts[1] + parts[3];
-						
-			logger.logToFile(cityAbbr + "[RUDPClient]: Reply received! Response: " + respons);
+			
+//			if (code.equals("REQ"))
+//				logger.logToFile(cityAbbr + "[RUDPClient]: Reply received! Response: " + respons);
 		} 
 		catch (UnknownHostException e)
 		{
@@ -133,7 +125,7 @@ public class RudpClient
 		{
 			if (socket != null)
 				socket.close();
-			logger.logToFile(cityAbbr + "[RUDPClient]: Socket is closed!");
+//			logger.logToFile(cityAbbr + "[RUDPClient]: Socket is closed!");
 		}
 		return 	respons;
 	}

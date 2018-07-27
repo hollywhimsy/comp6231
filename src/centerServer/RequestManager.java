@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import common.Logger;
 
-public class RequestPr extends Thread
+public class RequestManager extends Thread
 {
 	private DatagramPacket request;
 	private DatagramSocket socket;
@@ -18,7 +18,7 @@ public class RequestPr extends Thread
 	private HashMap<String, String[]> responses;
 	private Operations operations;
 
-	public RequestPr(DatagramPacket request, DatagramSocket socket, String cityAbbr, Logger logger, HashMap<String, String[]> responses,
+	public RequestManager(DatagramPacket request, DatagramSocket socket, String cityAbbr, Logger logger, HashMap<String, String[]> responses,
 			Operations operations)
 	{
 		super();
@@ -32,15 +32,14 @@ public class RequestPr extends Thread
 
 	public void run()
 	{
-		String req = new String(request.getData()); // Extract the request data
-		// logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Recieved a Request!");
+		String req = new String(request.getData()); // Extract the request data		
 
 		try
 		{
 			if (req.trim().length() < 41)
 			{
 				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort()));
-				logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (length)! NAK sent to the requester");
+//				logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (length)! NAK sent to the requester");
 				return;
 			}
 
@@ -49,7 +48,7 @@ public class RequestPr extends Thread
 			if (!parts[0].equals(generateChecksum(parts[1] + parts[2] + parts[3])))
 			{
 				socket.send(prepareRespons("NAK", "000000", "", request.getAddress(), request.getPort())); // Send the reply
-				logger.logToFile(cityAbbr + "[RUDPServer.run()]: Request is corrupted (chksm)! NAK sent to the requester");
+//				logger.logToFile(cityAbbr + "[RequestManager.run()]: Request is corrupted (chksm)! NAK sent to the requester");
 				return;
 			}
 
@@ -59,8 +58,8 @@ public class RequestPr extends Thread
 				{
 					String[] result = operations.processRequest(parts[3].trim());
 					socket.send(prepareRespons(result[0], parts[2], result[1], request.getAddress(), request.getPort())); // Send the reply
-					logger.logToFile(cityAbbr + "[RUDPServer.run()]: UDP CenterServer Replyed To " + request.getAddress().toString() + ":"
-							+ request.getPort());
+//					logger.logToFile(cityAbbr + "[RequestManager.run()]: CenterServer Replyed To " + request.getAddress().toString() + ":"
+//							+ request.getPort());
 
 					responses.put(parts[2], result);
 				} else
@@ -82,7 +81,7 @@ public class RequestPr extends Thread
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		} // Send the reply
 	}
 
