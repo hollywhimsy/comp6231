@@ -159,7 +159,7 @@ public class RecordManagerImpl extends FrontEndPOA {
 		// TODO
 		// refactor this when decide the appropriate data structure
 
-		return ports.get(activeServers.get(city)).get(city);
+		return masterServers.get(city).getUdpPort();
 	}
 
 	@Override
