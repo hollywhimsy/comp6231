@@ -353,7 +353,7 @@ public class RecordManagerImpl extends FrontEndPOA {
 			String city = e.getKey();
 			List<ServerInfo> cityServers = e.getValue();
 
-			System.out.println("CHECKING city: " +city );
+			System.out.println("CHECKING city: " +city + " " + cityServers.size() );
 			
 			
 			for (ServerInfo si : cityServers) {
@@ -361,14 +361,16 @@ public class RecordManagerImpl extends FrontEndPOA {
 				String response = client.requestRemote("HeartBit");
 				if (response == "ACK") {
 					// log server alive
-					System.out.println("alice city: " +city + " server" + si);
+					logger.logToFile(
+							cityAbbr + "[RecordManagerImpl.electNewLeadForCity()]: " + city + " server :" + si.toString());
+//					System.out.println("alice city: " +city + " server" + si);
 				} else if (response == "DWN") {
 
 					// log server down
 					cityServers.remove(si);
-					System.out.println("down city: " +city + " server" + si);
+//					System.out.println("down city: " +city + " server" + si);
 					if (isLeadServer(si)) {
-						System.out.println("Electing lead city: " +city );
+//						System.out.println("Electing lead city: " +city );
 						electNewLeadForCity(city, si.getServerId());
 					}
 				}

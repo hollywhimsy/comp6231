@@ -41,9 +41,9 @@ public class ServersRunnerFE {
 		lvlServers.add(new ServerInfo("LVL", "localhost", 4103, 36, 3));
 
 		List<ServerInfo> ddoServers = new CopyOnWriteArrayList<ServerInfo>();
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5101, 17, 1));
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5102, 28, 2));
-		lvlServers.add(new ServerInfo("DDO", "localhost", 5103, 39, 3));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5101, 17, 1));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5102, 28, 2));
+		ddoServers.add(new ServerInfo("DDO", "localhost", 5103, 39, 3));
 
 		servers.put("MTL", mtlServers);
 		servers.put("LVL", lvlServers);
