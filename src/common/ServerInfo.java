@@ -68,7 +68,7 @@ public class ServerInfo implements Comparable {
 	}
 	
 	public void markAlive() {
-		isAlive = false;
+		isAlive = true;
 	}
 
 	@Override
