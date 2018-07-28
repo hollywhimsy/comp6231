@@ -353,8 +353,9 @@ public class RecordManagerImpl extends FrontEndPOA {
 			String city = e.getKey();
 			List<ServerInfo> cityServers = e.getValue();
 
-			System.out.println("CHECKING city: " +city + " " + cityServers.size() );
-			
+		//	System.out.println("CHECKING city: " +city + " " + cityServers.size() );
+			logger.logToFile(
+					cityAbbr + "[RecordManagerImpl.checkServerStatuses()]: " + city + " cityServers :" + cityServers.size());	
 			
 			for (ServerInfo si : cityServers) {
 				RudpClient client = new RudpClient(si.getUdpPort(), city, logger);
@@ -362,7 +363,7 @@ public class RecordManagerImpl extends FrontEndPOA {
 				if (response == "ACK") {
 					// log server alive
 					logger.logToFile(
-							cityAbbr + "[RecordManagerImpl.electNewLeadForCity()]: " + city + " server :" + si.toString());
+							cityAbbr + "[RecordManagerImpl.checkServerStatuses()]: " + city + " server :" + si.toString());
 //					System.out.println("alice city: " +city + " server" + si);
 				} else if (response == "DWN") {
 
