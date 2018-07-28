@@ -27,11 +27,16 @@ public class HealthChecker extends Thread
 
 	public void run()
 	{
+		Boolean firstBoot = true; 
 		while (true)
 		{
 			try
 			{
-				Thread.sleep(2000);
+				if (firstBoot) {
+					Thread.sleep(25000);
+				}
+				
+				Thread.sleep(5000);
 			} catch (InterruptedException e1)
 			{
 				// e1.printStackTrace();
