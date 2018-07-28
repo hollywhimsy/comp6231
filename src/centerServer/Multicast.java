@@ -7,18 +7,18 @@ import common.Logger;
 public class Multicast extends Thread
 {
 	private int groupIndex;
-	private List<HashMap<String, Integer>> alives;
+	private List<HashMap<String, Integer>> activeServers;
 	private List<HashMap<String, Integer>> ports;
 	private String cityAbbr;
 	private Logger logger;
 	private List<String> brdcMsgQueue;
 
-	public Multicast(int groupIndex, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports, String cityAbbr, Logger logger,
-			List<String> brdcMsgQueue)
+	public Multicast(int groupIndex, List<HashMap<String, Integer>> activeServers, List<HashMap<String, Integer>> ports, String cityAbbr, 
+			Logger logger, List<String> brdcMsgQueue)
 	{
 		super();
 		this.groupIndex = groupIndex;
-		this.alives = alives;
+		this.activeServers = activeServers;
 		this.ports = ports;
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
@@ -54,7 +54,7 @@ public class Multicast extends Thread
 					{
 						if (i != groupIndex) // if the group ID in not equal to mine
 						{
-							if (alives.get(i).get(cityAbbr.toUpperCase()) == 1) // if the server is alive
+							if (activeServers.get(i).get(cityAbbr.toUpperCase()) == 1) // if the with my name server is alive
 							{
 								// Reliable send the same request to the server
 								RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);

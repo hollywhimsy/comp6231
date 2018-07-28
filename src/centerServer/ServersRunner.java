@@ -29,21 +29,21 @@ public class ServersRunner
 		
 		for (int i = 0; i < 3; i++)
 		{		
-			HashMap<String, Integer> ports1 = new HashMap<>();
+			HashMap<String, Integer> groupPorts = new HashMap<>();
 			for (int j = 0; j < 3; j++)
 			{			
-				ports1.put(cities[j], 3710 + i*1000 + j*10);				
+				groupPorts.put(cities[j], 3710 + i*1000 + j*10);				
 			}
-			ports.add(ports1);
+			ports.add(groupPorts);
 		}
 		
 		for (int i = 0; i < 3; i++)
 		{		
 			for (int j = 0; j < 3; j++)
 			{			
-				Logger logger1 = new Logger("SRV_" + cities[j] + i + ".log");
-				CenterServerCore rudpServer1 = new CenterServerCore(cities[j], logger1, ports, i);
-				rudpServer1.start();
+				Logger logger = new Logger("SRV_" + cities[j] + i + ".log");
+				CenterServerCore centerServerCore = new CenterServerCore(cities[j], logger, ports, i);
+				centerServerCore.start();
 			}
 		}
 		

@@ -11,33 +11,36 @@ import record.TeacherRecord;
 
 public class Operations
 {
-	private int groupIndex;
+	private int myGroupIndex;
 	private HashMap<String, Integer> myGroupPorts;
 	private String cityAbbr;
 	private Logger logger;
-	private List<HashMap<String, Integer>> alives; // 0 -> dead, 1 -> alive
+	private List<HashMap<String, Integer>> activeServers; // 0 -> dead, 1 -> alive
 	private List<HashMap<String, Integer>> ports;
 	private HashMap<Character, List<Record>> recordsMap;
 	private HashMap<String, Record> indexPerId;
 	private Integer lastTeacherId = 0;
 	private Integer lastStudentId = 0;
 	private List<String> brdcMsgQueue;
-
+	private HashMap<String, Integer> coordinator;
+	
 	// Constructor
-	public Operations(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> alives, List<HashMap<String, Integer>> ports,
-			HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, List<String> brdcMsgQueue)
+	public Operations(int groupIndex, String cityAbbr, Logger logger, List<HashMap<String, Integer>> activeServers, 
+			List<HashMap<String, Integer>> ports, HashMap<Character, List<Record>> recordsMap, HashMap<String, Record> indexPerId, 
+			List<String> brdcMsgQueue, HashMap<String, Integer> coordinator)
 	{
 		super();
-		this.groupIndex = groupIndex;
+		this.myGroupIndex = groupIndex;
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
-		this.alives = alives;
+		this.activeServers = activeServers;
 		this.ports = ports;
 		this.recordsMap = recordsMap;
 		this.indexPerId = indexPerId;
 		this.brdcMsgQueue = brdcMsgQueue;
-
-		myGroupPorts = this.ports.get(this.groupIndex);
+		this.coordinator = coordinator;
+		
+		myGroupPorts = this.ports.get(this.myGroupIndex);
 	}
 
 	/*
@@ -97,7 +100,7 @@ public class Operations
 				return response;
 			} else
 			{
-				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // Valid request + Record is not created
 				return response;
 			}
 		}
@@ -136,7 +139,7 @@ public class Operations
 				return response;
 			} else
 			{
-				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // Valid request + Record is not created
 				return response;
 			}
 		}
@@ -175,7 +178,7 @@ public class Operations
 				return response;
 			} else
 			{
-				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // Valid request + Record is not edited
 				return response;
 			}
 		}
@@ -194,11 +197,11 @@ public class Operations
 
 			if (recordExist(parts[1], parts[2]))
 			{
-				response[0] = "ACK"; // Valid request + the process is done
+				response[0] = "ACK"; // the record exists
 				return response;
 			} else
 			{
-				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // The record does not exist
 				return response;
 			}
 		}
@@ -237,7 +240,7 @@ public class Operations
 				return response;
 			} else
 			{
-				response[0] = "ERR"; // Valid request + Error in processing the request
+				response[0] = "ERR"; // Valid request + Record is not transferred
 				return response;
 			}
 		}
@@ -263,7 +266,7 @@ public class Operations
 				{
 					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase())) // All servers except myself
 					{
-						if (alives.get(groupIndex).get(srv) == 1) // if the server is alive
+						if (activeServers.get(myGroupIndex).get(srv) == 1) // if the server is alive
 						{
 							// Ask for the records count
 							RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
@@ -293,6 +296,61 @@ public class Operations
 			// build the response
 			response[0] = "ACK"; // Valid request + the process is done
 			response[1] = result;
+			return response;
+		}
+		
+		// Election
+		if (request.toLowerCase().contains("Election".toLowerCase()))
+		{
+			// [String]: callerId
+			String[] parts = isRequestFormatValid(request, 2);
+			if (parts == null)
+			{
+				response[0] = "INV"; // Invalid request
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				return response;
+			}
+			
+			if (Integer.parseInt(parts[1]) > myGroupIndex)
+			{
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "" + Integer.parseInt(parts[1]);
+				return response;
+			}
+			else
+			{
+				response[0] = "ACK"; // Valid request + the process is done
+				response[1] = "" + myGroupIndex;
+				
+				Logger lg = new Logger("bully.log");
+				lg.logToFile("Election received. Running election");
+				
+				BullyElection bullyElection = new BullyElection(ports, activeServers);
+				bullyElection.election(cityAbbr, myGroupIndex, logger);
+				
+				return response;
+			}
+		}
+		
+		// Coordinator
+		if (request.toLowerCase().contains("Coordinator".toLowerCase()))
+		{
+			// [String]: id
+			String[] parts = isRequestFormatValid(request, 2);
+			if (parts == null)
+			{
+				response[0] = "INV"; // Invalid request
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				return response;
+			}
+			
+//			Logger lg = new Logger("bully.log");
+//			lg.logToFile("Coordinator received. Setting Coordinator");
+			
+			coordinator.put("id", Integer.parseInt(parts[1]));
+			logger.logToFile(cityAbbr + "[Operations.processRequest()]: Coordinator received. Change Coordinator to " + Integer.parseInt(parts[1]));
+			
+			response[0] = "ACK"; // Valid request + the process is done
 			return response;
 		}
 
