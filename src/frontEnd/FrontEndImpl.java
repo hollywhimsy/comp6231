@@ -253,13 +253,6 @@ public class FrontEndImpl extends FrontEndPOA
 			if (result.equals("DWN"))
 			{
 				logger.logToFile(cityAbbr + "[FrontEndImpl.createTRecord()]: Coordinator is down. Wait for election " + coordinators.get(city));
-//				try
-//				{
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e)
-//				{
-//					// e.printStackTrace();
-//				}
 			}
 			else
 			{

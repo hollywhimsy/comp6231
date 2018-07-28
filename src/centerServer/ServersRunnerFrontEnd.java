@@ -15,7 +15,6 @@ import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
-import common.Logger;
 import frontEnd.FrontEnd;
 import frontEnd.FrontEndHelper;
 import frontEnd.FrontEndImpl;

@@ -23,8 +23,7 @@ public class CenterServerCore extends Thread
 	private Operations operations;
 	private List<String> brdcMsgQueue = new LinkedList<>();
 	private HashMap<String, Integer> coordinator = new HashMap<>();
-	private int myGroupIndex;
-
+	
 	// Constructor
 	public CenterServerCore(String cityAbbr, Logger logger, List<HashMap<String, Integer>> ports, int myGroupIndex)
 	{
@@ -32,8 +31,7 @@ public class CenterServerCore extends Thread
 		this.cityAbbr = cityAbbr;
 		this.logger = logger;
 		this.listenPort = ports.get(myGroupIndex).get(cityAbbr);
-		this.myGroupIndex = myGroupIndex;
-
+		
 		// Initialize "activeServers"
 		String[] cities = { "MTL", "LVL", "DDO" };
 		for (int i = 0; i < 3; i++)
@@ -71,28 +69,8 @@ public class CenterServerCore extends Thread
 			socket = new DatagramSocket(listenPort); // Socket initiation by given UDP port number
 			logger.logToFile(cityAbbr + "[CenterServerCore.run()]: Listening on " + listenPort + " UDP Port");
 
-			int count = 0;
-			
 			while (true) // Always receive the requests and response accordingly
 			{
-				// count ++;
-				// if ((count == 40) && (cityAbbr.equals("DDO")) && (myGroupIndex == 2))
-				// {
-				// 	return;
-				// }				
-				// if ((count == 60) && (cityAbbr.equals("MTL")) && (myGroupIndex == 2))
-				// {
-				// 	return;
-				// }				
-				// if ((count == 80) && (cityAbbr.equals("LVL")) && (myGroupIndex == 2))
-				// {
-				// 	return;
-				// }
-				// if ((count == 200) && (cityAbbr.equals("MTL")) && (myGroupIndex == 1))
-				// {
-				// 	return;
-				// }
-				
 				byte[] buffer = new byte[1024]; // Buffer which receives the request
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				socket.receive(request); // Receive request

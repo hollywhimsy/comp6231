@@ -12,7 +12,6 @@ import record.TeacherRecord;
 public class Operations
 {
 	private int myGroupIndex;
-//	private HashMap<String, Integer> myGroupPorts;
 	private String cityAbbr;
 	private Logger logger;
 	private List<HashMap<String, Integer>> activeServers; // 0 -> dead, 1 -> alive
@@ -39,8 +38,6 @@ public class Operations
 		this.indexPerId = indexPerId;
 		this.brdcMsgQueue = brdcMsgQueue;
 		this.coordinator = coordinator;
-		
-//		myGroupPorts = this.ports.get(this.myGroupIndex);
 	}
 
 	/*
@@ -221,22 +218,6 @@ public class Operations
 			if (transferRecord(parts[1], parts[2], parts[3]))
 			{
 				response[0] = "ACK"; // Valid request + the process is done
-
-//				if (request.toLowerCase().contains("transferrecord"))
-//				{
-//					String msg = "transferMyRecord";
-//					for (int j = 1; j < 4; j++)
-//					{
-//						msg = msg + "~" + parts[j];
-//					}
-//
-//					// Add the request to the Multicast Queue. Multicaster is running as a different thread
-//					synchronized (brdcMsgQueue)
-//					{
-//						brdcMsgQueue.add(msg);
-//					}
-//				}
-
 				return response;
 			} else
 			{
@@ -673,21 +654,6 @@ public class Operations
 			TeacherRecord teacher = (TeacherRecord) recordRemover(recordId);
 			if (teacher == null)
 				return false;
-//			synchronized (indexPerId)
-//			{
-//				synchronized (recordsMap)
-//				{
-//					teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-//					if (teacher == null)
-//					{
-//						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
-//								+ " {CallerManagerID: " + managerId + "}");
-//						return false; // The given record dosen't exist in this server
-//					}
-//					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
-//					indexPerId.remove(recordId.toUpperCase().trim(), teacher); // Delete the record from the Index
-//				}
-//			}
 
 			String spec = "";
 			String spliter = "";
@@ -715,21 +681,6 @@ public class Operations
 			StudentRecord student = (StudentRecord) recordRemover(recordId);
 			if (student == null)
 				return false;
-//			synchronized (indexPerId)
-//			{
-//				synchronized (recordsMap)
-//				{
-//					student = (StudentRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-//					if (student == null)
-//					{
-//						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
-//								+ " {CallerManagerID: " + managerId + "}");
-//						return false; // The given record dosen't exist in this server
-//					}
-//					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
-//					indexPerId.remove(recordId.toUpperCase().trim(), student); // Delete the record from the Index
-//				}
-//			}
 
 			String courses = "";
 			String spliter = "";
