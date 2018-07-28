@@ -32,6 +32,7 @@ public class ServerInfo implements Comparable {
 		this.udpPort = udpPort;
 		this.serverId = serverId;
 		this.stackId = stackId;
+		this.isAlive = true;
 	}
 
 	public String getLocation() {
