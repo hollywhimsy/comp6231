@@ -34,6 +34,7 @@ public class HealthChecker extends Thread
 			{
 				if (firstBoot) {
 					Thread.sleep(25000);
+					firstBoot = false;
 				}
 				
 				Thread.sleep(5000);
