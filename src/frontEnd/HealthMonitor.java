@@ -32,7 +32,7 @@ public class HealthMonitor extends Thread
 		{
 			try
 			{
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e1)
 			{
 				// e1.printStackTrace();
@@ -44,57 +44,90 @@ public class HealthMonitor extends Thread
 
 	public void updateAlivesList()
 	{
-		for (int i = 0; i < 3; i++) // for all the groups
+		for (String srv : coordinators.keySet()) // for all the servers inside each group
 		{
-			for (String srv : activeServers.get(i).keySet()) // for all the servers inside each group
+			// Heartbit check the server
+			RudpClient client = new RudpClient(ports.get(coordinators.get(srv)).get(srv), myCity, logger);
+			String result = client.requestRemote("HeartBit").trim();
+
+			if (result.contains("DWN")) // if the server is down
 			{
-				if (activeServers.get(i).get(srv) == 1) // if the server was alive based on the previous health check
+				activeServers.get(coordinators.get(srv)).put(srv, 0); // put this server is down
+
+				logger.logToFile(myCity + "[HealthMonitor.updateAlivesList()]: " + srv + " coordinator is DEAD");
+				
+				try
 				{
-					// Heartbit check the server
-					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
-					String result = client.requestRemote("HeartBit").trim();
+					Thread.sleep(3000);
+				} catch (InterruptedException e1)
+				{
+					// e1.printStackTrace();
+				}
 
-					if (result.contains("DWN")) // if the server is down
+				for (int k = 0; k < 3; k++) // for all the groups
+				{
+					if (activeServers.get(k).get(srv) == 1) // if the server was alive based on the previous health check
 					{
-						activeServers.get(i).put(srv, 0); // put this server is down
-
-						logger.logToFile(myCity + "[HealthMonitor.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv)
-								+ " is DEAD");
-
-						if (coordinators.get(srv) == i) // Coordinator is down //ask for the new coordinator and set it
+						RudpClient client2 = new RudpClient(ports.get(k).get(srv), myCity, logger);
+						String result2 = client2.requestRemote("getMaster").trim();
+						
+						if (result2.contains("ACK"))
 						{
-//							System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-							try
-							{
-								Thread.sleep(3000);
-							} catch (InterruptedException e1)
-							{
-								// e1.printStackTrace();
-							}
-
-//							System.out.println("here1");
-							for (int k = 0; k < 3; k++) // for all the groups
-							{
-//								System.out.println("here2");
-								if (activeServers.get(k).get(srv) == 1) // if the server was alive based on the previous health check
-								{
-//									System.out.println("here3 k: " + k + " srv: " + srv);
-									RudpClient client2 = new RudpClient(ports.get(k).get(srv), myCity, logger);
-									String result2 = client2.requestRemote("getMaster").trim();
-//									System.out.println("here4 result2: " + result2);
-									if (result2.contains("ACK"))
-									{
-//										System.out.println("here5 k: " + k + " srv: " + srv);
-										int temp = Integer.parseInt(result2.substring(3, result2.length()));
-//										System.out.println(temp);
-										coordinators.put(srv, temp);
-									}
-								}
-							}
+							int temp = Integer.parseInt(result2.substring(3, result2.length()));
+							coordinators.put(srv, temp);
 						}
 					}
-				}
+				}						
 			}
 		}
+		
+		
+		
+//		for (int i = 0; i < 3; i++) // for all the groups
+//		{
+//			for (String srv : activeServers.get(i).keySet()) // for all the servers inside each group
+//			{
+//				if (activeServers.get(i).get(srv) == 1) // if the server was alive based on the previous health check
+//				{
+//					// Heartbit check the server
+//					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
+//					String result = client.requestRemote("HeartBit").trim();
+//
+//					if (result.contains("DWN")) // if the server is down
+//					{
+//						activeServers.get(i).put(srv, 0); // put this server is down
+//
+//						logger.logToFile(myCity + "[HealthMonitor.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv)
+//								+ " is DEAD");
+//
+//						if (coordinators.get(srv) == i) // Coordinator is down //ask for the new coordinator and set it
+//						{
+//							try
+//							{
+//								Thread.sleep(3000);
+//							} catch (InterruptedException e1)
+//							{
+//								// e1.printStackTrace();
+//							}
+//
+//							for (int k = 0; k < 3; k++) // for all the groups
+//							{
+//								if (activeServers.get(k).get(srv) == 1) // if the server was alive based on the previous health check
+//								{
+//									RudpClient client2 = new RudpClient(ports.get(k).get(srv), myCity, logger);
+//									String result2 = client2.requestRemote("getMaster").trim();
+//									
+//									if (result2.contains("ACK"))
+//									{
+//										int temp = Integer.parseInt(result2.substring(3, result2.length()));
+//										coordinators.put(srv, temp);
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 	}
 }

@@ -7,45 +7,52 @@ import org.omg.CORBA.ORB;
 import centerServer.RudpClient;
 import common.Infrastucture;
 import common.Logger;
-import common.ServerInfo;
 
 public class FrontEndImpl extends FrontEndPOA
 {
 	private ORB orb;
-	private String cityAbbr;
-	private Logger logger;
-	
-	// to store requests in case of a server failure to send the request to a chosen 
-	// replica next
-	private List<String> requests = new ArrayList<>(); 
-	
-	// RUDP ports for the 9 servers, each List entry for 3 servers
-	private List<HashMap<String, Integer>> ports; 	
-
-	// indicates active server of each city: {0, 1, 2}
-	private HashMap<String, Integer> activeServers = new HashMap<>(); 
-	
-	
-	// indicates master server of each city: {MTL, DDO, LVL}
-	private HashMap<String, ServerInfo> masterServers = new HashMap<>();
-	
-	private HashMap<String, ServerInfo> actServers = new HashMap<>();
-	
-	
+	private String cityAbbr = "FE";
+	private Logger logger;	
+	private List<HashMap<String, Integer>> ports = new ArrayList<>();
+	private List<HashMap<String, Integer>> activeServers = new ArrayList<>();
+	private HashMap<String, Integer> coordinators = new HashMap<>();	
 	
 	// Constructor
-	public FrontEndImpl(List<HashMap<String, Integer>> ports)
+	public FrontEndImpl()
 	{
 		super();
-		this.cityAbbr = "FE";
-		this.ports = ports;
-		activeServers.put("MTL", 0);
-		activeServers.put("LVL", 0);
-		activeServers.put("DDO", 0);
+		logger = new Logger("SRV_" + "FE" + ".log");
 		
-		this.logger = new Logger("SRV_" + "FE" + ".log");
+		String[] cities = {"MTL", "LVL", "DDO"};
+				
+		for (int i = 0; i < 3; i++)
+		{		
+			HashMap<String, Integer> groupPorts = new HashMap<>();
+			for (int j = 0; j < 3; j++)
+			{			
+				groupPorts.put(cities[j], 3710 + i*1000 + j*10);				
+			}
+			ports.add(groupPorts);
+		}
+		
+		for (int i = 0; i < 3; i++)
+		{
+			HashMap<String, Integer> aliveGroup = new HashMap<>();
+			for (int j = 0; j < 3; j++)
+			{
+				aliveGroup.put(cities[j], 1);
+			}
+			activeServers.add(aliveGroup);
+		}		
+		
+		coordinators.put("MTL", 2);
+		coordinators.put("LVL", 2);
+		coordinators.put("DDO", 2);
+		
+		HealthMonitor healthMonitor = new HealthMonitor(ports, activeServers, logger, coordinators);
+		healthMonitor.start();
 
-		logger.logToFile(cityAbbr + "[RecordManagerImpl Constructor]: An instance of RecordManagerImpl is created");
+		logger.logToFile(cityAbbr + "[FrontEndImpl Constructor]: An instance of FrontEndImpl is created");
 	}
 
 	@Override
@@ -56,7 +63,7 @@ public class FrontEndImpl extends FrontEndPOA
 		if ((firstName == null) || (lastName == null) || (address == null) || (phoneNumber == null)
 				|| (specialization == null) || (location == null) || (managerId == null))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord failed (at least one property was NULL)"
+			logger.logToFile(cityAbbr + "[FrontEndImpl.createTRecord()]: createTRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
@@ -67,17 +74,13 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 		
-		String city = managerId.substring(0,3);
-		
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
-		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + address + "~" + phoneNumber + "~" 
-				+ specialization + "~" + location + "~" + managerId);
+		String result = sender("createTRecord~" + firstName + "~" + lastName + "~" + address + "~" + phoneNumber + "~" + specialization + "~" 
+				+ location + "~" + managerId, managerId);
 				
 		if (result.contains("ACK"))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createTRecord()]: createTRecord is successfully done "
-					+ " {CallerManagerID: " + managerId + "}");
+			logger.logToFile(cityAbbr + "[FrontEndImpl.createTRecord()]: createTRecord is successfully done " + " {CallerManagerID: " 
+					+ managerId + "}");
 			return true;
 		}
 		else
@@ -91,7 +94,7 @@ public class FrontEndImpl extends FrontEndPOA
 	{
 		if ((firstName == null) || (lastName == null) || (coursesRegistred == null) || (statusDate == null) || (managerId == null))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createSRecord failed (at least one property was NULL)"
+			logger.logToFile(cityAbbr + "[FrontEndImpl.createSRecord()]: createSRecord failed (at least one property was NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
@@ -102,16 +105,12 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 		
-		String city = managerId.substring(0,3);
-		
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
-		String result = rudpClient.requestRemote("createTRecord~" + firstName + "~" + lastName + "~" + coursesRegistred + "~" + status + "~" 
-				+ statusDate + "~" + managerId);
-				
+		String result = sender("createSRecord~" + firstName + "~" + lastName + "~" + coursesRegistred + "~" + status + "~" 
+				+ statusDate + "~" + managerId, managerId);
+						
 		if (result.contains("ACK"))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.createSRecord()]: createTRecord is successfully done " + " {CallerManagerID: " 
+			logger.logToFile(cityAbbr + "[FrontEndImpl.createSRecord()]: createTRecord is successfully done " + " {CallerManagerID: " 
 					+ managerId + "}");
 			return true;
 		}
@@ -130,41 +129,31 @@ public class FrontEndImpl extends FrontEndPOA
 			return null;
 		}
 		
-		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		String result = rudpClient.requestRemote("getRecordsCount~"+ managerId);
+		String result = sender("getRecordsCount~"+ managerId, managerId);
 		
 		if (result.contains("ACK"))
 		{
-			return result;
+			return result.substring(3, result.length());
 		}
 		else
 		{
 			return null;
 		}
 	}
-	
-    // Returns the UDP port of the master server instance 
-	
-	private Integer getMasterPortUDPByCity(String city) {
-		// TODO 
-		// refactor  this when decide the appropriate data structure
-		return ports.get(activeServers.get(city)).get(city);
-	}
-
+ 	
 	@Override
 	public boolean editRecord(String recordID, String fieldName, String newValue, String managerId)
 	{
 		if ((recordID == null) || (fieldName == null) || (newValue == null) || (managerId == null))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
+			logger.logToFile(cityAbbr + "[FrontEndImpl.editRecord()]: editRecord failed (recordId and/or fieldName and/or newValue is(are) NULL)"
 					+ " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
 		if (!(isRecordIdFormatCorrect(recordID)))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " 
+			logger.logToFile(cityAbbr + "[FrontEndImpl.editRecord()]: editRecord failed (recordId format is incorrect)" + " {CallerManagerID: " 
 					+ managerId + "}");
 			return false;
 		}
@@ -175,11 +164,8 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 		
-		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		// [String]: recordID~fieldName~newValue~managerId
-		String result = rudpClient.requestRemote("editRecord~" + recordID + "~" + fieldName + "~" + newValue + "~" + managerId);
-
+		String result = sender("editRecord~" + recordID + "~" + fieldName + "~" + newValue + "~" + managerId, managerId);
+		
 		if (result.contains("ACK"))
 		{
 			return true;
@@ -196,7 +182,7 @@ public class FrontEndImpl extends FrontEndPOA
 		if (!(isRecordIdFormatCorrect(recordId)))
 		{
 			logger.logToFile(cityAbbr
-					+ "[RecordManagerImpl.recordExist()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
+					+ "[FrontEndImpl.recordExist()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
 			return false;
 		}
 
@@ -206,10 +192,7 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 		
-		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		// [String]: recordId~managerId
-		String result = rudpClient.requestRemote("recordExist~" + recordId + "~" + managerId);
+		String result = sender("recordExist~" + recordId + "~" + managerId, managerId);		
 
 		if (result.contains("ACK"))
 		{
@@ -226,7 +209,7 @@ public class FrontEndImpl extends FrontEndPOA
 	{
 		if (!(isRecordIdFormatCorrect(recordId)))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " 
+			logger.logToFile(cityAbbr + "[FrontEndImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " 
 					+ managerId + "}");
 			return false;
 		}
@@ -234,7 +217,7 @@ public class FrontEndImpl extends FrontEndPOA
 		if (!((remoteCenterServerName.toUpperCase().equals("MTL") || remoteCenterServerName.toUpperCase().equals("LVL")
 				|| remoteCenterServerName.toUpperCase().equals("DDO"))))
 		{
-			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: " 
+			logger.logToFile(cityAbbr + "[FrontEndImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: " 
 					+ managerId	+ "}");
 			return false; // Given city name is incorrect
 		}
@@ -245,10 +228,7 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 		
-		String city = managerId.substring(0,3);
-		RudpClient rudpClient = new RudpClient(getMasterPortUDPByCity(city), cityAbbr, logger);
-		// [String]: recordId~remoteCenterServerName~managerId
-		String result = rudpClient.requestRemote("transferRecord~" + recordId + "~" + remoteCenterServerName + "~" + managerId);
+		String result = sender("transferRecord~" + recordId + "~" + remoteCenterServerName + "~" + managerId, managerId);		
 
 		if (result.contains("ACK"))
 		{
@@ -258,6 +238,36 @@ public class FrontEndImpl extends FrontEndPOA
 		{
 			return false;
 		}				
+	}
+	
+	private String sender(String msg, String managerId)
+	{
+		String city = managerId.substring(0,3).toUpperCase();
+		String result = "";
+		boolean check = true;
+		while (check)
+		{
+			RudpClient rudpClient = new RudpClient(ports.get(coordinators.get(city)).get(city), cityAbbr, logger);
+			// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
+			result = rudpClient.requestRemote(msg);
+			if (result.equals("DWN"))
+			{
+				logger.logToFile(cityAbbr + "[FrontEndImpl.createTRecord()]: Coordinator is down. Wait for election " + coordinators.get(city));
+//				try
+//				{
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e)
+//				{
+//					// e.printStackTrace();
+//				}
+			}
+			else
+			{
+				check = false;
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -296,11 +306,21 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 
-		if (!(id.substring(2, 5).chars().allMatch(Character::isDigit)))
+		if (!isNumeric(id.substring(2, 7)))
 		{
 			return false;
 		}
 
+		return true;
+	}
+
+	private boolean isNumeric(String str)
+	{
+		for (char c : str.toCharArray())
+		{
+			if (!Character.isDigit(c))
+				return false;
+		}
 		return true;
 	}
 	
@@ -322,7 +342,7 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 
-		if (!(id.substring(3, 7).chars().allMatch(Character::isDigit)))
+		if (!isNumeric(id.substring(3, 7)))
 		{
 			return false;
 		}

@@ -31,7 +31,7 @@ public class HealthChecker extends Thread
 		{
 			try
 			{
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e1)
 			{
 				// e1.printStackTrace();

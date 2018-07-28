@@ -54,7 +54,7 @@ public class ServersRunner
 			POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 			rootPOA.the_POAManager().activate();
 			
-			FrontEndImpl recMngImp = new FrontEndImpl(ports);
+			FrontEndImpl recMngImp = new FrontEndImpl();
 			recMngImp.setOrb(orb);
 			
 			org.omg.CORBA.Object ref = rootPOA.servant_to_reference(recMngImp);

@@ -12,7 +12,7 @@ import record.TeacherRecord;
 public class Operations
 {
 	private int myGroupIndex;
-	private HashMap<String, Integer> myGroupPorts;
+//	private HashMap<String, Integer> myGroupPorts;
 	private String cityAbbr;
 	private Logger logger;
 	private List<HashMap<String, Integer>> activeServers; // 0 -> dead, 1 -> alive
@@ -31,7 +31,7 @@ public class Operations
 	{
 		super();
 		this.myGroupIndex = groupIndex;
-		this.cityAbbr = cityAbbr;
+		this.cityAbbr = cityAbbr.toUpperCase();
 		this.logger = logger;
 		this.activeServers = activeServers;
 		this.ports = ports;
@@ -40,7 +40,7 @@ public class Operations
 		this.brdcMsgQueue = brdcMsgQueue;
 		this.coordinator = coordinator;
 		
-		myGroupPorts = this.ports.get(this.myGroupIndex);
+//		myGroupPorts = this.ports.get(this.myGroupIndex);
 	}
 
 	/*
@@ -222,20 +222,20 @@ public class Operations
 			{
 				response[0] = "ACK"; // Valid request + the process is done
 
-				if (request.toLowerCase().contains("transferrecord"))
-				{
-					String msg = "transferMyRecord";
-					for (int j = 1; j < 4; j++)
-					{
-						msg = msg + "~" + parts[j];
-					}
-
-					// Add the request to the Multicast Queue. Multicaster is running as a different thread
-					synchronized (brdcMsgQueue)
-					{
-						brdcMsgQueue.add(msg);
-					}
-				}
+//				if (request.toLowerCase().contains("transferrecord"))
+//				{
+//					String msg = "transferMyRecord";
+//					for (int j = 1; j < 4; j++)
+//					{
+//						msg = msg + "~" + parts[j];
+//					}
+//
+//					// Add the request to the Multicast Queue. Multicaster is running as a different thread
+//					synchronized (brdcMsgQueue)
+//					{
+//						brdcMsgQueue.add(msg);
+//					}
+//				}
 
 				return response;
 			} else
@@ -258,44 +258,45 @@ public class Operations
 			}
 
 			String result = getRecordsCount(parts[1]); // My records count
+			HashMap<String, String> counts = new HashMap<>();
+			counts.put("MTL", "MTL E");
+			counts.put("LVL", "LVL E");
+			counts.put("DDO", "DDO E");
+			counts.put(cityAbbr, result);
 
 			// we should ask other cities to gather the records count, but we need to prevent making loop
 			if (request.toLowerCase().contains("getrecordscount"))
-			{
-				for (String srv : myGroupPorts.keySet()) // For all servers in my group
-				{
-					if (!srv.toUpperCase().equals(cityAbbr.toUpperCase())) // All servers except myself
-					{
-						if (activeServers.get(myGroupIndex).get(srv) == 1) // if the server is alive
-						{
-							// Ask for the records count
-							RudpClient client = new RudpClient(myGroupPorts.get(srv), cityAbbr, logger);
-							String remoteCount = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
-
-							if (remoteCount.equals("DWN")) // if the server went down during this request processing
+			{				
+				for (int i = 0; i < 3; i++) // for all the groups = 3
+				{					
+					for (String srv : activeServers.get(i).keySet()) // For all servers 
+					{						
+						if (!srv.equals(cityAbbr)) // All servers except myself
+						{							
+							if (activeServers.get(i).get(srv) == 1) // if the server is alive
 							{
-								result = result + ", " + srv + " D"; // Return "D" instead of the count
-							} else
-							{
+								// Ask for the records count
+								RudpClient client = new RudpClient(ports.get(i).get(srv), cityAbbr, logger);
+								String remoteCount = client.requestRemote("getMyRecordsCount~" + srv + "0001").trim();
+	
 								if (remoteCount.contains("ACK")) // if request is processed successfully
 								{
-									result = result + ", " + remoteCount.substring(3, remoteCount.length());
-								} else // message delivered successfully, but error happened during processing the request
-								{
-									result = result + ", " + srv + " E";
-								}
-							}
-						} else // the server was DEAD
-						{
-							result = result + ", " + srv + " D";
+									counts.put(srv, remoteCount.substring(3, remoteCount.length()));									
+								} 							
+							} 
 						}
 					}
 				}
+				
+				response[1] = counts.get("MTL") + ", " + counts.get("LVL") + ", " + counts.get("DDO");
+			}
+			else
+			{
+				response[1] = result;
 			}
 
 			// build the response
-			response[0] = "ACK"; // Valid request + the process is done
-			response[1] = result;
+			response[0] = "ACK"; // Valid request + the process is done			
 			return response;
 		}
 		
@@ -322,9 +323,6 @@ public class Operations
 				response[0] = "ACK"; // Valid request + the process is done
 				response[1] = "" + myGroupIndex;
 				
-				Logger lg = new Logger("bully.log");
-				lg.logToFile("Election received. Running election");
-				
 				BullyElection bullyElection = new BullyElection(ports, activeServers);
 				bullyElection.election(cityAbbr, myGroupIndex, logger);
 				
@@ -345,8 +343,7 @@ public class Operations
 			}
 			
 			coordinator.put("id", Integer.parseInt(parts[1]));
-//			logger.logToFile(cityAbbr + "[Operations.processRequest()]: My ID: " + myGroupIndex + " Coordinator received. Change Coordinator to " 
-//					+ Integer.parseInt(parts[1]));
+			logger.logToFile(cityAbbr + "[Operations.processRequest()]: My ID: " + myGroupIndex + " Coordinator received. Coordinator is changed");
 			
 			response[0] = "ACK"; // Valid request + the process is done
 			return response;
@@ -357,6 +354,23 @@ public class Operations
 		{			
 			response[0] = "ACK"; // Valid request + the process is done
 			response[1] = "" + coordinator.get("id");
+			return response;
+		}
+		
+		// recordRemover
+		if (request.toLowerCase().contains("recordRemover".toLowerCase()))
+		{
+			// [String]: recordId
+			String[] parts = isRequestFormatValid(request, 2);
+			if (parts == null)
+			{
+				response[0] = "INV"; // Invalid request
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!8");
+				return response;
+			}
+			
+			recordRemover(parts[1]);
+			response[0] = "ACK"; // Valid request + the process is done
 			return response;
 		}
 
@@ -656,22 +670,24 @@ public class Operations
 
 		if (recordId.toUpperCase().trim().charAt(0) == 'T') // Teacher record
 		{
-			TeacherRecord teacher;
-			synchronized (indexPerId)
-			{
-				synchronized (recordsMap)
-				{
-					teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-					if (teacher == null)
-					{
-						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
-								+ " {CallerManagerID: " + managerId + "}");
-						return false; // The given record dosen't exist in this server
-					}
-					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
-					indexPerId.remove(recordId.toUpperCase().trim(), teacher); // Delete the record from the Index
-				}
-			}
+			TeacherRecord teacher = (TeacherRecord) recordRemover(recordId);
+			if (teacher == null)
+				return false;
+//			synchronized (indexPerId)
+//			{
+//				synchronized (recordsMap)
+//				{
+//					teacher = (TeacherRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
+//					if (teacher == null)
+//					{
+//						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
+//								+ " {CallerManagerID: " + managerId + "}");
+//						return false; // The given record dosen't exist in this server
+//					}
+//					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
+//					indexPerId.remove(recordId.toUpperCase().trim(), teacher); // Delete the record from the Index
+//				}
+//			}
 
 			String spec = "";
 			String spliter = "";
@@ -681,11 +697,10 @@ public class Operations
 				spec = spec + spliter + teacher.getSpecialization().get(i);
 				spliter = ",";
 			}
+			
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
-			// [String]: firstName~lastName~address~phoneNumber~specialization~location~managerId
-			String reply = rudpClient.requestRemote("createTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~"
-					+ teacher.getAddress() + "~" + teacher.getPhone().toString() + "~" + spec + "~" + city + "~" + city + "0001");
+			String reply = recordSender("createMyTRecord~" + teacher.getFirstName() + "~" + teacher.getLastName() + "~" + teacher.getAddress() 
+				+ "~" + teacher.getPhone().toString() + "~" + spec + "~" + city + "~" + city + "0001", city, teacher.getRecordId());
 
 			if (reply.toUpperCase().contains("ERR"))
 			{
@@ -697,22 +712,24 @@ public class Operations
 
 		if (recordId.toUpperCase().trim().charAt(0) == 'S') // Student record
 		{
-			StudentRecord student;
-			synchronized (indexPerId)
-			{
-				synchronized (recordsMap)
-				{
-					student = (StudentRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
-					if (student == null)
-					{
-						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
-								+ " {CallerManagerID: " + managerId + "}");
-						return false; // The given record dosen't exist in this server
-					}
-					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
-					indexPerId.remove(recordId.toUpperCase().trim(), student); // Delete the record from the Index
-				}
-			}
+			StudentRecord student = (StudentRecord) recordRemover(recordId);
+			if (student == null)
+				return false;
+//			synchronized (indexPerId)
+//			{
+//				synchronized (recordsMap)
+//				{
+//					student = (StudentRecord) indexPerId.get(recordId.toUpperCase().trim()); // Retrieve the record
+//					if (student == null)
+//					{
+//						logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record dosen't exist in this server"
+//								+ " {CallerManagerID: " + managerId + "}");
+//						return false; // The given record dosen't exist in this server
+//					}
+//					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
+//					indexPerId.remove(recordId.toUpperCase().trim(), student); // Delete the record from the Index
+//				}
+//			}
 
 			String courses = "";
 			String spliter = "";
@@ -722,15 +739,14 @@ public class Operations
 				courses = courses + spliter + student.getCoursesRegistred().get(i);
 				spliter = ",";
 			}
+			
 			// Call the remote server to add this record on that
-			RudpClient rudpClient = new RudpClient(myGroupPorts.get(city), cityAbbr, logger);
-			// [String]: firstName~lastName~coursesRegistred~status~statusDate~managerId
-			String reply = rudpClient.requestRemote("createSRecord~" + student.getFirstName() + "~" + student.getLastName() + "~" + courses
-					+ "~" + student.getStatus() + "~" + student.getDate().toString() + "~" + city + "0001");
-
+			String reply = recordSender("createMySRecord~" + student.getFirstName() + "~" + student.getLastName() + "~" + courses
+					+ "~" + student.getStatus() + "~" + student.getDate().toString() + "~" + city + "0001", city, student.getRecordId());
+			
 			if (reply.toUpperCase().contains("NAK"))
 			{
-				logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record is not added to thenew server"
+				logger.logToFile(cityAbbr + "[Operations.transferRecord()]: Failed! The given record is not added to the new server"
 						+ " {CallerManagerID: " + managerId + "}");
 				return false; // The given record dosen't exist in this server
 			}
@@ -740,6 +756,78 @@ public class Operations
 				+ " {CallerManagerID: " + managerId + "}");
 
 		return true;
+	}
+	
+	private Record recordRemover(String id)
+	{
+		if (id.toUpperCase().trim().charAt(0) == 'T') // Teacher record
+		{
+			TeacherRecord teacher;
+			synchronized (indexPerId)
+			{
+				synchronized (recordsMap)
+				{
+					teacher = (TeacherRecord) indexPerId.get(id.toUpperCase().trim()); // Retrieve the record
+					if (teacher == null)
+					{
+						logger.logToFile(cityAbbr + "[Operations.recordRemover()]: The given record dosen't exist in this server");
+						return null; // The given record dosen't exist in this server
+					}
+					recordsMap.get(teacher.getLastName().toUpperCase().charAt(0)).remove(teacher); // Delete the record from the Map
+					indexPerId.remove(id.toUpperCase().trim(), teacher); // Delete the record from the Index
+					logger.logToFile(cityAbbr + "[Operations.recordRemover()]: The given record removed successfully");
+				}
+			}
+			return teacher;
+		}
+		else
+		{		
+			StudentRecord student;
+			synchronized (indexPerId)
+			{
+				synchronized (recordsMap)
+				{
+					student = (StudentRecord) indexPerId.get(id.toUpperCase().trim()); // Retrieve the record
+					if (student == null)
+					{
+						logger.logToFile(cityAbbr + "[Operations.recordRemover()]: The given record dosen't exist in this server");
+						return null; // The given record dosen't exist in this server
+					}
+					recordsMap.get(student.getLastName().toUpperCase().charAt(0)).remove(student); // Delete the record from the Map
+					indexPerId.remove(id.toUpperCase().trim(), student); // Delete the record from the Index
+					logger.logToFile(cityAbbr + "[Operations.recordRemover()]: The given record removed successfully");
+				}
+			}
+			return student;
+		}
+	}
+	
+	private String recordSender(String msg, String city, String recordId)
+	{
+		for (int i = 0; i < 3; i++) // for all the groups = 3
+		{
+			if (activeServers.get(i).get(cityAbbr.toUpperCase()) == 1) // if the server is alive
+			{
+				if (i != myGroupIndex) // if the group ID in not equal to mine
+				{
+					// Reliable send the same request to the server
+					RudpClient client = new RudpClient(ports.get(i).get(cityAbbr), cityAbbr, logger);
+					client.requestRemote("recordRemover~" + recordId).trim();
+				}
+			}
+		}
+		
+		String result = "";				
+		for (int i = 0; i < 3; i++) // for all the groups = 3
+		{
+			if (activeServers.get(i).get(city.toUpperCase()) == 1) // if the with my name server is alive
+			{
+				// Reliable send the same request to the server
+				RudpClient client = new RudpClient(ports.get(i).get(city), cityAbbr, logger);
+				result = client.requestRemote(msg).trim();
+			}
+		}		
+		return result;
 	}
 
 	private String produceNewId(String prefix, String managerId)

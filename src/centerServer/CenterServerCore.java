@@ -76,19 +76,19 @@ public class CenterServerCore extends Thread
 			while (true) // Always receive the requests and response accordingly
 			{
 				count ++;
-				if ((count == 20) && (cityAbbr.equals("DDO")) && (myGroupIndex == 2))
+				if ((count == 40) && (cityAbbr.equals("DDO")) && (myGroupIndex == 2))
 				{
 					return;
 				}				
-				if ((count == 30) && (cityAbbr.equals("MTL")) && (myGroupIndex == 2))
+				if ((count == 60) && (cityAbbr.equals("MTL")) && (myGroupIndex == 2))
 				{
 					return;
 				}				
-				if ((count == 40) && (cityAbbr.equals("LVL")) && (myGroupIndex == 2))
+				if ((count == 80) && (cityAbbr.equals("LVL")) && (myGroupIndex == 2))
 				{
 					return;
 				}
-				if ((count == 100) && (cityAbbr.equals("MTL")) && (myGroupIndex == 1))
+				if ((count == 200) && (cityAbbr.equals("MTL")) && (myGroupIndex == 1))
 				{
 					return;
 				}
