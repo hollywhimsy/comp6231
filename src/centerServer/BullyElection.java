@@ -33,10 +33,7 @@ public class BullyElection
 				RudpClient client = new RudpClient(ports.get(i).get(cityName), cityName, logger);
 				String result = client.requestRemote("Election~" + MyIndex).trim();
 
-				if (result.equals("DWN")) // if the server is down
-				{
-					activeServers.get(i).put(cityName, 0); // put this server is down
-				} else
+				if (!result.equals("DWN")) // if the server is not down
 				{
 					int temp = Integer.parseInt(result.substring(3, result.length()));
 					if (temp > maxId)

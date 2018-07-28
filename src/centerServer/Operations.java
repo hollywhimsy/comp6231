@@ -72,7 +72,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!1");
 				return response;
 			}
 
@@ -113,7 +113,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!2");
 				return response;
 			}
 
@@ -152,7 +152,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!3");
 				return response;
 			}
 
@@ -191,7 +191,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!4");
 				return response;
 			}
 
@@ -214,7 +214,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!5");
 				return response;
 			}
 
@@ -253,7 +253,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!6");
 				return response;
 			}
 
@@ -307,7 +307,7 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!7");
 				return response;
 			}
 			
@@ -340,23 +340,29 @@ public class Operations
 			if (parts == null)
 			{
 				response[0] = "INV"; // Invalid request
-				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+				logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!8");
 				return response;
 			}
 			
-//			Logger lg = new Logger("bully.log");
-//			lg.logToFile("Coordinator received. Setting Coordinator");
-			
 			coordinator.put("id", Integer.parseInt(parts[1]));
-			logger.logToFile(cityAbbr + "[Operations.processRequest()]: Coordinator received. Change Coordinator to " + Integer.parseInt(parts[1]));
+//			logger.logToFile(cityAbbr + "[Operations.processRequest()]: My ID: " + myGroupIndex + " Coordinator received. Change Coordinator to " 
+//					+ Integer.parseInt(parts[1]));
 			
 			response[0] = "ACK"; // Valid request + the process is done
+			return response;
+		}
+		
+		// getCoordinator
+		if (request.toLowerCase().contains("getMaster".toLowerCase()))
+		{			
+			response[0] = "ACK"; // Valid request + the process is done
+			response[1] = "" + coordinator.get("id");
 			return response;
 		}
 
 		// if the request does not match at least to one of the above
 		response[0] = "INV"; // Invalid request
-		logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid!");
+		logger.logToFile(cityAbbr + "[Operations.processRequest()]: Request Was Invalid! -> " + request);
 		return response;
 	}
 

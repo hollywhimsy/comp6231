@@ -75,23 +75,23 @@ public class CenterServerCore extends Thread
 			
 			while (true) // Always receive the requests and response accordingly
 			{
-//				count ++;
-//				if ((count == 20) && (cityAbbr.equals("DDO")) && (myGroupIndex == 2))
-//				{
-//					return;
-//				}				
-//				if ((count == 30) && (cityAbbr.equals("MTL")) && (myGroupIndex == 2))
-//				{
-//					return;
-//				}				
-//				if ((count == 40) && (cityAbbr.equals("LVL")) && (myGroupIndex == 2))
-//				{
-//					return;
-//				}
-//				if ((count == 50) && (cityAbbr.equals("MTL")) && (myGroupIndex == 1))
-//				{
-//					return;
-//				}
+				count ++;
+				if ((count == 20) && (cityAbbr.equals("DDO")) && (myGroupIndex == 2))
+				{
+					return;
+				}				
+				if ((count == 30) && (cityAbbr.equals("MTL")) && (myGroupIndex == 2))
+				{
+					return;
+				}				
+				if ((count == 40) && (cityAbbr.equals("LVL")) && (myGroupIndex == 2))
+				{
+					return;
+				}
+				if ((count == 100) && (cityAbbr.equals("MTL")) && (myGroupIndex == 1))
+				{
+					return;
+				}
 				
 				byte[] buffer = new byte[1024]; // Buffer which receives the request
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);

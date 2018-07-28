@@ -226,17 +226,16 @@ public class FrontEndImpl extends FrontEndPOA
 	{
 		if (!(isRecordIdFormatCorrect(recordId)))
 		{
-			logger.logToFile(
-					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " + managerId + "}");
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! recordId format is incorrect" + " {CallerManagerID: " 
+					+ managerId + "}");
 			return false;
 		}
 
 		if (!((remoteCenterServerName.toUpperCase().equals("MTL") || remoteCenterServerName.toUpperCase().equals("LVL")
 				|| remoteCenterServerName.toUpperCase().equals("DDO"))))
 		{
-			logger.logToFile(
-					cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: " + managerId
-							+ "}");
+			logger.logToFile(cityAbbr + "[RecordManagerImpl.transferRecord()]: Error! remoteCenterServerName is invalid" + " {CallerManagerID: " 
+					+ managerId	+ "}");
 			return false; // Given city name is incorrect
 		}
 
@@ -323,22 +322,12 @@ public class FrontEndImpl extends FrontEndPOA
 			return false;
 		}
 
-		if (!(id.substring(3, 4).chars().allMatch(Character::isDigit)))
+		if (!(id.substring(3, 7).chars().allMatch(Character::isDigit)))
 		{
 			return false;
 		}
 
 		return true;
 	}
-	
-	// elects a new lead in the group for the passed city
-	private void electNewLeadForCity(String city)
-	{
 		
-	}
-	
-	// checks the server health statuses
-	public void checkServerStatuses() {
-		
-	}
 }

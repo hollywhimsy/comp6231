@@ -45,35 +45,35 @@ public class HealthChecker extends Thread
 	{
 		for (int i = 0; i < 3; i++) // for all the groups
 		{
-//			for (String srv : activeServers.get(i).keySet()) // for all the servers inside each group
+			for (String srv : activeServers.get(i).keySet()) // for all the servers inside each group
 			{
-				if ( (i == myGroupIndex)) // if this is myself   //(srv.toUpperCase().equals(myCity)) &&
+				if ((srv.toUpperCase().equals(myCity)) && (i == myGroupIndex)) // if this is me
 				{
-					continue; // do not check healthiness
+					continue; // do not check
 				}
 
-				if (activeServers.get(i).get(myCity) == 1) // if the server was alive based on the previous health check
+				if (activeServers.get(i).get(srv) == 1) // if the server was alive based on the previous health check
 				{
 					// Heartbit check the server
-					RudpClient client = new RudpClient(ports.get(i).get(myCity), myCity, logger);
+					RudpClient client = new RudpClient(ports.get(i).get(srv), myCity, logger);
 					String result = client.requestRemote("HeartBit").trim();
 
 					if (result.equals("DWN")) // if the server is down
 					{
-						activeServers.get(i).put(myCity, 0); // put this server is down
+						activeServers.get(i).put(srv, 0); // put this server is down
 						
-						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + myCity + " listening on " + ports.get(i).get(myCity) 
+						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv) 
 								+ " is DEAD");
 						
-						if (coordinator.get("id") == i) // Coordinator is down. Run the Bully algorithm
+						if ((srv.equals(myCity)) && (coordinator.get("id") == i)) // Coordinator is down
 						{		
 							BullyElection bullyElection = new BullyElection(ports, activeServers);
 							bullyElection.election(myCity, myGroupIndex, logger);
 						}
 					} else
 					{
-						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + myCity + " listening on " + ports.get(i).get(myCity) 
-								+ " is ALIVE");
+//						logger.logToFile(myCity + "[HealthCheker.updateAlivesList()]: " + srv + " listening on " + ports.get(i).get(srv) 
+//								+ " is ALIVE");
 					}
 				}
 			}
